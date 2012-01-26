@@ -1,4 +1,4 @@
-package org.nutz.ajax;
+package org.nutz.web.ajax;
 
 public abstract class Ajax {
 

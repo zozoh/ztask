@@ -1,4 +1,4 @@
-package org.nutz.ajax;
+package org.nutz.web.ajax;
 
 import org.nutz.ioc.Ioc;
 import org.nutz.mvc.View;

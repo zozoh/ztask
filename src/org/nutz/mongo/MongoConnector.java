@@ -2,6 +2,7 @@ package org.nutz.mongo;
 
 import java.net.UnknownHostException;
 
+import com.mongodb.DB;
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 
@@ -29,9 +30,21 @@ public class MongoConnector {
 	}
 
 	/**
+	 * 得到一个 MongoDB 的访问类，这个类是 DB 类的一个包裹，提供更便利的方法
+	 * 
+	 * @param dbname
+	 *            数据库名称
+	 * @return MongoDB 数据访问借口
+	 */
+	public MongoDao getDao(String dbname) {
+		DB db = mongo.getDB(dbname);
+		return new MongoDao(db);
+	}
+
+	/**
 	 * 注销一个 MongoDB 的连接
 	 */
-	public void depose() {
+	public void close() {
 		mongo.close();
 	}
 

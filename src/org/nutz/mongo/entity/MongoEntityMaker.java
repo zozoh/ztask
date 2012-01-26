@@ -31,6 +31,7 @@ public class MongoEntityMaker {
 	 * <li>字符串 - 作为 JSON 字符串，所以当作 Dynamic
 	 * <li>Map - 作为 Map，所以当作 Dynamic
 	 * <li>POJO - 作为 POJO，所以当作 Static
+	 * <li>Class - 根据具体的类型再做判断
 	 * </ul>
 	 * 如果传入数组，或者集合，将会根据第一个元素来生成 MongoEntity
 	 * 
@@ -44,27 +45,30 @@ public class MongoEntityMaker {
 		if (null == obj) {
 			throw Lang.makeThrow("Null refer for MongoEntity!");
 		}
+		// 得到对象类型
+		Class<?> type = obj instanceof Class<?> ? (Class<?>) obj : obj.getClass();
+
 		// 下面看看是不是集合
-		if (obj.getClass().isArray() || obj instanceof Collection<?>) {
+		if (type.isArray() || Collection.class.isAssignableFrom(type)) {
 			Object sub = Lang.first(obj);
 			if (null == sub)
 				throw Lang.makeThrow("Empty refer for MongoEntity!");
 			return get(sub);
 		}
 		// Map...
-		if (obj instanceof Map<?, ?>) {
+		if (Map.class.isAssignableFrom(type)) {
 			return new MapMongoEntity();
 		}
 		// String ...
-		else if (obj instanceof CharSequence) {
+		else if (CharSequence.class.isAssignableFrom(type)) {
 			return new StringMongoEntity();
 		}
 		// 检查缓存
-		MongoEntity<?> en = ens.get(obj.getClass());
+		MongoEntity<?> en = ens.get(type);
 		if (null != en)
 			return en;
 		// 开始构建 Static MongoEntity
-		return _makeStaticMontoEntity((Class<Object>) obj.getClass());
+		return _makeStaticMontoEntity((Class<Object>) type);
 	}
 
 	private MongoEntity<?> _makeStaticMontoEntity(Class<Object> type) {

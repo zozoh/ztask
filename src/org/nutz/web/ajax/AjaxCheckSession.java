@@ -1,4 +1,4 @@
-package org.nutz.ajax;
+package org.nutz.web.ajax;
 
 import org.nutz.mvc.ActionContext;
 import org.nutz.mvc.ActionFilter;

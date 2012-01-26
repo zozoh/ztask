@@ -1,0 +1,22 @@
+body{
+    background-color:#EFEFEF;
+}
+
+h1{
+    text-align: center;
+    margin-top:100px;
+}
+
+form table{
+    margin:0 auto;
+}
+
+.footer{
+    color:#888;
+    width:300px;
+    text-align: center;
+    margin:10px auto;
+    line-height:24px;
+}
+
+

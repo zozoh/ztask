@@ -5,6 +5,7 @@ import java.util.TreeMap;
 
 import org.bson.types.ObjectId;
 import org.nutz.lang.random.R;
+import org.nutz.mongo.Mongos;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -19,6 +20,10 @@ import com.mongodb.DBObject;
  */
 public abstract class DynamicMongoEntity<T> implements MongoEntity<T> {
 
+	protected String evalCollectionName(Map<String, Object> map) {
+		return map.get(Mongos.COLLECTION_KEY).toString();
+	}
+
 	protected DBObject fromMap(Map<String, Object> map) {
 		DBObject dbo = new BasicDBObject();
 		dbo.putAll(map);
@@ -26,6 +31,8 @@ public abstract class DynamicMongoEntity<T> implements MongoEntity<T> {
 	}
 
 	protected Map<String, Object> toMap(DBObject dbo) {
+		if (null == dbo)
+			return null;
 		Map<String, Object> map = new TreeMap<String, Object>();
 		for (String key : dbo.keySet()) {
 			Object dbval = dbo.get(key);
@@ -44,6 +51,14 @@ public abstract class DynamicMongoEntity<T> implements MongoEntity<T> {
 	protected void fillIdToMapIfNoexits(Map<String, Object> map) {
 		if (!map.containsKey("_id"))
 			map.put("_id", R.UU64());
+	}
+
+	protected DBObject map2dbo(Map<String, Object> map) {
+		return Mongos.map2dbo(map);
+	}
+
+	public String getFieldDbName(String key) {
+		return key;
 	}
 
 }

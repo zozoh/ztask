@@ -15,6 +15,8 @@ public class User {
 
 	private Email email;
 
+	private String description;
+
 	public String getName() {
 		return name;
 	}
@@ -37,6 +39,14 @@ public class User {
 
 	public void setEmail(Email email) {
 		this.email = email;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 }

@@ -1,15 +1,15 @@
-package org.nutz.ajax;
+package org.nutz.web.ajax;
 
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.nutz.err.Err;
-import org.nutz.err.NutException;
 import org.nutz.json.JsonFormat;
 import org.nutz.mvc.Mvcs;
 import org.nutz.mvc.View;
+import org.nutz.web.WebException;
+import org.nutz.web.Webs;
 
 /**
  * 将返回渲染成标准 AjaxReturn
@@ -28,7 +28,7 @@ public class AjaxView implements View {
 		}
 		// 异常
 		else if (obj instanceof Throwable) {
-			NutException err = Err.wrap((Throwable) obj);
+			WebException err = Webs.Err.wrap((Throwable) obj);
 			String msg = Mvcs.getMessage(req, err.getKey());
 			re = Ajax.fail().setMsg(msg).setData(err);
 		}

@@ -3,9 +3,10 @@ package org.nutz.mongo.entity;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.nutz.lang.Lang;
 import org.nutz.lang.Mirror;
 import org.nutz.lang.born.Borning;
-
+import org.nutz.mongo.Mongos;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
@@ -37,7 +38,7 @@ public class StaticMongoEntity<T> implements MongoEntity<T> {
 	}
 
 	@Override
-	public DBObject from(T obj) {
+	public DBObject toDBObject(T obj) {
 		DBObject dbo = new BasicDBObject();
 		for (MongoEntityField mef : fields.values())
 			mef.setToDB(obj, dbo);
@@ -45,7 +46,9 @@ public class StaticMongoEntity<T> implements MongoEntity<T> {
 	}
 
 	@Override
-	public T to(DBObject dbo) {
+	public T toObject(DBObject dbo) {
+		if (null == dbo)
+			return null;
 		T obj = borning.born(new Object[0]);
 		for (MongoEntityField mef : fields.values())
 			mef.getFromDB(obj, dbo);
@@ -60,7 +63,61 @@ public class StaticMongoEntity<T> implements MongoEntity<T> {
 	}
 
 	@Override
-	public void fillIdIfNoexits(T obj) {}
+	public void fillIdIfNoexits(T obj) {
+		if (null != _id && _id.isNull(obj)) {
+			_id.fillId(obj);
+		}
+	}
+
+	@Override
+	public String getCollectionName(Object ref) {
+		return this.collectionName;
+	}
+
+	@Override
+	public String getFieldDbName(String key) {
+		MongoEntityField mef = fields.get(key);
+		if (null == mef)
+			throw Lang.makeThrow("Unknow '%s' in '%s'", key, collectionName);
+		return mef.getDbName();
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public DBObject formatObject(Object o) {
+		if (null == o)
+			return new BasicDBObject();
+		// 如果是本类型
+		if (type.isAssignableFrom(o.getClass())) {
+			return toDBObject((T) o);
+		}
+		// 否则变成 Map
+		Map<String, Object> map = Mongos.obj2map(o);
+		// 循环，改变键值
+		for (String key : map.keySet()) {
+			// 那么让我们看看值吧 ...
+			Object val = map.get(key);
+			// 如果值还是一个 Map , 且当前 key 是个修改器
+			if (null != val && key.startsWith("$") && val instanceof Map<?, ?>) {
+				map.put(key, formatObject(val));
+				continue;
+			}
+			// 默认情况
+			MongoEntityField mef = "_id".equals(key) ? _id : fields.get(key);
+			// 未知的键，抛错
+			if (null == mef)
+				throw Lang.makeThrow("Unknow key '%s' in collection '%s'", key, collectionName);
+			// 不需要改变键值，跳过
+			if (key.equals(mef.getDbName()))
+				continue;
+			map.remove(key);
+			map.put(mef.getDbName(), val);
+		}
+		// 建立返回值
+		DBObject dbo = new BasicDBObject();
+		dbo.putAll(map);
+		return dbo;
+	}
 
 	public Map<String, MongoEntityField> getFields() {
 		return fields;

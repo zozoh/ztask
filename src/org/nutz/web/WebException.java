@@ -1,6 +1,6 @@
-package org.nutz.err;
+package org.nutz.web;
 
-public class NutException extends RuntimeException {
+public class WebException extends RuntimeException {
 
 	private static final long serialVersionUID = 3343036182101828118L;
 
@@ -8,11 +8,11 @@ public class NutException extends RuntimeException {
 
 	private String reason;
 
-	public NutException() {
+	public WebException() {
 		super();
 	}
 
-	public NutException(Throwable cause) {
+	public WebException(Throwable cause) {
 		super(cause);
 	}
 
@@ -20,7 +20,7 @@ public class NutException extends RuntimeException {
 		return key;
 	}
 
-	public NutException key(String key) {
+	public WebException key(String key) {
 		this.key = key;
 		return this;
 	}
@@ -29,12 +29,12 @@ public class NutException extends RuntimeException {
 		return this.reason;
 	}
 
-	public NutException reasonf(String fmt, Object... args) {
+	public WebException reasonf(String fmt, Object... args) {
 		this.reason = String.format(fmt, args);
 		return this;
 	}
 
-	public NutException reason(Object msg) {
+	public WebException reason(Object msg) {
 		this.reason = null == msg ? null : msg.toString();
 		return this;
 	}

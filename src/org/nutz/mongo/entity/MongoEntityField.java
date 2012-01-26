@@ -23,18 +23,27 @@ public class MongoEntityField {
 
 	private Injecting injecting;
 
+	protected boolean isNull(Object obj) {
+		Object val = ejecting.eject(obj);
+		return null == val;
+	}
+
 	protected void fillId(Object obj) {
 		if (null != idType)
 			switch (idType) {
 			// 保证值为 null，这样 MongoDB 会自动设置
 			case DEFAULT:
 				injecting.inject(obj, null);
+				break;
 			case UU64:
 				injecting.inject(obj, R.UU64());
+				break;
 			case UU16:
 				injecting.inject(obj, R.UU16());
+				break;
 			case UUID:
 				injecting.inject(obj, UUID.randomUUID().toString());
+				break;
 			default:
 				throw Lang.noImplement();
 			}
@@ -48,6 +57,8 @@ public class MongoEntityField {
 		if (isId()) {
 			if (idType == CoIdType.DEFAULT)
 				dbo.removeField("_id");
+			else
+				dbo.put("_id", v);
 		}
 		// 其他字段
 		else {
@@ -72,6 +83,18 @@ public class MongoEntityField {
 		return null != idType;
 	}
 
+	public String getName() {
+		return name;
+	}
+
+	public String getDbName() {
+		return dbName;
+	}
+
+	public CoIdType getIdType() {
+		return idType;
+	}
+
 	public MongoEntityField(FieldInfo fi) {
 		name = fi.getName();
 		dbName = Strings.sBlank(null == fi.getAnnotation() ? name : fi.getAnnotation().value(),
@@ -82,6 +105,10 @@ public class MongoEntityField {
 		// 如果是 _id 那么， dbName 要固定
 		if (isId())
 			dbName = "_id";
+
+		// 得到 In/Ejectint
+		injecting = fi.getInjecting();
+		ejecting = fi.getEjecting();
 	}
 
 }
