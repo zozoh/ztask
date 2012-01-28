@@ -27,9 +27,8 @@ public abstract class MoChain {
 	 *            回调
 	 */
 	public void each(Each<MoChain> callback) {
-		MoChain c = head;
-		while (c.hasNext()) {
-			c = c.next();
+		MoChain c = head == null ? null : head.next();
+		while (null != c) {
 			try {
 				callback.invoke(c.index(), c, c.head.n);
 			}
@@ -38,6 +37,7 @@ public abstract class MoChain {
 			catch (LoopException e) {
 				throw Lang.wrapThrow(e);
 			}
+			c = c.next();
 		}
 	}
 
@@ -150,4 +150,19 @@ public abstract class MoChain {
 		this.head = this;
 	}
 
+	public String toString() {
+		final StringBuilder sb = new StringBuilder();
+		final MoChain me = this;
+		each(new Each<MoChain>() {
+			public void invoke(int index, MoChain c, int length) {
+				sb.append("[");
+				if (c == me) {
+					sb.append('*');
+				}
+				sb.append(c.key).append(": ").append(c.value);
+				sb.append("] ");
+			}
+		});
+		return sb.toString();
+	}
 }

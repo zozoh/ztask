@@ -12,6 +12,39 @@ import org.nutz.web.WebException;
 public abstract class Err {
 
 	/**
+	 * 任务相关的错误
+	 */
+	public static class T {
+
+		public static WebException NO_EXISTS(String taskId) {
+			return create("e.t.no_exists").reason(taskId);
+		}
+
+		public static WebException BLANK_TASK() {
+			return create("e.t.blank_task");
+		}
+	}
+
+	/**
+	 * 任务堆栈相关的错误
+	 */
+	public static class S {
+
+		public static WebException NO_EXISTS(String name) {
+			return create("e.s.no_exists").reason(name);
+		}
+
+		public static WebException EXISTS(String name) {
+			return create("e.s.exists").reason(name);
+		}
+
+		public static WebException BLANK_NAME() {
+			return create("e.s.blank_name");
+		}
+
+	}
+
+	/**
 	 * 用户相关的错误
 	 */
 	public static class U {

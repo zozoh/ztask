@@ -9,19 +9,22 @@ import com.mongodb.MongoException;
 
 public class MongoCase {
 
-	protected MongoDao mgdao;
+	protected MongoDao dao;
 
 	private MongoConnector mgconn;
 
 	@Before
 	public void before() throws UnknownHostException, MongoException {
 		mgconn = new MongoConnector("localhost", 27017);
-		mgdao = mgconn.getDao("nutz_mongo_unit");
+		dao = mgconn.getDao("nutz_mongo_unit");
+		onBefore();
 	}
+
+	protected void onBefore() {}
 
 	@After
 	public void after() {
-		mgdao.cleanCursors();
+		dao.cleanCursors();
 		mgconn.close();
 	}
 

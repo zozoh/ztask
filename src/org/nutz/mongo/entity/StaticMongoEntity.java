@@ -91,15 +91,20 @@ public class StaticMongoEntity<T> implements MongoEntity<T> {
 		if (type.isAssignableFrom(o.getClass())) {
 			return toDBObject((T) o);
 		}
+		// 如果是 DBObject 直接返回 
+		if (o instanceof DBObject)
+			return (DBObject) o;
+
 		// 否则变成 Map
 		Map<String, Object> map = Mongos.obj2map(o);
+		Map<String, Object> dboMap = new HashMap<String, Object>();
 		// 循环，改变键值
 		for (String key : map.keySet()) {
 			// 那么让我们看看值吧 ...
 			Object val = map.get(key);
 			// 如果值还是一个 Map , 且当前 key 是个修改器
 			if (null != val && key.startsWith("$") && val instanceof Map<?, ?>) {
-				map.put(key, formatObject(val));
+				dboMap.put(key, formatObject(val));
 				continue;
 			}
 			// 默认情况
@@ -107,15 +112,13 @@ public class StaticMongoEntity<T> implements MongoEntity<T> {
 			// 未知的键，抛错
 			if (null == mef)
 				throw Lang.makeThrow("Unknow key '%s' in collection '%s'", key, collectionName);
-			// 不需要改变键值，跳过
-			if (key.equals(mef.getDbName()))
-				continue;
-			map.remove(key);
-			map.put(mef.getDbName(), val);
+
+			// 加入值
+			dboMap.put(mef.getDbName(), mef.getAdaptor().adaptForGet(val));
 		}
 		// 建立返回值
 		DBObject dbo = new BasicDBObject();
-		dbo.putAll(map);
+		dbo.putAll(dboMap);
 		return dbo;
 	}
 

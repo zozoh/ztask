@@ -24,9 +24,25 @@ public abstract class DynamicMongoEntity<T> implements MongoEntity<T> {
 		return map.get(Mongos.COLLECTION_KEY).toString();
 	}
 
+	@SuppressWarnings("unchecked")
 	protected DBObject fromMap(Map<String, Object> map) {
 		DBObject dbo = new BasicDBObject();
-		dbo.putAll(map);
+		if (null != map) {
+			for (Map.Entry<String, Object> en : map.entrySet()) {
+				Object val = en.getValue();
+				if (null == val)
+					continue;
+				// 如果是枚举
+				if (val.getClass().isEnum())
+					val = val.toString();
+				// 如果是 Map，递归
+				else if (val instanceof Map<?, ?>)
+					val = fromMap((Map<String, Object>) val);
+
+				// 加入 DBObject
+				dbo.put(en.getKey(), val);
+			}
+		}
 		return dbo;
 	}
 

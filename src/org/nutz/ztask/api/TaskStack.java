@@ -10,8 +10,8 @@ import org.nutz.mongo.annotation.CoIdType;
  * 
  * @author zozoh(zozohtnt@gmail.com)
  */
-@Co("tstack")
-public class TStack {
+@Co("taskstack")
+public class TaskStack {
 
 	/**
 	 * 任务栈的 ID
@@ -20,7 +20,7 @@ public class TStack {
 	private String _id;
 
 	/**
-	 * 本任务栈的名称 （唯一性约束）
+	 * 本任务栈的名称 （唯一性约束） TODO 需要添加唯一性约束 ...
 	 */
 	@CoField("nm")
 	private String name;
@@ -36,18 +36,6 @@ public class TStack {
 	 */
 	@CoField("cnt")
 	private int count;
-
-	/**
-	 * 保存每个任务的 ID
-	 */
-	@CoField("tids")
-	private String[] taskIds;
-
-	/**
-	 * 本任务栈完成的任务，一定要被打上的额外标签
-	 */
-	@CoField("lbls")
-	private String[] labels;
 
 	/**
 	 * 当前堆栈的所有者
@@ -85,22 +73,6 @@ public class TStack {
 
 	public void setCount(int count) {
 		this.count = count;
-	}
-
-	public String[] getTaskIds() {
-		return taskIds;
-	}
-
-	public void setTaskIds(String[] taskIds) {
-		this.taskIds = taskIds;
-	}
-
-	public String[] getLabels() {
-		return labels;
-	}
-
-	public void setLabels(String[] labels) {
-		this.labels = labels;
 	}
 
 	public String getOwner() {

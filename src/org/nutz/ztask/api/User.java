@@ -7,46 +7,14 @@ import org.nutz.lang.meta.Email;
  * 
  * @author zozoh(zozohtnt@gmail.com)
  */
-public class User {
+public interface User {
 
-	private String name;
+	public String getName();
 
-	private String password;
+	public String getPassword();
 
-	private Email email;
+	public Email getEmail();
 
-	private String description;
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	public Email getEmail() {
-		return email;
-	}
-
-	public void setEmail(Email email) {
-		this.email = email;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
+	public String getDescription();
 
 }

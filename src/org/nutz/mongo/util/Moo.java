@@ -122,11 +122,11 @@ public class Moo extends MoChain {
 		return new Moo(this, key, val);
 	}
 
-	public Moo() {
+	private Moo() {
 		super();
 	}
 
-	public Moo(Moo prev, String key, Object value) {
+	private Moo(Moo prev, String key, Object value) {
 		super(prev, key, value);
 	}
 

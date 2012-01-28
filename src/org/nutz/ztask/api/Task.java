@@ -1,5 +1,6 @@
 package org.nutz.ztask.api;
 
+import org.nutz.mongo.annotation.Co;
 import org.nutz.mongo.annotation.CoField;
 import org.nutz.mongo.annotation.CoId;
 import org.nutz.mongo.annotation.CoIdType;
@@ -9,6 +10,7 @@ import org.nutz.mongo.annotation.CoIdType;
  * 
  * @author zozoh(zozohtnt@gmail.com)
  */
+@Co("task")
 public class Task {
 
 	/**
@@ -18,10 +20,10 @@ public class Task {
 	private String _id;
 
 	/**
-	 * 本任务的内容简述
+	 * 本任务的内容简述，内容不要超过 140 个字
 	 */
-	@CoField("con")
-	private String content;
+	@CoField("tt")
+	private String title;
 
 	/**
 	 * 本任务的父任务，一个任务可以被无限级拆分
@@ -56,7 +58,14 @@ public class Task {
 	/**
 	 * 所有者的帐户名
 	 */
+	@CoField("ow")
 	private String owner;
+
+	/**
+	 * 任务状态
+	 */
+	@CoField("sta")
+	private TaskStatus status;
 
 	/**
 	 * 本任务的标签
@@ -72,12 +81,12 @@ public class Task {
 		this._id = _id;
 	}
 
-	public String getContent() {
-		return content;
+	public String getTitle() {
+		return title;
 	}
 
-	public void setContent(String content) {
-		this.content = content;
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 	public String getParentId() {
@@ -134,6 +143,14 @@ public class Task {
 
 	public void setOwner(String owner) {
 		this.owner = owner;
+	}
+
+	public TaskStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(TaskStatus status) {
+		this.status = status;
 	}
 
 }

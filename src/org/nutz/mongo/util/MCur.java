@@ -63,11 +63,11 @@ public class MCur extends MoChain {
 		return new MCur(this, key, val);
 	}
 
-	public MCur() {
+	private MCur() {
 		super();
 	}
 
-	public MCur(MCur prev, String key, Object value) {
+	private MCur(MCur prev, String key, Object value) {
 		super(prev, key, value);
 	}
 

@@ -2,15 +2,15 @@ package org.nutz.mongo.entity;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 
 import org.nutz.lang.Mirror;
 import org.nutz.lang.eject.EjectByGetter;
-import org.nutz.lang.eject.Ejecting;
 import org.nutz.lang.inject.InjectBySetter;
-import org.nutz.lang.inject.Injecting;
 import org.nutz.lang.util.Callback3;
 import org.nutz.mongo.annotation.CoField;
 import org.nutz.mongo.annotation.CoId;
+import org.nutz.mongo.entity.adaptor.EnumAdaptor;
 
 /**
  * 提供给解析用的一个实体字段中间描述类，它的构造函数提供一点点分析功能，以便解析类更方便的解析实体
@@ -27,9 +27,7 @@ class FieldInfo {
 
 	private CoField annotation;
 
-	private Ejecting ejecting;
-
-	private Injecting injecting;
+	private FieldAdaptor adaptor;
 
 	/**
 	 * 根据字段得到 Field 信息
@@ -42,8 +40,9 @@ class FieldInfo {
 		this.name = fld.getName();
 		this._id = fld.getAnnotation(CoId.class);
 		this.annotation = fld.getAnnotation(CoField.class);
-		this.ejecting = mirror.getEjecting(fld.getName());
-		this.injecting = mirror.getInjecting(fld.getName());
+		this.adaptor = _eval_adaptor(fld.getGenericType());
+		this.adaptor.setEjecting(mirror.getEjecting(fld.getName()));
+		this.adaptor.setInjecting(mirror.getInjecting(fld.getName()));
 	}
 
 	/**
@@ -58,10 +57,25 @@ class FieldInfo {
 		Mirror.evalGetterSetter(method, ERR_MSG, new Callback3<String, Method, Method>() {
 			public void invoke(String nm, Method getter, Method setter) {
 				name = nm;
-				ejecting = new EjectByGetter(getter);
-				injecting = new InjectBySetter(setter);
+				adaptor = _eval_adaptor(getter.getGenericReturnType());
+				adaptor.setEjecting(new EjectByGetter(getter));
+				adaptor.setInjecting(new InjectBySetter(setter));
 			}
 		});
+	}
+
+	private static FieldAdaptor _eval_adaptor(Type type) {
+		Mirror<?> mirror = Mirror.me(type);
+		// 枚举
+		if (mirror.isEnum()) {
+			return new EnumAdaptor().setFieldType(type);
+		}
+		// 默认
+		return new FieldAdaptor().setFieldType(type);
+	}
+
+	public FieldAdaptor getAdaptor() {
+		return adaptor;
 	}
 
 	public String getName() {
@@ -74,14 +88,6 @@ class FieldInfo {
 
 	public CoField getAnnotation() {
 		return annotation;
-	}
-
-	public Ejecting getEjecting() {
-		return ejecting;
-	}
-
-	public Injecting getInjecting() {
-		return injecting;
 	}
 
 }

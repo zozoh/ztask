@@ -4,8 +4,6 @@ import java.util.UUID;
 
 import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
-import org.nutz.lang.eject.Ejecting;
-import org.nutz.lang.inject.Injecting;
 import org.nutz.lang.random.R;
 import org.nutz.mongo.annotation.CoIdType;
 
@@ -19,12 +17,10 @@ public class MongoEntityField {
 
 	private CoIdType idType;
 
-	private Ejecting ejecting;
-
-	private Injecting injecting;
+	private FieldAdaptor adaptor;
 
 	protected boolean isNull(Object obj) {
-		Object val = ejecting.eject(obj);
+		Object val = adaptor.get(obj);
 		return null == val;
 	}
 
@@ -33,16 +29,16 @@ public class MongoEntityField {
 			switch (idType) {
 			// 保证值为 null，这样 MongoDB 会自动设置
 			case DEFAULT:
-				injecting.inject(obj, null);
+				adaptor.set(obj, null);
 				break;
 			case UU64:
-				injecting.inject(obj, R.UU64());
+				adaptor.set(obj, R.UU64());
 				break;
 			case UU16:
-				injecting.inject(obj, R.UU16());
+				adaptor.set(obj, R.UU16());
 				break;
 			case UUID:
-				injecting.inject(obj, UUID.randomUUID().toString());
+				adaptor.set(obj, UUID.randomUUID().toString());
 				break;
 			default:
 				throw Lang.noImplement();
@@ -50,7 +46,7 @@ public class MongoEntityField {
 	}
 
 	protected void setToDB(Object obj, DBObject dbo) {
-		Object v = ejecting.eject(obj);
+		Object v = adaptor.get(obj);
 		if (null == v)
 			return;
 		// 对于默认 ID，则，保证 dbo 中没有 "_id" 以便 MongoDB 自动设值
@@ -76,7 +72,7 @@ public class MongoEntityField {
 		} else {
 			v = dbval;
 		}
-		injecting.inject(obj, v);
+		adaptor.set(obj, v);
 	}
 
 	public boolean isId() {
@@ -95,6 +91,10 @@ public class MongoEntityField {
 		return idType;
 	}
 
+	public FieldAdaptor getAdaptor() {
+		return adaptor;
+	}
+
 	public MongoEntityField(FieldInfo fi) {
 		name = fi.getName();
 		dbName = Strings.sBlank(null == fi.getAnnotation() ? name : fi.getAnnotation().value(),
@@ -107,8 +107,7 @@ public class MongoEntityField {
 			dbName = "_id";
 
 		// 得到 In/Ejectint
-		injecting = fi.getInjecting();
-		ejecting = fi.getEjecting();
+		adaptor = fi.getAdaptor();
 	}
 
 }

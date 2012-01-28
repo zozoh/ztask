@@ -9,6 +9,12 @@ import org.nutz.web.WebConfig;
  */
 public class ZTaskConfig extends WebConfig {
 
+	public static String JUNIT_DB_SUFFIX = "";
+
+	public String getDB(String key) {
+		return get(key) + JUNIT_DB_SUFFIX;
+	}
+
 	public ZTaskConfig(String path) {
 		super(path);
 	}

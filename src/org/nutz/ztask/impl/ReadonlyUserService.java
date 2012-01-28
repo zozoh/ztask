@@ -28,7 +28,7 @@ public class ReadonlyUserService implements UserService {
 				continue;
 			// 执行 ...
 			String[] cols = Strings.splitIgnoreBlank(line, ":");
-			User u = new User();
+			ReadonlyUser u = new ReadonlyUser();
 			u.setName(cols[0]);
 			u.setPassword(cols[1]);
 			u.setEmail(new Email(cols[2]));

@@ -2,7 +2,9 @@ package org.nutz.mongo;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
+import org.bson.types.ObjectId;
 import org.nutz.castor.Castors;
 import org.nutz.json.Json;
 import org.nutz.lang.Lang;
@@ -46,6 +48,37 @@ public abstract class Mongos {
 	 */
 	public static DBObject dbo(String key, Object value) {
 		return new BasicDBObject(key, value);
+	}
+
+	/**
+	 * MongoDB 默认 ID 的模板
+	 */
+	private static final Pattern OBJ_ID = Pattern.compile("^[0-9a-f]{24}$");
+
+	/**
+	 * 判断给定的字符串是否是 MongoDB 默认的 ID 格式
+	 * 
+	 * @param ID
+	 *            给定 ID
+	 * @return true or false
+	 */
+	public static boolean isDefaultMongoId(String ID) {
+		if (null == ID || ID.length() != 24)
+			return false;
+		return OBJ_ID.matcher(ID).find();
+	}
+
+	/**
+	 * 快速创建 DBObject 的帮助方法
+	 * 
+	 * @param ID
+	 *            DBObject 的 ID
+	 * @return 一个包含一个键值对的 DBObject
+	 */
+	public static DBObject dboId(String ID) {
+		if (isDefaultMongoId(ID))
+			return new BasicDBObject("_id", new ObjectId(ID));
+		return new BasicDBObject("_id", ID);
 	}
 
 	/**

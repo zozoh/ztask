@@ -38,6 +38,9 @@ public class MapMongoEntity extends DynamicMongoEntity<Map<String, Object>> {
 	public DBObject formatObject(Object o) {
 		if (null == o)
 			return null;
+		// 如果是 DBObject 直接返回
+		if (o instanceof DBObject)
+			return (DBObject) o;
 		return super.map2dbo(Mongos.obj2map(o));
 	}
 

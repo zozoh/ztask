@@ -28,7 +28,7 @@ public class MongoDao {
 	 * @param type
 	 *            对象类型，除了 POJO 也可以是 Map 或者 String
 	 * @param q
-	 *            查询条件
+	 *            查询条件 TODO 是不是要支持一下直接的 DBObject ?
 	 * @return 修改结果
 	 */
 	public WriteResult remove(Class<?> type, Object q) {
@@ -63,8 +63,27 @@ public class MongoDao {
 	 *            对象 ID
 	 * @return 修改结果
 	 */
-	public WriteResult removeById(String id) {
-		return remove(String.class, String.format("{'_id':'%s'}", id));
+	public WriteResult removeById(Class<?> type, String id) {
+		return remove(type, Mongos.dboId(id));
+	}
+
+	/**
+	 * 根据 ID 删除一个对象
+	 * 
+	 * @param collName
+	 *            集合名称
+	 * 
+	 * @param id
+	 *            对象 ID
+	 * @return 修改结果
+	 */
+	public WriteResult removeById(String collName, String id) {
+		WriteResult wr = null;
+		if (db.collectionExists(collName)) {
+			DBCollection coll = db.getCollection(collName);
+			wr = coll.remove(Mongos.dboId(id));
+		}
+		return wr;
 	}
 
 	/**
@@ -149,7 +168,7 @@ public class MongoDao {
 	 * @return 修改结果
 	 */
 	public WriteResult updateById(Object enref, String id, Object o) {
-		return update(enref, Lang.mapf("{_id:'%s'}", id), o);
+		return update(enref, Mongos.dboId(id), o);
 	}
 
 	/**
@@ -164,7 +183,7 @@ public class MongoDao {
 	 * @return 修改结果
 	 */
 	public WriteResult updateObj(String collName, String id, Object o) {
-		return updateBy(collName, Lang.mapf("{_id:'%s'}", id), o);
+		return updateBy(collName, Mongos.dboId(id), o);
 	}
 
 	/**
@@ -267,6 +286,26 @@ public class MongoDao {
 	 */
 	public <T> T findById(Class<T> type, String id) {
 		return findOne(type, Lang.mapf("{_id:'%s'}", id));
+	}
+
+	/**
+	 * 根据条件，计算一组对象的数量
+	 * 
+	 * @param enref
+	 *            参考对象，根据这个对象获得集合名称
+	 * @param q
+	 *            条件，为 null 表示整个集合
+	 * @return 数量
+	 */
+	public long count(Object enref, Object q) {
+		MongoEntity<?> moe = Mongos.entity(enref);
+		String collName = moe.getCollectionName(q);
+		if (db.collectionExists(collName)) {
+			DBCollection coll = db.getCollection(collName);
+			DBObject dbq = moe.formatObject(q);
+			return null == q ? coll.count() : coll.count(dbq);
+		}
+		return -1;
 	}
 
 	// ======================================================== 私有
