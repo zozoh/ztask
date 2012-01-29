@@ -2,6 +2,8 @@ package org.nutz.ztask.api;
 
 import java.util.List;
 
+import org.nutz.lang.Each;
+
 /**
  * 封装 zTASK 所有的核心操作，主要是针对 Task 和 TStack 的操作
  * 
@@ -40,6 +42,16 @@ public interface TaskService extends AbstractService {
 	 * @see org.nutz.ztask.api.TaskQuery
 	 */
 	List<Task> queryTasks(TaskQuery tq);
+
+	/**
+	 * 迭代所有符合条的任务， 这个方法适用于比较多的任务迭代，不占内存
+	 * 
+	 * @param callback
+	 *            回调
+	 * @param tq
+	 *            查询条件，如果为 null，则用默认顺序迭代所有的 Task
+	 */
+	void each(Each<Task> callback, TaskQuery tq);
 
 	/**
 	 * 查询一个 Stack 下面到底有哪些任务，这里仅仅返回根任务

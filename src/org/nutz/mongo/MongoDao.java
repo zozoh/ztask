@@ -3,7 +3,11 @@ package org.nutz.mongo;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.nutz.lang.ContinueLoop;
+import org.nutz.lang.Each;
+import org.nutz.lang.ExitLoop;
 import org.nutz.lang.Lang;
+import org.nutz.lang.LoopException;
 import org.nutz.lang.Strings;
 import org.nutz.lang.util.Callback;
 import org.nutz.mongo.entity.MongoEntity;
@@ -250,6 +254,59 @@ public class MongoDao {
 			return null;
 		Class<T> type = (Class<T>) q.getClass();
 		return find(type, q, mcur);
+	}
+
+	/**
+	 * 迭代某个集合里的数据，这个适合比较大的数据，不能一次返回一个 List
+	 * 
+	 * @param <T>
+	 * @param callback
+	 *            回调，由于不知到数据的总体大小(为了效率)，所以 length 一项永远为 -1
+	 * @param type
+	 *            对象类型，除了 POJO 也可以是 Map 或者 String
+	 * @param q
+	 *            查询条件，可以是 POJO, String,Map,或者 Moo
+	 * 
+	 * @param mcur
+	 *            对游标的排序等方式的修改
+	 */
+	@SuppressWarnings("unchecked")
+	public <T> void each(Each<T> callback, Class<T> type, Object q, MCur mcur) {
+		MongoEntity<?> moe = Mongos.entity(type);
+		// 获得集合
+		String collName = moe.getCollectionName(q);
+		if (db.collectionExists(collName)) {
+			DBCollection coll = db.getCollection(collName);
+			// 将 ref 对象转换成 DBObject
+			DBObject dbRef = moe.formatObject(q);
+
+			// 执行查询
+			DBCursor cur = null == dbRef ? coll.find() : coll.find(dbRef);
+
+			// 设置排序条件
+			if (null != mcur) {
+				mcur.setupCursor(cur, moe);
+			}
+
+			// 遍历游标
+			try {
+				int i = 0;
+				while (cur.hasNext()) {
+					DBObject dbo = cur.next();
+					T obj = (T) moe.toObject(dbo);
+					try {
+						callback.invoke(i++, obj, -1);
+					}
+					catch (ContinueLoop e) {
+						throw Lang.wrapThrow(e);
+					}
+				}
+			}
+			catch (ExitLoop e) {}
+			catch (LoopException e) {
+				throw Lang.wrapThrow(e.getCause());
+			}
+		}
 	}
 
 	/**

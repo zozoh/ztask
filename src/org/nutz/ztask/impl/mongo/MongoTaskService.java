@@ -2,6 +2,7 @@ package org.nutz.ztask.impl.mongo;
 
 import java.util.List;
 
+import org.nutz.lang.Each;
 import org.nutz.lang.Strings;
 import org.nutz.mongo.MongoConnector;
 import org.nutz.mongo.util.MCur;
@@ -28,43 +29,18 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 	@Override
 	public List<Task> queryTasks(TaskQuery tq) {
 		Moo q = Moo.born();
-
-		// 仅仅搜索根节点
-		q.append("parentId", null);
-
-		// 处理 owners
-		String[] ows = tq.getOwners();
-		if (null != ows && ows.length > 0) {
-			q.inArray("owner", ows);
-		}
-
-		// 处理标签
-		String[] lbs = tq.getLabels();
-		if (null != lbs && lbs.length > 0) {
-			q.all("labels", lbs);
-		}
-
-		// 处理关键字，这个放在后面，以便提高查询效率
-		if (!Strings.isBlank(tq.getKeyword())) {
-			if (tq.getKeyword().startsWith("^"))
-				q.startsWith("title", tq.getKeyword().substring(1));
-			else
-				q.contains("title", tq.getKeyword());
-		}
-
-		// 排序
 		MCur mcur = MCur.born();
-		String sortBy = tq.isSortByCreateTime() ? "createTime" : "lastModified";
-		if (tq.isNew2old()) {
-			mcur.desc(sortBy);
-		} else {
-			mcur.asc(sortBy);
-		}
-		// 然后固定按照 title 排序
-		mcur.asc("title");
+
+		// 设置查询和排序条件
+		_setupQuery(tq == null ? TaskQuery.create() : tq, q, mcur);
 
 		// 返回结果
 		return dao.find(Task.class, q, mcur);
+	}
+
+	@Override
+	public void each(Each<Task> callback, TaskQuery tq) {
+
 	}
 
 	@Override
@@ -268,4 +244,38 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 		return ts;
 	}
 
+	private void _setupQuery(TaskQuery tq, Moo q, MCur mcur) {
+		// 仅仅搜索根节点
+		q.append("parentId", null);
+
+		// 处理 owners
+		String[] ows = tq.getOwners();
+		if (null != ows && ows.length > 0) {
+			q.inArray("owner", ows);
+		}
+
+		// 处理标签
+		String[] lbs = tq.getLabels();
+		if (null != lbs && lbs.length > 0) {
+			q.all("labels", lbs);
+		}
+
+		// 处理关键字，这个放在后面，以便提高查询效率
+		if (!Strings.isBlank(tq.getKeyword())) {
+			if (tq.getKeyword().startsWith("^"))
+				q.startsWith("title", tq.getKeyword().substring(1));
+			else
+				q.contains("title", tq.getKeyword());
+		}
+
+		// 处理排序
+		String sortBy = tq.isSortByCreateTime() ? "createTime" : "lastModified";
+		if (tq.isNew2old()) {
+			mcur.desc(sortBy);
+		} else {
+			mcur.asc(sortBy);
+		}
+		// 然后固定按照 title 排序
+		mcur.asc("title");
+	}
 }
