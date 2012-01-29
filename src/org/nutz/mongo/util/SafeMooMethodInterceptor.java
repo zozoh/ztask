@@ -4,6 +4,7 @@ import org.nutz.aop.InterceptorChain;
 import org.nutz.aop.MethodInterceptor;
 import org.nutz.lang.Lang;
 import org.nutz.lang.util.Callback;
+import org.nutz.mongo.MongoDao;
 import org.nutz.mongo.Mongos;
 
 import com.mongodb.CommandResult;
@@ -21,12 +22,9 @@ public class SafeMooMethodInterceptor implements MethodInterceptor {
 			public void invoke(DB db) {
 				try {
 					chain.invoke();
-					db = Mongos.getCurrentDB();
-					if (db != null) {
-						CommandResult cr = db.getLastError();
-						if (cr.get("err") != null)
-							throw Lang.makeThrow("Fail! %s", cr.getErrorMessage());
-					}
+					CommandResult cr = ((MongoDao)chain.getCallingObj()).getLastError();
+					if (cr.get("err") != null)
+						throw Lang.makeThrow("Fail! %s", cr.getErrorMessage());
 				} catch (Throwable e) {
 					throw Lang.wrapThrow(e);
 				}

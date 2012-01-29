@@ -443,4 +443,8 @@ public class MongoDao {
 			}
 		});
 	}
+	
+	public CommandResult getLastError() {
+		return db.getLastError();
+	}
 }

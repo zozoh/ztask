@@ -188,7 +188,6 @@ public abstract class Mongos {
 	}
 	
 	private static ThreadLocal<Integer> reqs = new ThreadLocal<Integer>();
-	private static ThreadLocal<DB> threadLocal_db = new ThreadLocal<DB>();
 	
 	public static void run(DB db, Callback<DB> callback) {
 		try {
@@ -197,24 +196,12 @@ public abstract class Mongos {
 				db.requestStart(); //最顶层
 			} else 
 				reqs.set(reqs.get() + 1);
-			if (db != null) 
-				threadLocal_db.set(db);
-			else
-				threadLocal_db.get();
 			callback.invoke(db);
-			if (db != null) 
-				threadLocal_db.set(db);
 		} finally {
-			if (reqs.get() == 0) {//最顶层
-				threadLocal_db.set(null);
+			if (reqs.get() == 0)//最顶层
 				db.requestDone();
-			}
 			else
 				reqs.set(reqs.get() - 1);
 		}
-	}
-	
-	public static DB getCurrentDB() {
-		return threadLocal_db.get();
 	}
 }
