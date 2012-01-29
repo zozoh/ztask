@@ -4,8 +4,10 @@ import org.nutz.mongo.annotation.Co;
 import org.nutz.mongo.annotation.CoField;
 import org.nutz.mongo.annotation.CoId;
 import org.nutz.mongo.annotation.CoIdType;
+import org.nutz.mongo.annotation.CoIndexes;
 
 @Co("label")
+@CoIndexes("!:+name")
 public class Label {
 
 	@CoId(CoIdType.DEFAULT)

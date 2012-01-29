@@ -12,7 +12,7 @@ import org.nutz.mongo.annotation.CoIndexes;
  * @author zozoh(zozohtnt@gmail.com)
  */
 @Co("taskstack")
-@CoIndexes("!:name")
+@CoIndexes("!:+name")
 public class TaskStack {
 
 	/**

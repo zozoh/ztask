@@ -76,31 +76,36 @@ public class MongoEntityMaker {
 		// 准备返回对象
 		StaticMongoEntity<Object> en = new StaticMongoEntity<Object>(type);
 
-		// 获得集合名称
-		Co co = type.getAnnotation(Co.class);
-		en.setCollectionName(Strings.sBlank(co.value(), type.getName().toLowerCase()));
+		try {
+			// 获得集合名称
+			Co co = type.getAnnotation(Co.class);
+			en.setCollectionName(Strings.sBlank(co.value(), type.getName().toLowerCase()));
 
-		// 获得集合索引
-		CoIndexes cix = type.getAnnotation(CoIndexes.class);
-		if (null != cix)
-			for (String str : cix.value())
-				en.addIndex(str);
+			// 获得集合索引
+			CoIndexes cix = type.getAnnotation(CoIndexes.class);
+			if (null != cix)
+				for (String str : cix.value())
+					en.addIndex(str);
 
-		// 循环所有的字段
-		for (Field fld : en.getMirror().getFields()) {
-			CoField cf = fld.getAnnotation(CoField.class);
-			CoId ci = fld.getAnnotation(CoId.class);
-			if (null != cf || null != ci) {
-				en.addField(new FieldInfo(fld));
+			// 循环所有的字段
+			for (Field fld : en.getMirror().getFields()) {
+				CoField cf = fld.getAnnotation(CoField.class);
+				CoId ci = fld.getAnnotation(CoId.class);
+				if (null != cf || null != ci) {
+					en.addField(new FieldInfo(fld));
+				}
+			}
+			// 循环所有的方法
+			for (Method method : en.getType().getMethods()) {
+				CoField cf = method.getAnnotation(CoField.class);
+				CoId ci = method.getAnnotation(CoId.class);
+				if (null != cf || null != ci) {
+					en.addField(new FieldInfo(method));
+				}
 			}
 		}
-		// 循环所有的方法
-		for (Method method : en.getType().getMethods()) {
-			CoField cf = method.getAnnotation(CoField.class);
-			CoId ci = method.getAnnotation(CoId.class);
-			if (null != cf || null != ci) {
-				en.addField(new FieldInfo(method));
-			}
+		catch (RuntimeException e) {
+			throw Lang.wrapThrow(e, "Fail to eval POJO '%s' to MongoEntity", type.getName());
 		}
 		// 存入缓存
 		ens.put(type, en);
