@@ -4,6 +4,7 @@ import org.nutz.mongo.annotation.Co;
 import org.nutz.mongo.annotation.CoField;
 import org.nutz.mongo.annotation.CoId;
 import org.nutz.mongo.annotation.CoIdType;
+import org.nutz.mongo.annotation.CoIndexes;
 
 /**
  * 一个任务栈，里面存放 Task
@@ -11,6 +12,7 @@ import org.nutz.mongo.annotation.CoIdType;
  * @author zozoh(zozohtnt@gmail.com)
  */
 @Co("taskstack")
+@CoIndexes("!:name")
 public class TaskStack {
 
 	/**
@@ -20,9 +22,9 @@ public class TaskStack {
 	private String _id;
 
 	/**
-	 * 本任务栈的名称 （唯一性约束） TODO 需要添加唯一性约束 ...
+	 * 本任务栈的名称
 	 */
-	@CoField(value="nm",unique=true)
+	@CoField(value = "nm")
 	private String name;
 
 	/**

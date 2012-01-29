@@ -1,6 +1,8 @@
 package org.nutz.mongo.entity;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.nutz.lang.Lang;
@@ -29,13 +31,16 @@ public class StaticMongoEntity<T> implements MongoEntity<T> {
 
 	private Map<String, MongoEntityField> fields;
 
+	private List<MongoEntityIndex> indexes;
+
 	private MongoEntityField _id;
-	
+
 	public StaticMongoEntity(Class<T> type) {
 		this.type = type;
 		this.mirror = Mirror.me(type);
 		this.borning = this.mirror.getBorning();
 		this.fields = new HashMap<String, MongoEntityField>();
+		this.indexes = new ArrayList<MongoEntityIndex>(6); // 一个集合默认 6 个索引，够了吧
 	}
 
 	@Override
@@ -92,7 +97,7 @@ public class StaticMongoEntity<T> implements MongoEntity<T> {
 		if (type.isAssignableFrom(o.getClass())) {
 			return toDBObject((T) o);
 		}
-		// 如果是 DBObject 直接返回 
+		// 如果是 DBObject 直接返回
 		if (o instanceof DBObject)
 			return (DBObject) o;
 
@@ -123,8 +128,14 @@ public class StaticMongoEntity<T> implements MongoEntity<T> {
 		return dbo;
 	}
 
-	public Map<String, MongoEntityField> getFields() {
-		return fields;
+	@Override
+	public boolean hasIndexes() {
+		return indexes.size() > 0;
+	}
+
+	@Override
+	public List<MongoEntityIndex> getIndexes() {
+		return indexes;
 	}
 
 	public Class<T> getType() {
@@ -142,6 +153,10 @@ public class StaticMongoEntity<T> implements MongoEntity<T> {
 		fields.put(fi.getName(), mef);
 	}
 
+	void addIndex(String str) {
+		indexes.add(new MongoEntityIndex(str));
+	}
+
 	String getCollectionName() {
 		return collectionName;
 	}
@@ -149,6 +164,5 @@ public class StaticMongoEntity<T> implements MongoEntity<T> {
 	void setCollectionName(String collectionName) {
 		this.collectionName = collectionName;
 	}
-
 
 }

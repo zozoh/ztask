@@ -11,6 +11,7 @@ import org.nutz.lang.Strings;
 import org.nutz.mongo.annotation.Co;
 import org.nutz.mongo.annotation.CoField;
 import org.nutz.mongo.annotation.CoId;
+import org.nutz.mongo.annotation.CoIndexes;
 
 /**
  * 根据一个 POJO 的注解，得到这个 POJO 与 MongoDB 的文档对象的映射关系
@@ -74,9 +75,17 @@ public class MongoEntityMaker {
 	private MongoEntity<?> _makeStaticMontoEntity(Class<Object> type) {
 		// 准备返回对象
 		StaticMongoEntity<Object> en = new StaticMongoEntity<Object>(type);
+
 		// 获得集合名称
 		Co co = type.getAnnotation(Co.class);
 		en.setCollectionName(Strings.sBlank(co.value(), type.getName().toLowerCase()));
+
+		// 获得集合索引
+		CoIndexes cix = type.getAnnotation(CoIndexes.class);
+		if (null != cix)
+			for (String str : cix.value())
+				en.addIndex(str);
+
 		// 循环所有的字段
 		for (Field fld : en.getMirror().getFields()) {
 			CoField cf = fld.getAnnotation(CoField.class);

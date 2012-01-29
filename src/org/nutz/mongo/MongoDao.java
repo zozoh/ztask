@@ -4,9 +4,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.nutz.lang.Lang;
+import org.nutz.lang.Strings;
 import org.nutz.lang.util.Callback;
 import org.nutz.mongo.entity.MongoEntity;
-import org.nutz.mongo.entity.MongoEntityField;
+import org.nutz.mongo.entity.MongoEntityIndex;
 import org.nutz.mongo.util.MCur;
 
 import com.mongodb.BasicDBObject;
@@ -351,25 +352,21 @@ public class MongoDao {
 		MongoEntity<?> moe = Mongos.entity(pojoType);
 		String colName = moe.getCollectionName(null);
 		create(colName, dropIfExists);
-		if (moe.getFields() != null)
-			for (MongoEntityField field : moe.getFields().values()) {
-				int index = field.getIndex();
-				switch (field.getIndex()) {
-				case 1:
-				case -1:
-					if (field.isUnique())
-						db.getCollection(colName)
-							.ensureIndex(	Mongos.dbo(field.getDbName(), index),
-											Mongos.dbo("unique", true));
-					else
-						db.getCollection(colName).ensureIndex(Mongos.dbo(field.getDbName(), index));
-					break;
-				default:
-					if (field.isUnique())
-						db.getCollection(colName).ensureIndex(	Mongos.dbo(field.getDbName(), 1),
-																Mongos.dbo("unique", true));
+		// 创建索引
+		if (moe.hasIndexes()) {
+			for (MongoEntityIndex mei : moe.getIndexes()) {
+				DBCollection coll = db.getCollection(colName);
+				DBObject keys = moe.formatObject(mei.getFields());
+				// 采用默认的名称
+				if (Strings.isBlank(mei.getName())) {
+					coll.ensureIndex(keys, Mongos.dbo("unique", mei.isUnique()));
+				}
+				// 采用自定义名称
+				else {
+					coll.ensureIndex(keys, mei.getName(), mei.isUnique());
 				}
 			}
+		}
 	}
 
 	/**

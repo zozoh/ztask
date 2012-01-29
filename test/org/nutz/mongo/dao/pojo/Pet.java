@@ -1,12 +1,10 @@
 package org.nutz.mongo.dao.pojo;
 
 import org.nutz.lang.random.R;
-import org.nutz.mongo.annotation.Co;
-import org.nutz.mongo.annotation.CoField;
-import org.nutz.mongo.annotation.CoId;
-import org.nutz.mongo.annotation.CoIdType;
+import org.nutz.mongo.annotation.*;
 
 @Co("pet")
+@CoIndexes("!:+name")
 public class Pet {
 
 	public static Pet me(PetType type, String name) {
@@ -39,7 +37,7 @@ public class Pet {
 	@CoId(CoIdType.UU64)
 	private String id;
 
-	@CoField(value="nm",unique=true)
+	@CoField(value = "nm")
 	private String name;
 
 	@CoField("tp")

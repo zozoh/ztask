@@ -125,7 +125,7 @@ public abstract class Mongos {
 	 *            Map 对象
 	 * @return DBObject 对象
 	 */
-	public static DBObject map2dbo(Map<String, Object> map) {
+	public static DBObject map2dbo(Map<String, ? extends Object> map) {
 		DBObject dbo = new BasicDBObject();
 		dbo.putAll(map);
 		return dbo;
@@ -176,15 +176,22 @@ public abstract class Mongos {
 	}
 
 	/**
-	 * 获取自动增长id
+	 * 本函数为你获得一个自动增长的整数
+	 * <p>
+	 * 它用一个集合模拟 SQL 数据库的序列，这个序列集合在整个 DB 中是唯一的
+	 * 
+	 * @param db
+	 *            DB 对象
+	 * @param seqName
+	 *            序列集合名称
+	 * @return 自增过的整数
 	 */
-	public static Integer getAutoIncreaseID(DB db, String idName) {
-		BasicDBObject query = new BasicDBObject("name", idName);
-		BasicDBObject update = new BasicDBObject("$inc", new BasicDBObject("id", 1));
+	public static int autoInc(DB db, String seqName) {
+		DBObject q = Mongos.dbo("name", seqName);
+		DBObject o = Mongos.dbo("$inc", 1);
 		return (Integer) db.getCollection("inc_ids")
-				.findAndModify(query, null, null, false, update, true, true)
-				.get("id");
+							.findAndModify(q, null, null, false, o, true, true)
+							.get("id");
 	}
-	
-	
+
 }

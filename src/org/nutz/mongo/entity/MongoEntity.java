@@ -1,6 +1,6 @@
 package org.nutz.mongo.entity;
 
-import java.util.Map;
+import java.util.List;
 
 import com.mongodb.DBObject;
 
@@ -22,6 +22,16 @@ public interface MongoEntity<T> {
 	 * @return 集合名称
 	 */
 	String getCollectionName(Object ref);
+
+	/**
+	 * @return 实体是否声明了索引
+	 */
+	boolean hasIndexes();
+
+	/**
+	 * @return 实体的索引列表
+	 */
+	List<MongoEntityIndex> getIndexes();
 
 	/**
 	 * 格式花参考对象
@@ -77,5 +87,4 @@ public interface MongoEntity<T> {
 	 */
 	void fillIdIfNoexits(T obj);
 
-	Map<String, MongoEntityField> getFields() ;
 }

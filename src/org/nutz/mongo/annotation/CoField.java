@@ -7,6 +7,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * 描述了一个实体字段，以及它在 MongoDB 中的名字，如果为空串，就取 Java 字段的名字
  * 
  * @author zozoh(zozohtnt@gmail.com)
  * @author Wendal(wendal1985@gmail.com)
@@ -18,8 +19,4 @@ public @interface CoField {
 
 	String value() default "";
 
-	int index() default 0;
-	
-	boolean unique() default false;
-	
 }
