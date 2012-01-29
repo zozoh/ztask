@@ -35,11 +35,11 @@ public class PageModule {
 		if (null == u) {
 			return "page/login";
 		}
-		return "page/main";
+		return "page/stack";
 	}
 
 	/**
-	 * 登录视图
+	 * 登录界面
 	 */
 	@Filters
 	@At("/page/login")
@@ -47,10 +47,10 @@ public class PageModule {
 	public void showLogin() {}
 
 	/**
-	 * 主页
+	 * 堆栈界面
 	 */
-	@At("/page/main")
-	@Ok("jsp:jsp.main")
+	@At("/page/stack")
+	@Ok("jsp:jsp.stack")
 	public void showMain() {}
 
 }

@@ -15,8 +15,36 @@ import org.nutz.mongo.util.Moo;
 import org.nutz.mongo.util.MCur;
 
 import com.mongodb.DB;
+import com.mongodb.WriteResult;
 
 public class MongoDaoPojoTest extends MongoCase {
+
+	@Test
+	public void test_save_again_by_defaulID() {
+		dao.create(SObj.class, true);
+
+		SObj obj = dao.save(SObj.create("xyz"));
+		obj = dao.findOne(SObj.class, Moo.born("name", "xyz"));
+		obj.setNumber(3000);
+
+		dao.save(obj);
+		SObj obj2 = dao.findOne(SObj.class, Moo.born("name", "xyz"));
+
+		assertEquals(3000, obj2.getNumber());
+	}
+
+	@Test
+	public void test_save_again_by_uu64() {
+		dao.create(Pet.class, true);
+
+		Pet xb = dao.save(Pet.me("xb"));
+		xb.setCount(6000);
+
+		dao.save(xb);
+		Pet xb2 = dao.findById(Pet.class, xb.getId());
+
+		assertEquals(6000, xb2.getCount());
+	}
 
 	@Test
 	public void test_query_in_array() {
@@ -138,9 +166,13 @@ public class MongoDaoPojoTest extends MongoCase {
 	public void test_simple_update() {
 		dao.create(Pet.class, true);
 		Pet xb = dao.save(Pet.me("XiaoBai"));
-		dao.update(	xb,
-					Moo.born().append("id", xb.getId()),
-					Moo.born().set("name", "XB").inc("age", 2));
+
+		WriteResult wr = dao.update(xb,
+									Moo.born().append("id", xb.getId()),
+									Moo.born().set("name", "XB").inc("age", 2));
+		assertEquals(1, wr.getN());
+		assertNull(wr.getError());
+
 		Pet xb2 = dao.findById(Pet.class, xb.getId());
 		assertEquals(xb.getAge() + 2, xb2.getAge());
 		assertEquals("XB", xb2.getName());
@@ -149,6 +181,12 @@ public class MongoDaoPojoTest extends MongoCase {
 		Pet xb3 = dao.findById(Pet.class, xb.getId());
 		assertEquals(xb.getCount() + 1, xb3.getCount());
 		assertEquals("XB", xb3.getName());
+
+		wr = dao.update(xb, Moo.born().append("id", "888888"), Moo.born()
+																	.set("name", "GGGGGG")
+																	.inc("age", 2555));
+		assertEquals(0, wr.getN());
+		assertNull(wr.getError());
 	}
 
 	@Test
@@ -192,14 +230,14 @@ public class MongoDaoPojoTest extends MongoCase {
 			}
 		});
 	}
-	
+
 	// 测试固定集合
 	@Test
 	public void test_capped() {
-		dao.create(CappedPet.class, true); //固定大小是10k,肯定放不到1000个对象
+		dao.create(CappedPet.class, true); // 固定大小是10k,肯定放不到1000个对象
 		for (int i = 0; i < 1000; i++) {
 			CappedPet pet = new CappedPet();
-			pet.setName("V"+System.currentTimeMillis());
+			pet.setName("V" + System.currentTimeMillis());
 			dao.save(pet);
 		}
 		long size = dao.count(CappedPet.class, null);

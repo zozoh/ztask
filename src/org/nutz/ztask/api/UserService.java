@@ -1,5 +1,9 @@
 package org.nutz.ztask.api;
 
+import java.util.List;
+
+import org.nutz.lang.Each;
+
 /**
  * 用户服务接口
  * 
@@ -26,5 +30,18 @@ public interface UserService {
 	 * @return 用户对象, null 表示该用户不存在
 	 */
 	User get(String name);
+
+	/**
+	 * @return 全部的用户
+	 */
+	List<User> all();
+
+	/**
+	 * 迭代每个用户
+	 * 
+	 * @param callback
+	 *            回调
+	 */
+	void each(Each<User> callback);
 
 }

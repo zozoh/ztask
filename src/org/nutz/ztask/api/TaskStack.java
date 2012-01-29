@@ -3,7 +3,6 @@ package org.nutz.ztask.api;
 import org.nutz.mongo.annotation.Co;
 import org.nutz.mongo.annotation.CoField;
 import org.nutz.mongo.annotation.CoId;
-import org.nutz.mongo.annotation.CoIdType;
 import org.nutz.mongo.annotation.CoIndexes;
 
 /**
@@ -18,7 +17,7 @@ public class TaskStack {
 	/**
 	 * 任务栈的 ID
 	 */
-	@CoId(CoIdType.DEFAULT)
+	@CoId
 	private String _id;
 
 	/**
@@ -85,4 +84,7 @@ public class TaskStack {
 		this.owner = owner;
 	}
 
+	public String toString() {
+		return String.format("<%s>@%s[%d]", name, owner, count);
+	}
 }

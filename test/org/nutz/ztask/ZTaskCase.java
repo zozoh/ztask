@@ -54,6 +54,13 @@ public class ZTaskCase {
 		return t;
 	}
 
+	protected Task t_l(String title, String... lbs) {
+		Task t = new Task();
+		t.setTitle(title);
+		t.setLabels(lbs);
+		return t;
+	}
+
 	protected TaskStack ts(String name) {
 		TaskStack ts = new TaskStack();
 		ts.setName(name);

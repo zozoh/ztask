@@ -17,4 +17,6 @@ public interface User {
 
 	public String getDescription();
 
+	public String getMainStackName();
+
 }

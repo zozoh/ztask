@@ -35,8 +35,8 @@ public class MongoTaskServiceTest extends ZTaskCase {
 	@Test
 	public void test_simple_task_push_pop() {
 		Task t = tasks.createTask(t("abcd"));
-		tasks.createStack(ts("X"));
-		tasks.createStack(ts("Y"));
+		tasks.saveStack(ts("X"));
+		tasks.saveStack(ts("Y"));
 
 		// 两个栈是空的
 		assertEquals(0, tasks.getTopTasksInStack("X").size());
@@ -134,7 +134,7 @@ public class MongoTaskServiceTest extends ZTaskCase {
 
 	@Test
 	public void stack_simple_create_move_and_remove() {
-		tasks.createStack(ts("sA"));
+		tasks.saveStack(ts("sA"));
 		TaskStack ts = tasks.getStack("sA");
 		assertEquals("sA", ts.getName());
 		assertEquals(1, countStack());

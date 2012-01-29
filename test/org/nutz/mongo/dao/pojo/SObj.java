@@ -14,8 +14,11 @@ public class SObj {
 	@CoId(CoIdType.DEFAULT)
 	private String id;
 
-	@CoField("nm")
+	@CoField
 	private String name;
+
+	@CoField("n")
+	private int number;
 
 	public String getId() {
 		return id;
@@ -31,6 +34,14 @@ public class SObj {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public int getNumber() {
+		return number;
+	}
+
+	public void setNumber(int number) {
+		this.number = number;
 	}
 
 }

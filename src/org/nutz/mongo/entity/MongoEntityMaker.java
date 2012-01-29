@@ -20,10 +20,10 @@ import org.nutz.mongo.annotation.CoIndexes;
  */
 public class MongoEntityMaker {
 
-	private Map<Class<?>, MongoEntity<?>> ens;
+	private Map<Class<?>, MongoEntity> ens;
 
 	public MongoEntityMaker() {
-		this.ens = new HashMap<Class<?>, MongoEntity<?>>();
+		this.ens = new HashMap<Class<?>, MongoEntity>();
 	}
 
 	/**
@@ -41,7 +41,7 @@ public class MongoEntityMaker {
 	 * @return MongoEntity 的操作类
 	 */
 	@SuppressWarnings("unchecked")
-	public MongoEntity<?> get(Object obj) {
+	public MongoEntity get(Object obj) {
 		// 绝对不能是 null
 		if (null == obj) {
 			throw Lang.makeThrow("Null refer for MongoEntity!");
@@ -56,31 +56,30 @@ public class MongoEntityMaker {
 				throw Lang.makeThrow("Empty refer for MongoEntity!");
 			return get(sub);
 		}
-		// Map...
-		if (Map.class.isAssignableFrom(type)) {
-			return new MapMongoEntity();
+
+		// 静态实体，声明了 @Co
+		if (null != type.getAnnotation(Co.class)) {
+			// 检查缓存
+			MongoEntity en = ens.get(type);
+			if (null != en)
+				return en;
+			// 开始构建 Static MongoEntity
+			return _makeStaticMontoEntity((Class<Object>) type);
 		}
-		// String ...
-		else if (CharSequence.class.isAssignableFrom(type)) {
-			return new StringMongoEntity();
-		}
-		// 检查缓存
-		MongoEntity<?> en = ens.get(type);
-		if (null != en)
-			return en;
-		// 开始构建 Static MongoEntity
-		return _makeStaticMontoEntity((Class<Object>) type);
+
+		// 动态实体，一般是针对 Map 或者 JSON 字符串
+		return new DynamicMongoEntity();
 	}
 
-	private MongoEntity<?> _makeStaticMontoEntity(Class<Object> type) {
+	private MongoEntity _makeStaticMontoEntity(Class<Object> type) {
 		// 准备返回对象
-		StaticMongoEntity<Object> en = new StaticMongoEntity<Object>(type);
+		StaticMongoEntity en = new StaticMongoEntity(type);
 
 		try {
 			// 获得集合名称
 			Co co = type.getAnnotation(Co.class);
 			en.setCollectionName(Strings.sBlank(co.value(), type.getName().toLowerCase()));
-			
+
 			// 获取capped属性,判断是否为固定集合
 			en.setCappedSize(co.cappedSize());
 

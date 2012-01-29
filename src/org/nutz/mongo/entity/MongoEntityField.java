@@ -2,9 +2,11 @@ package org.nutz.mongo.entity;
 
 import java.util.UUID;
 
+import org.bson.types.ObjectId;
 import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
 import org.nutz.lang.random.R;
+import org.nutz.mongo.Mongos;
 import org.nutz.mongo.annotation.CoIdType;
 
 import com.mongodb.DBObject;
@@ -51,9 +53,15 @@ public class MongoEntityField {
 			return;
 		// 对于默认 ID，则，保证 dbo 中没有 "_id" 以便 MongoDB 自动设值
 		if (isId()) {
-			if (idType == CoIdType.DEFAULT)
-				dbo.removeField("_id");
-			else
+			if (idType == CoIdType.DEFAULT) {
+				String ID = v.toString();
+				// 检查一下 ID 的格式
+				if (!Mongos.isDefaultMongoId(ID))
+					throw Lang.makeThrow(	"_id(%s) field for '%s' is invalid format",
+											ID,
+											obj.getClass().getName());
+				dbo.put("_id", new ObjectId(ID));
+			} else
 				dbo.put("_id", v);
 		}
 		// 其他字段

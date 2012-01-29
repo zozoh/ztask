@@ -5,9 +5,12 @@ import static org.junit.Assert.*;
 import java.util.List;
 
 import org.junit.Test;
+import org.nutz.lang.Lang;
 import org.nutz.ztask.ZTaskCase;
 import org.nutz.ztask.api.Label;
 import org.nutz.ztask.api.LabelService;
+import org.nutz.ztask.api.Task;
+import org.nutz.ztask.api.TaskService;
 
 public class MongoLabelServiceTest extends ZTaskCase {
 
@@ -15,18 +18,68 @@ public class MongoLabelServiceTest extends ZTaskCase {
 
 	protected void onBefore() {
 		lbls = this.getService(LabelService.class);
-		lbls.dao().create(Label.class, true);
+		dao.create(Label.class, true);
+	}
+
+	@Test
+	public void test_sync_task_label() {
+		// 准备 Task
+		TaskService tasks = this.getService(TaskService.class);
+		dao.create(Task.class, true);
+
+		// 初始化数据
+		tasks.createTask(t_l("Task0", "A", "B", "C"));
+		tasks.createTask(t_l("Task1", "D", "E"));
+		tasks.createTask(t_l("Task2", "A", "E"));
+		Task t3 = tasks.createTask(t_l("Task3", "B", "F"));
+		Task t4 = tasks.createTask(t_l("Task4", "D", "G"));
+
+		// 同步一次
+		List<Label> lbs = lbls.syncLables();
+
+		// 检查一下
+		assertEquals(7, lbs.size());
+		lbs = lbls.getTopLabels();
+		assertEquals(7, lbs.size());
+		assertEquals("A:2", lbs.get(0).toString());
+		assertEquals("B:2", lbs.get(1).toString());
+		assertEquals("C:1", lbs.get(2).toString());
+		assertEquals("D:2", lbs.get(3).toString());
+		assertEquals("E:2", lbs.get(4).toString());
+		assertEquals("F:1", lbs.get(5).toString());
+		assertEquals("G:1", lbs.get(6).toString());
+
+		// 修改任务数据
+		tasks.setTaskLabels(t3.get_id(), Lang.array("A", "B", "F"));
+		tasks.setTaskLabels(t4.get_id(), Lang.array("B", "D", "H", "I"));
+
+		// 同步一次
+		lbs = lbls.syncLables();
+
+		// 检查一下
+		assertEquals(8, lbs.size());
+		lbs = lbls.getTopLabels();
+		assertEquals(8, lbs.size());
+		assertEquals("A:3", lbs.get(0).toString());
+		assertEquals("B:3", lbs.get(1).toString());
+		assertEquals("C:1", lbs.get(2).toString());
+		assertEquals("D:2", lbs.get(3).toString());
+		assertEquals("E:2", lbs.get(4).toString());
+		assertEquals("F:1", lbs.get(5).toString());
+		assertEquals("H:1", lbs.get(6).toString());
+		assertEquals("I:1", lbs.get(7).toString());
+
 	}
 
 	@Test
 	public void test_simple_add_and_remove() {
-		lbls.addIfNoExists("A", "B", "C");
+		lbls.save("A", "B", "C");
 		assertEquals(3, lbls.count());
 
-		lbls.addIfNoExists("A", "B", "C", "E", "D");
+		lbls.save("A", "B", "C", "E", "D");
 		assertEquals(5, lbls.count());
 
-		lbls.addIfNoExists("F", "G", "H");
+		lbls.save("F", "G", "H");
 		assertEquals(8, lbls.count());
 
 		lbls.remove("H");

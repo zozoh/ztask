@@ -10,7 +10,7 @@ import com.mongodb.DBObject;
  * @author zozoh(zozohtnt@gmail.com)
  * @param <T>
  */
-public interface MongoEntity<T> {
+public interface MongoEntity {
 
 	/**
 	 * 根据一个 ref 对象，得到集合名称
@@ -51,7 +51,7 @@ public interface MongoEntity<T> {
 	 *            对象
 	 * @return DBObjet
 	 */
-	DBObject toDBObject(T obj);
+	DBObject toDBObject(Object obj);
 
 	/**
 	 * 根据一个键，得到这个键在 MongoDB 集合中的名字
@@ -69,7 +69,7 @@ public interface MongoEntity<T> {
 	 *            MongoDB 的文档对象
 	 * @return 目标对象
 	 */
-	T toObject(DBObject dbo);
+	Object toObject(DBObject dbo);
 
 	/**
 	 * 为要操作的对象，填充一个 _id
@@ -77,7 +77,7 @@ public interface MongoEntity<T> {
 	 * @param obj
 	 *            目标对象
 	 */
-	void fillId(T obj);
+	void fillId(Object obj);
 
 	/**
 	 * 如果 _id 键不存在，为要操作的对象，填充一个 _id
@@ -85,9 +85,15 @@ public interface MongoEntity<T> {
 	 * @param obj
 	 *            目标对象
 	 */
-	void fillIdIfNoexits(T obj);
+	void fillIdIfNoexits(Object obj);
 
+	/**
+	 * @return 是否为一个固定集合
+	 */
 	boolean isCapped();
-	
+
+	/**
+	 * @return 固定集合的大小，小于等于 0 表示为非固定集合
+	 */
 	long getCappedSize();
 }

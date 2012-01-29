@@ -13,6 +13,10 @@ public class ReadonlyUser implements User {
 
 	private String description;
 
+	public String getMainStackName() {
+		return "u_" + name;
+	}
+
 	public String getName() {
 		return name;
 	}

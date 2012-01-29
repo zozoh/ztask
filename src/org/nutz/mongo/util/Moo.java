@@ -232,7 +232,16 @@ public class Moo extends MoChain {
 	public static Moo born() {
 		return new Moo();
 	}
-	
+
+	/**
+	 * 创建链表的静态方法，同时 append 一个节点
+	 * 
+	 * @param key
+	 *            键
+	 * @param val
+	 *            值
+	 * @return 链表对象
+	 */
 	public static Moo born(String key, Object val) {
 		Moo moo = born();
 		return moo.append(key, val);

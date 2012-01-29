@@ -40,7 +40,14 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 
 	@Override
 	public void each(Each<Task> callback, TaskQuery tq) {
-
+		// 设置查询条件
+		Moo q = null == tq ? null : Moo.born();
+		MCur mcur = null == tq ? null : MCur.born();
+		if (null != tq) {
+			_setupQuery(tq, q, mcur);
+		}
+		// 开始迭代
+		dao.each(callback, Task.class, q, mcur);
 	}
 
 	@Override
@@ -194,20 +201,32 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 	}
 
 	@Override
-	public TaskStack createStack(TaskStack stack) {
-		// 检查名称
+	public TaskStack saveStack(TaskStack stack) {
 		stack.setName(Strings.trim(stack.getName()));
-		if (Strings.isBlank(stack.getName())) {
-			throw Err.S.BLANK_NAME();
+		return dao.save(stack);
+	}
+
+	@Override
+	public TaskStack createStackIfNoExistis(String stackName, String ownerName) {
+		TaskStack s = getStack(stackName);
+		if (null == s) {
+			s = new TaskStack();
+			s.setName(stackName);
+			s.setOwner(ownerName);
+			dao.save(s);
+		} else {
+			dao.updateById(TaskStack.class, s.get_id(), Moo.born().set("owner", ownerName));
+			s.setOwner(ownerName);
 		}
-		// 确保不存在
-		TaskStack ts = getStack(stack.getName());
-		if (null != ts)
-			throw Err.S.EXISTS(stack.getName());
-		// 执行创建
-		dao.save(stack);
-		// 返回
-		return stack;
+		return s;
+	}
+
+	@Override
+	public TaskStack setTackDescription(String stackName, String des) {
+		TaskStack s = this.checkStack(stackName);
+		s.setDescription(des);
+		dao.updateById(TaskStack.class, s.get_id(), Moo.born().set("description", des));
+		return s;
 	}
 
 	@Override

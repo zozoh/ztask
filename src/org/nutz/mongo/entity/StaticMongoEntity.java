@@ -19,13 +19,13 @@ import com.mongodb.DBObject;
  * @author zozoh(zozohtnt@gmail.com)
  * @param <T>
  */
-public class StaticMongoEntity<T> implements MongoEntity<T> {
+public class StaticMongoEntity implements MongoEntity {
 
-	private Class<T> type;
+	private Class<?> type;
 
-	private Mirror<T> mirror;
+	private Mirror<?> mirror;
 
-	private Borning<T> borning;
+	private Borning<?> borning;
 
 	private String collectionName;
 
@@ -34,10 +34,10 @@ public class StaticMongoEntity<T> implements MongoEntity<T> {
 	private List<MongoEntityIndex> indexes;
 
 	private MongoEntityField _id;
-	
+
 	private long cappedSize;
 
-	public StaticMongoEntity(Class<T> type) {
+	public StaticMongoEntity(Class<?> type) {
 		this.type = type;
 		this.mirror = Mirror.me(type);
 		this.borning = this.mirror.getBorning();
@@ -46,7 +46,7 @@ public class StaticMongoEntity<T> implements MongoEntity<T> {
 	}
 
 	@Override
-	public DBObject toDBObject(T obj) {
+	public DBObject toDBObject(Object obj) {
 		DBObject dbo = new BasicDBObject();
 		for (MongoEntityField mef : fields.values())
 			mef.setToDB(obj, dbo);
@@ -54,24 +54,24 @@ public class StaticMongoEntity<T> implements MongoEntity<T> {
 	}
 
 	@Override
-	public T toObject(DBObject dbo) {
+	public Object toObject(DBObject dbo) {
 		if (null == dbo)
 			return null;
-		T obj = borning.born(new Object[0]);
+		Object obj = borning.born(new Object[0]);
 		for (MongoEntityField mef : fields.values())
 			mef.getFromDB(obj, dbo);
 		return obj;
 	}
 
 	@Override
-	public void fillId(T obj) {
+	public void fillId(Object obj) {
 		if (null != _id) {
 			_id.fillId(obj);
 		}
 	}
 
 	@Override
-	public void fillIdIfNoexits(T obj) {
+	public void fillIdIfNoexits(Object obj) {
 		if (null != _id && _id.isNull(obj)) {
 			_id.fillId(obj);
 		}
@@ -91,13 +91,12 @@ public class StaticMongoEntity<T> implements MongoEntity<T> {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public DBObject formatObject(Object o) {
 		if (null == o)
 			return new BasicDBObject();
 		// 如果是本类型
 		if (type.isAssignableFrom(o.getClass())) {
-			return toDBObject((T) o);
+			return toDBObject(o);
 		}
 		// 如果是 DBObject 直接返回
 		if (o instanceof DBObject)
@@ -140,11 +139,11 @@ public class StaticMongoEntity<T> implements MongoEntity<T> {
 		return indexes;
 	}
 
-	public Class<T> getType() {
+	public Class<?> getType() {
 		return type;
 	}
 
-	public Mirror<T> getMirror() {
+	public Mirror<?> getMirror() {
 		return mirror;
 	}
 
@@ -170,11 +169,11 @@ public class StaticMongoEntity<T> implements MongoEntity<T> {
 	public void setCappedSize(long cappedSize) {
 		this.cappedSize = cappedSize;
 	}
-	
+
 	public boolean isCapped() {
 		return cappedSize > 0;
 	}
-	
+
 	public long getCappedSize() {
 		return this.cappedSize;
 	}

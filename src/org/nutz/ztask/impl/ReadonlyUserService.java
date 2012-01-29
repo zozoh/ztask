@@ -1,9 +1,16 @@
 package org.nutz.ztask.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.nutz.lang.ContinueLoop;
+import org.nutz.lang.Each;
+import org.nutz.lang.ExitLoop;
 import org.nutz.lang.Files;
+import org.nutz.lang.Lang;
+import org.nutz.lang.LoopException;
 import org.nutz.lang.Strings;
 import org.nutz.lang.meta.Email;
 import org.nutz.ztask.api.User;
@@ -34,6 +41,30 @@ public class ReadonlyUserService implements UserService {
 			u.setEmail(new Email(cols[2]));
 			u.setDescription(cols[3]);
 			map.put(u.getName(), u);
+		}
+	}
+
+	@Override
+	public List<User> all() {
+		ArrayList<User> list = new ArrayList<User>(map.size());
+		list.addAll(map.values());
+		return list;
+	}
+
+	@Override
+	public void each(Each<User> callback) {
+		int i = 0;
+		int len = map.size();
+		try {
+			for (User u : map.values())
+				try {
+					callback.invoke(i++, u, len);
+				}
+				catch (ContinueLoop e) {}
+		}
+		catch (ExitLoop e) {}
+		catch (LoopException e) {
+			throw Lang.wrapThrow(e);
 		}
 	}
 

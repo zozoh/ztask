@@ -206,15 +206,37 @@ public interface TaskService extends AbstractService {
 	TaskStack checkStack(String stackName);
 
 	/**
-	 * 创建一个新的任务堆栈
+	 * 创建一个新的任务堆栈，如果堆栈已经存在，则更新
 	 * 
 	 * @param stack
 	 *            任务堆栈对象
 	 * @return 创建后的任务堆栈对象
-	 * @throws org.nutz.ztask.Err.S
-	 *             #EXISTS
 	 */
-	TaskStack createStack(TaskStack stack);
+	TaskStack saveStack(TaskStack stack);
+
+	/**
+	 * 创建一个新的任务堆栈，如果堆栈已经存在，则将其获取
+	 * 
+	 * @param stackName
+	 *            任务堆栈名称
+	 * @param ownerName
+	 *            堆栈的所有者
+	 * @return 创建后的任务堆栈对象
+	 */
+	TaskStack createStackIfNoExistis(String stackName, String ownerName);
+
+	/**
+	 * 更新任务的描述，如果堆栈不存在，则抛错
+	 * 
+	 * @param stackName
+	 *            任务堆栈名称
+	 * @param des
+	 *            描述
+	 * @return 堆栈对象
+	 * @throws org.nutz.ztask.Err.S
+	 *             #NO_EXISTS
+	 */
+	TaskStack setTackDescription(String stackName, String des);
 
 	/**
 	 * 移除一个任务堆栈

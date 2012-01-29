@@ -9,6 +9,7 @@ import org.nutz.castor.Castors;
 import org.nutz.json.Json;
 import org.nutz.lang.Lang;
 import org.nutz.lang.util.Callback;
+import org.nutz.lang.util.NutMap;
 import org.nutz.mongo.entity.MongoEntity;
 import org.nutz.mongo.entity.MongoEntityMaker;
 import org.nutz.mongo.util.MoChain;
@@ -91,20 +92,28 @@ public abstract class Mongos {
 	 * @return Map 对象
 	 */
 	@SuppressWarnings("unchecked")
-	public static Map<String, Object> obj2map(Object o) {
+	public static NutMap obj2map(Object o) {
+		// 空
 		if (null == o)
-			return new HashMap<String, Object>();
+			return new NutMap();
 
+		// MoChain
 		if (o instanceof MoChain)
 			return ((MoChain) o).toMap();
 
-		if (o instanceof Map)
-			return (Map<String, Object>) o;
+		// NutMap
+		if (o instanceof NutMap)
+			return (NutMap) o;
 
+		// 字符串
 		if (o instanceof CharSequence)
-			return Json.fromJsonAsMap(Object.class, o.toString());
+			return Json.fromJson(NutMap.class, o.toString());
 
-		return Castors.me().castTo(o, Map.class);
+		// 其他的，调用 Castors 先变 Map 再说
+		Map<String, Object> objMap = Castors.me().castTo(o, Map.class);
+		NutMap map = new NutMap();
+		map.putAll(objMap);
+		return map;
 	}
 
 	/**
@@ -126,9 +135,34 @@ public abstract class Mongos {
 	 *            Map 对象
 	 * @return DBObject 对象
 	 */
+	@SuppressWarnings("unchecked")
 	public static DBObject map2dbo(Map<String, ? extends Object> map) {
 		DBObject dbo = new BasicDBObject();
-		dbo.putAll(map);
+		if (null != map) {
+			for (Map.Entry<String, ? extends Object> en : map.entrySet()) {
+				String key = en.getKey();
+				Object val = en.getValue();
+				if (null == val)
+					continue;
+				// 如果是 _id
+				if ("_id".equals(key)) {
+					String ID = val.toString();
+					if (Mongos.isDefaultMongoId(ID)) {
+						val = new ObjectId(ID);
+					}
+				}
+				// 如果是枚举
+				else if (val.getClass().isEnum())
+					val = val.toString();
+
+				// 如果是 Map，递归
+				else if (val instanceof Map<?, ?>)
+					val = map2dbo((Map<String, Object>) val);
+
+				// 加入 DBObject
+				dbo.put(key, val);
+			}
+		}
 		return dbo;
 	}
 
@@ -154,7 +188,7 @@ public abstract class Mongos {
 	 *            参考对象
 	 * @return MongoEntity 对象
 	 */
-	public static MongoEntity<?> entity(Object obj) {
+	public static MongoEntity entity(Object obj) {
 		return entities.get(obj);
 	}
 
@@ -194,19 +228,20 @@ public abstract class Mongos {
 							.findAndModify(q, null, null, false, o, true, true)
 							.get("id");
 	}
-	
+
 	private static ThreadLocal<Integer> reqs = new ThreadLocal<Integer>();
-	
+
 	public static void run(DB db, Callback<DB> callback) {
 		try {
 			if (reqs.get() == null) {
 				reqs.set(0);
-				db.requestStart(); //最顶层
-			} else 
+				db.requestStart(); // 最顶层
+			} else
 				reqs.set(reqs.get() + 1);
 			callback.invoke(db);
-		} finally {
-			if (reqs.get() == 0)//最顶层
+		}
+		finally {
+			if (reqs.get() == 0)// 最顶层
 				db.requestDone();
 			else
 				reqs.set(reqs.get() - 1);

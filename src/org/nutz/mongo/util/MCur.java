@@ -30,7 +30,7 @@ public class MCur extends MoChain {
 		return append(Mongos.SK_SKIP, num);
 	}
 
-	public void setupCursor(final DBCursor cur, final MongoEntity<?> moe) {
+	public void setupCursor(final DBCursor cur, final MongoEntity moe) {
 		each(new Each<MoChain>() {
 			public void invoke(int index, MoChain ele, int length) {
 				String key = ele.key();

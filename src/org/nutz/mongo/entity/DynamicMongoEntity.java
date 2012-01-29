@@ -1,13 +1,15 @@
 package org.nutz.mongo.entity;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.bson.types.ObjectId;
+import org.nutz.lang.Lang;
 import org.nutz.lang.random.R;
+import org.nutz.lang.util.NutMap;
 import org.nutz.mongo.Mongos;
 
-import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
 /**
@@ -18,38 +20,52 @@ import com.mongodb.DBObject;
  * @author zozoh(zozohtnt@gmail.com)
  * @param <T>
  */
-public abstract class DynamicMongoEntity<T> implements MongoEntity<T> {
+public class DynamicMongoEntity implements MongoEntity {
 
-	protected String evalCollectionName(Map<String, Object> map) {
+	public String getFieldDbName(String key) {
+		return key;
+	}
+
+	public boolean isCapped() {
+		return false;
+	}
+
+	@Override
+	public long getCappedSize() {
+		return 0;
+	}
+
+	@Override
+	public String getCollectionName(Object ref) {
+		NutMap map = Mongos.obj2map(ref);
 		return map.get(Mongos.COLLECTION_KEY).toString();
 	}
 
-	@SuppressWarnings("unchecked")
-	protected DBObject fromMap(Map<String, Object> map) {
-		DBObject dbo = new BasicDBObject();
-		if (null != map) {
-			for (Map.Entry<String, Object> en : map.entrySet()) {
-				Object val = en.getValue();
-				if (null == val)
-					continue;
-				// 如果是枚举
-				if (val.getClass().isEnum())
-					val = val.toString();
-				// 如果是 Map，递归
-				else if (val instanceof Map<?, ?>)
-					val = fromMap((Map<String, Object>) val);
-
-				// 加入 DBObject
-				dbo.put(en.getKey(), val);
-			}
-		}
-		return dbo;
+	@Override
+	public boolean hasIndexes() {
+		return false;
 	}
 
-	protected Map<String, Object> toMap(DBObject dbo) {
+	@Override
+	public List<MongoEntityIndex> getIndexes() {
+		return new LinkedList<MongoEntityIndex>();
+	}
+
+	@Override
+	public DBObject formatObject(Object o) {
+		return Mongos.obj2dbo(o);
+	}
+
+	@Override
+	public DBObject toDBObject(Object obj) {
+		return Mongos.obj2dbo(obj);
+	}
+
+	@Override
+	public Object toObject(DBObject dbo) {
 		if (null == dbo)
 			return null;
-		Map<String, Object> map = new TreeMap<String, Object>();
+		NutMap map = new NutMap();
 		for (String key : dbo.keySet()) {
 			Object dbval = dbo.get(key);
 			if (dbval instanceof ObjectId)
@@ -60,29 +76,29 @@ public abstract class DynamicMongoEntity<T> implements MongoEntity<T> {
 		return map;
 	}
 
-	protected void fillIdToMap(Map<String, Object> map) {
-		map.put("_id", R.UU64());
-	}
-
-	protected void fillIdToMapIfNoexits(Map<String, Object> map) {
-		if (!map.containsKey("_id"))
-			map.put("_id", R.UU64());
-	}
-
-	protected DBObject map2dbo(Map<String, Object> map) {
-		return Mongos.map2dbo(map);
-	}
-
-	public String getFieldDbName(String key) {
-		return key;
-	}
-
-	public boolean isCapped() {
-		return false;
-	}
-	
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	@Override
-	public long getCappedSize() {
-		return 0;
+	public void fillId(Object obj) {
+		if (null != obj && obj instanceof Map) {
+			((Map) obj).put("_id", R.UU64());
+			return;
+		}
+		throw _failToFill(obj);
+	}
+
+	@SuppressWarnings({"unchecked", "rawtypes"})
+	@Override
+	public void fillIdIfNoexits(Object obj) {
+		if (null != obj && obj instanceof Map) {
+			if (!((Map) obj).containsKey("_id"))
+				((Map) obj).put("_id", R.UU64());
+			return;
+		}
+		throw _failToFill(obj);
+	}
+
+	private RuntimeException _failToFill(Object obj) {
+		return Lang.makeThrow(	"Can only fillId to Map<String,Object> but it is '%s'",
+								obj.getClass().getName());
 	}
 }

@@ -1,11 +1,8 @@
 package org.nutz.ztask.web.module;
 
-import org.nutz.mvc.annotation.Fail;
-import org.nutz.mvc.annotation.IocBy;
-import org.nutz.mvc.annotation.Localization;
-import org.nutz.mvc.annotation.Modules;
-import org.nutz.mvc.annotation.SetupBy;
+import org.nutz.mvc.annotation.*;
 import org.nutz.mvc.ioc.provider.ComboIocProvider;
+import org.nutz.web.ajax.AjaxViewMaker;
 import org.nutz.ztask.web.ZTaskSetup;
 
 /**
@@ -21,4 +18,5 @@ import org.nutz.ztask.web.ZTaskSetup;
 				"ioc",
 				"*org.nutz.ioc.loader.annotation.AnnotationIocLoader",
 				"org.nutz.ztask.web.module"}, type = ComboIocProvider.class)
+@Views({AjaxViewMaker.class})
 public class ZTaskMainModule {}

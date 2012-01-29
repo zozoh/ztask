@@ -10,6 +10,7 @@ import org.nutz.lang.Lang;
 import org.nutz.lang.LoopException;
 import org.nutz.lang.Strings;
 import org.nutz.lang.util.Callback;
+import org.nutz.lang.util.NutMap;
 import org.nutz.mongo.entity.MongoEntity;
 import org.nutz.mongo.entity.MongoEntityIndex;
 import org.nutz.mongo.util.MCur;
@@ -37,12 +38,12 @@ public class MongoDao {
 	 * @param type
 	 *            对象类型，除了 POJO 也可以是 Map 或者 String
 	 * @param q
-	 *            查询条件 TODO 是不是要支持一下直接的 DBObject ?
+	 *            查询条件
 	 * @return 修改结果
 	 */
 	public WriteResult remove(Class<?> type, Object q) {
 		WriteResult wr = null;
-		MongoEntity<?> moe = Mongos.entity(type);
+		MongoEntity moe = Mongos.entity(type);
 		// 获得集合
 		String collName = moe.getCollectionName(q);
 		if (db.collectionExists(collName)) {
@@ -100,14 +101,15 @@ public class MongoDao {
 	 * <p>
 	 * 如果对象没有存在 "_id"，则自动设置 "_id"
 	 * 
+	 * TODO 需要考虑一下 List 和 Array ...
+	 * 
 	 * @param <T>
 	 * @param obj
 	 *            对象
 	 * @return 保存后的对象，如果为 null，表示集合不存在，保存失败
 	 */
-	@SuppressWarnings("unchecked")
 	public <T extends Object> T save(T obj) {
-		MongoEntity<T> moe = (MongoEntity<T>) Mongos.entity(obj);
+		MongoEntity moe = Mongos.entity(obj);
 		String collName = moe.getCollectionName(obj);
 		if (db.collectionExists(collName)) {
 			moe.fillIdIfNoexits(obj);
@@ -131,7 +133,7 @@ public class MongoDao {
 	 * @return 修改结果
 	 */
 	public WriteResult update(Object enref, Object q, Object o) {
-		MongoEntity<?> moe = (MongoEntity<?>) Mongos.entity(enref);
+		MongoEntity moe = (MongoEntity) Mongos.entity(enref);
 		String collName = moe.getCollectionName(q);
 		WriteResult wr = null;
 		if (db.collectionExists(collName)) {
@@ -209,55 +211,40 @@ public class MongoDao {
 	 * 
 	 * @return 对象列表
 	 */
-	@SuppressWarnings("unchecked")
 	public <T> List<T> find(Class<T> type, Object q, MCur mcur) {
-		LinkedList<T> re = new LinkedList<T>();
-		MongoEntity<?> moe = Mongos.entity(type);
-		// 获得集合
-		String collName = moe.getCollectionName(q);
-		if (db.collectionExists(collName)) {
-			DBCollection coll = db.getCollection(collName);
-			// 将 ref 对象转换成 DBObject
-			DBObject dbRef = moe.formatObject(q);
-
-			// 执行查询
-			DBCursor cur = null == dbRef ? coll.find() : coll.find(dbRef);
-
-			// 设置排序条件
-			if (null != mcur) {
-				mcur.setupCursor(cur, moe);
+		final LinkedList<T> list = new LinkedList<T>();
+		each(new Each<T>() {
+			public void invoke(int index, T obj, int length) {
+				list.add(obj);
 			}
-
-			// 执行转换
-			while (cur.hasNext()) {
-				DBObject dbo = cur.next();
-				T obj = (T) moe.toObject(dbo);
-				re.add(obj);
-			}
-		}
-		return re;
+		}, type, q, mcur);
+		return list;
 	}
 
 	/**
 	 * 根据 Map 或者 JSON 字符串执行查询
 	 * 
 	 * @param <T>
+	 * @param collName
+	 *            集合名称
 	 * @param q
 	 *            查询条件，可以是 POJO, String,Map,或者 Moo
 	 * @param mcur
 	 *            对游标的排序等方式的修改
 	 * @return 对象列表
 	 */
-	@SuppressWarnings("unchecked")
-	public <T> List<T> find(T q, MCur mcur) {
-		if (null == q)
-			return null;
-		Class<T> type = (Class<T>) q.getClass();
-		return find(type, q, mcur);
+	public List<NutMap> find(String collName, Object q, MCur mcur) {
+		final LinkedList<NutMap> list = new LinkedList<NutMap>();
+		each(new Each<NutMap>() {
+			public void invoke(int index, NutMap obj, int length) {
+				list.add(obj);
+			}
+		}, collName, q, mcur);
+		return list;
 	}
 
 	/**
-	 * 迭代某个集合里的数据，这个适合比较大的数据，不能一次返回一个 List
+	 * 迭代某个集合里的数据，这个适合比较大的数据时，不能一次返回一个 List 的场景
 	 * 
 	 * @param <T>
 	 * @param callback
@@ -270,43 +257,27 @@ public class MongoDao {
 	 * @param mcur
 	 *            对游标的排序等方式的修改
 	 */
-	@SuppressWarnings("unchecked")
 	public <T> void each(Each<T> callback, Class<T> type, Object q, MCur mcur) {
-		MongoEntity<?> moe = Mongos.entity(type);
-		// 获得集合
-		String collName = moe.getCollectionName(q);
-		if (db.collectionExists(collName)) {
-			DBCollection coll = db.getCollection(collName);
-			// 将 ref 对象转换成 DBObject
-			DBObject dbRef = moe.formatObject(q);
+		MongoEntity moe = Mongos.entity(type);
+		_each(callback, moe.getCollectionName(q), moe, q, mcur);
+	}
 
-			// 执行查询
-			DBCursor cur = null == dbRef ? coll.find() : coll.find(dbRef);
-
-			// 设置排序条件
-			if (null != mcur) {
-				mcur.setupCursor(cur, moe);
-			}
-
-			// 遍历游标
-			try {
-				int i = 0;
-				while (cur.hasNext()) {
-					DBObject dbo = cur.next();
-					T obj = (T) moe.toObject(dbo);
-					try {
-						callback.invoke(i++, obj, -1);
-					}
-					catch (ContinueLoop e) {
-						throw Lang.wrapThrow(e);
-					}
-				}
-			}
-			catch (ExitLoop e) {}
-			catch (LoopException e) {
-				throw Lang.wrapThrow(e.getCause());
-			}
-		}
+	/**
+	 * 根据 Map 或者 JSON 字符串迭代某个集合里的数据， <br>
+	 * 这个适合比较大的数据时，不能一次返回一个 List 的场景
+	 * 
+	 * @param <T>
+	 * @param callback
+	 *            回调，由于不知到数据的总体大小(为了效率)，所以 length 一项永远为 -1
+	 * @param q
+	 *            查询条件，可以是 POJO, String,Map,或者 Moo
+	 * @param mcur
+	 *            对游标的排序等方式的修改
+	 * @return 对象列表
+	 */
+	public void each(Each<NutMap> callback, String collName, Object q, MCur mcur) {
+		MongoEntity moe = Mongos.entity(q);
+		_each(callback, collName, moe, q, mcur);
 	}
 
 	/**
@@ -322,7 +293,7 @@ public class MongoDao {
 	@SuppressWarnings("unchecked")
 	public <T> T findOne(Class<T> type, Object q) {
 		T re = null;
-		MongoEntity<?> moe = Mongos.entity(type);
+		MongoEntity moe = Mongos.entity(type);
 		// 获得集合
 		String collName = moe.getCollectionName(q);
 		if (db.collectionExists(collName)) {
@@ -360,7 +331,7 @@ public class MongoDao {
 	 * @return 数量
 	 */
 	public long count(Object enref, Object q) {
-		MongoEntity<?> moe = Mongos.entity(enref);
+		MongoEntity moe = Mongos.entity(enref);
 		String collName = moe.getCollectionName(q);
 		if (db.collectionExists(collName)) {
 			DBCollection coll = db.getCollection(collName);
@@ -390,7 +361,7 @@ public class MongoDao {
 	public void create(String collName, boolean dropIfExists) {
 		create(collName, dropIfExists, -1);
 	}
-	
+
 	/**
 	 * 创建一个集合
 	 * 
@@ -399,24 +370,29 @@ public class MongoDao {
 	 * 
 	 * @param dropIfExists
 	 *            true 则如果存在，就 drop
-	 *            
+	 * 
 	 * @param cappedSize
-	 * 			   如果大于0,则创建一个固定集合,单位是byte
+	 *            如果大于0,则创建一个固定集合,单位是byte
 	 */
 	public void create(String collName, boolean dropIfExists, long cappedSize) {
-		// 判断集合是否存在
+		// 判断集合是否存在，如果存在，且是不需要 drop 的 ...
+		// TODO 如果一个集合是非固定的，想将其变成固定的，这个是不是需要再弄个方法叫 toCapped ?
 		if (!dropIfExists && db.collectionExists(collName))
 			return;
+
 		// 首先移除
 		drop(collName);
-		// TODO 这里可以设置集合一些特殊的设置，比如固定集合等
+
+		// 创建固定集合
 		if (cappedSize > 0) {
 			DBObject colConfig = Mongos.dbo("capped", true);
 			colConfig.put("size", cappedSize);
 			db.createCollection(collName, colConfig);
 		}
-		else
+		// 创建非固定集合
+		else {
 			db.createCollection(collName, new BasicDBObject());
+		}
 	}
 
 	/**
@@ -429,13 +405,17 @@ public class MongoDao {
 	 *            true 则如果存在，就 drop
 	 */
 	public void create(Class<?> pojoType, boolean dropIfExists) {
-		MongoEntity<?> moe = Mongos.entity(pojoType);
-		String colName = moe.getCollectionName(null);
-		create(colName, dropIfExists, moe.getCappedSize());
+		// 得到对应实体
+		MongoEntity moe = Mongos.entity(pojoType);
+
+		// 创建集合
+		String collName = moe.getCollectionName(null);
+		create(collName, dropIfExists, moe.getCappedSize());
+
 		// 创建索引
 		if (moe.hasIndexes()) {
 			for (MongoEntityIndex mei : moe.getIndexes()) {
-				DBCollection coll = db.getCollection(colName);
+				DBCollection coll = db.getCollection(collName);
 				DBObject keys = moe.formatObject(mei.getFields());
 				// 采用默认的名称
 				if (Strings.isBlank(mei.getName())) {
@@ -469,7 +449,7 @@ public class MongoDao {
 	 * 
 	 */
 	public void drop(Class<?> pojoType) {
-		MongoEntity<?> moe = Mongos.entity(pojoType);
+		MongoEntity moe = Mongos.entity(pojoType);
 		drop(moe.getCollectionName(null));
 	}
 
@@ -532,5 +512,41 @@ public class MongoDao {
 	 */
 	public CommandResult getLastError() {
 		return db.getLastError();
+	}
+
+	@SuppressWarnings("unchecked")
+	private <T> void _each(Each<T> callback, String collName, MongoEntity moe, Object q, MCur mcur) {
+		if (db.collectionExists(collName)) {
+			DBCollection coll = db.getCollection(collName);
+			// 将 ref 对象转换成 DBObject
+			DBObject dbRef = moe.formatObject(q);
+
+			// 执行查询
+			DBCursor cur = null == dbRef ? coll.find() : coll.find(dbRef);
+
+			// 设置排序条件
+			if (null != mcur) {
+				mcur.setupCursor(cur, moe);
+			}
+
+			// 遍历游标
+			try {
+				int index = 0;
+				while (cur.hasNext()) {
+					DBObject dbo = cur.next();
+					T obj = (T) moe.toObject(dbo);
+					try {
+						callback.invoke(index++, obj, -1);
+					}
+					catch (ContinueLoop e) {
+						throw Lang.wrapThrow(e);
+					}
+				}
+			}
+			catch (ExitLoop e) {}
+			catch (LoopException e) {
+				throw Lang.wrapThrow(e.getCause());
+			}
+		}
 	}
 }

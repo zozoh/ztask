@@ -3,15 +3,14 @@ package org.nutz.ztask.api;
 import org.nutz.mongo.annotation.Co;
 import org.nutz.mongo.annotation.CoField;
 import org.nutz.mongo.annotation.CoId;
-import org.nutz.mongo.annotation.CoIdType;
 import org.nutz.mongo.annotation.CoIndexes;
 
 @Co("label")
 @CoIndexes("!:+name")
 public class Label {
 
-	@CoId(CoIdType.DEFAULT)
-	private String id;
+	@CoId
+	private String _id;
 
 	@CoField("nm")
 	private String name;
@@ -19,12 +18,15 @@ public class Label {
 	@CoField("pnm")
 	private String parent;
 
-	public String getId() {
-		return id;
+	@CoField("cnt")
+	private int count;
+
+	public String get_id() {
+		return _id;
 	}
 
-	public void setId(String id) {
-		this.id = id;
+	public void set_id(String _id) {
+		this._id = _id;
 	}
 
 	public String getName() {
@@ -41,6 +43,18 @@ public class Label {
 
 	public void setParent(String parent) {
 		this.parent = parent;
+	}
+
+	public int getCount() {
+		return count;
+	}
+
+	public void setCount(int count) {
+		this.count = count;
+	}
+
+	public String toString() {
+		return name + ":" + count;
 	}
 
 }
