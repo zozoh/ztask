@@ -17,6 +17,12 @@ public class Pet {
 		return me(null, name);
 	}
 
+	public static Pet mel(String name, String... lbs) {
+		Pet pet = me(null, name);
+		pet.labels = lbs;
+		return pet;
+	}
+
 	public static Pet me(String name, int age, int count) {
 		return me(null, name, age, count);
 	}
@@ -41,6 +47,9 @@ public class Pet {
 
 	@CoField
 	private int age;
+
+	@CoField("lbs")
+	private String[] labels;
 
 	@CoField("cun")
 	private int count;
@@ -83,6 +92,14 @@ public class Pet {
 
 	public void setCount(int count) {
 		this.count = count;
+	}
+
+	public String[] getLabels() {
+		return labels;
+	}
+
+	public void setLabels(String[] labels) {
+		this.labels = labels;
 	}
 
 	@Override

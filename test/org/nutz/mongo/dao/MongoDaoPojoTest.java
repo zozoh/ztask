@@ -15,6 +15,89 @@ import org.nutz.mongo.util.MCur;
 public class MongoDaoPojoTest extends MongoCase {
 
 	@Test
+	public void test_query_in_array() {
+		dao.create(Pet.class, true);
+		dao.save(Pet.me("xiaohei"));
+		dao.save(Pet.me("xiaobai"));
+		dao.save(Pet.me("super.man"));
+		dao.save(Pet.me("bush"));
+		dao.save(Pet.me("zozoh"));
+
+		List<Pet> pets = dao.find(	Pet.class,
+									Moo.born().in("name", "xiaohei", "zozoh"),
+									MCur.born().asc("name"));
+		assertEquals(2, pets.size());
+		assertEquals("xiaohei", pets.get(0).getName());
+		assertEquals("zozoh", pets.get(1).getName());
+	}
+
+	@Test
+	public void test_query_by_labels() {
+		dao.create(Pet.class, true);
+		dao.save(Pet.mel("xiaohei", "A", "B", "C"));
+		dao.save(Pet.mel("xiaobai", "A", "C"));
+		dao.save(Pet.mel("super.man", "A", "B"));
+		dao.save(Pet.mel("bush", "B"));
+		dao.save(Pet.mel("zozoh", "C"));
+
+		// 默认按照名字从小到大
+		MCur c = MCur.born().asc("name");
+
+		// A+C
+		List<Pet> pets = dao.find(Pet.class, Moo.born().array("labels", "A", "C"), c);
+		assertEquals(2, pets.size());
+		assertEquals("xiaobai", pets.get(0).getName());
+		assertEquals("xiaohei", pets.get(1).getName());
+
+		// B+C
+		pets = dao.find(Pet.class, Moo.born().array("labels", "B", "C"), c);
+		assertEquals(1, pets.size());
+		assertEquals("xiaohei", pets.get(0).getName());
+
+		// C
+		pets = dao.find(Pet.class, Moo.born().array("labels", "C"), c);
+		assertEquals(3, pets.size());
+		assertEquals("xiaobai", pets.get(0).getName());
+		assertEquals("xiaohei", pets.get(1).getName());
+		assertEquals("zozoh", pets.get(2).getName());
+
+	}
+
+	@Test
+	public void test_query_by_regex() {
+		dao.create(Pet.class, true);
+		dao.save(Pet.me("xiaohei"));
+		dao.save(Pet.me("xiaobai"));
+		dao.save(Pet.me("super.man"));
+		dao.save(Pet.me("bush"));
+		dao.save(Pet.me("zozoh"));
+
+		// startsWith
+		List<Pet> pets = dao.find(	Pet.class,
+									Moo.born().startsWith("name", "x"),
+									MCur.born().desc("name"));
+		assertEquals(2, pets.size());
+		assertEquals("xiaohei", pets.get(0).getName());
+		assertEquals("xiaobai", pets.get(1).getName());
+
+		// contains
+		pets = dao.find(Pet.class, Moo.born().contains("name", "h"), MCur.born().desc("name"));
+		assertEquals(3, pets.size());
+		assertEquals("zozoh", pets.get(0).getName());
+		assertEquals("xiaohei", pets.get(1).getName());
+		assertEquals("bush", pets.get(2).getName());
+
+		// regex
+		pets = dao.find(Pet.class,
+						Moo.born().match("name", "^(zozoh)|(.*u[p|s].*)$"),
+						MCur.born().desc("name"));
+		assertEquals(3, pets.size());
+		assertEquals("zozoh", pets.get(0).getName());
+		assertEquals("super.man", pets.get(1).getName());
+		assertEquals("bush", pets.get(2).getName());
+	}
+
+	@Test
 	public void test_default_id_save_and_remove() {
 		dao.create(SObj.class, true);
 		SObj obj = SObj.create("ABC");
@@ -22,7 +105,7 @@ public class MongoDaoPojoTest extends MongoCase {
 		assertEquals(1, dao.count(obj, null));
 
 		obj = dao.findOne(SObj.class, Moo.born().append("name", "ABC"));
-		
+
 		dao.removeById(SObj.class, obj.getId());
 		assertEquals(0, dao.count(obj, null));
 	}

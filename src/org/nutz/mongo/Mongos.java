@@ -131,6 +131,21 @@ public abstract class Mongos {
 	}
 
 	/**
+	 * 建立只有一个键的 Map 对象
+	 * 
+	 * @param key
+	 *            键
+	 * @param val
+	 *            值
+	 * @return Map 对象
+	 */
+	public static Map<String, Object> map(String key, Object val) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put(key, val);
+		return map;
+	}
+
+	/**
 	 * 根据一个 POJO 对象，获取一个实体
 	 * 
 	 * @param obj

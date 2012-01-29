@@ -134,6 +134,10 @@ public abstract class MoChain {
 	}
 
 	protected MoChain(MoChain prev, String key, Object value) {
+		// 寻找链表的尾部
+		while(null!=prev.next)
+			prev = prev.next;
+		// 开始设置
 		this.head = prev.head;
 		prev.next = this;
 		this.n = prev.head.n; // 记录自己的 index
