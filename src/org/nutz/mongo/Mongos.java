@@ -8,6 +8,7 @@ import org.bson.types.ObjectId;
 import org.nutz.castor.Castors;
 import org.nutz.json.Json;
 import org.nutz.lang.Lang;
+import org.nutz.lang.util.Callback;
 import org.nutz.mongo.entity.MongoEntity;
 import org.nutz.mongo.entity.MongoEntityMaker;
 import org.nutz.mongo.util.MoChain;
@@ -186,5 +187,34 @@ public abstract class Mongos {
 				.get("id");
 	}
 	
+	private static ThreadLocal<Integer> reqs = new ThreadLocal<Integer>();
+	private static ThreadLocal<DB> threadLocal_db = new ThreadLocal<DB>();
 	
+	public static void run(DB db, Callback<DB> callback) {
+		try {
+			if (reqs.get() == null) {
+				reqs.set(0);
+				db.requestStart(); //最顶层
+			} else 
+				reqs.set(reqs.get() + 1);
+			if (db != null) 
+				threadLocal_db.set(db);
+			else
+				threadLocal_db.get();
+			callback.invoke(db);
+			if (db != null) 
+				threadLocal_db.set(db);
+		} finally {
+			if (reqs.get() == 0) {//最顶层
+				threadLocal_db.set(null);
+				db.requestDone();
+			}
+			else
+				reqs.set(reqs.get() - 1);
+		}
+	}
+	
+	public static DB getCurrentDB() {
+		return threadLocal_db.get();
+	}
 }
