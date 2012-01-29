@@ -10,6 +10,12 @@ import org.nutz.mongo.util.Moo;
 import org.nutz.ztask.api.Label;
 import org.nutz.ztask.api.LabelService;
 
+/**
+ * 
+ * @author zozoh(zozohtnt@gmail.com)
+ * @author Wendal(wendal1985@gmail.com)
+ *
+ */
 public class MongoLabelService extends AbstractMongoService implements LabelService {
 
 	public MongoLabelService(MongoConnector conn, String dbname) {
@@ -18,11 +24,12 @@ public class MongoLabelService extends AbstractMongoService implements LabelServ
 
 	@Override
 	public Label get(String labelName) {
-		return dao.findOne(Label.class, Moo.born().append("name", labelName));
+		return dao.findOne(Label.class, Moo.born("name", labelName));
 	}
 
 	@Override
 	public Label remove(String labelName) {
+		//TODO 无需先查询,直接执行remove即可
 		Label l = get(labelName);
 		if (null != l)
 			dao.removeById(Label.class, l.getId());
@@ -31,22 +38,23 @@ public class MongoLabelService extends AbstractMongoService implements LabelServ
 
 	@Override
 	public boolean hasLabel(String labelName) {
+		//TODO count是更好的选择
 		return get(labelName) != null;
 	}
 
 	@Override
 	public List<Label> getTopLabels() {
-		return dao.find(Label.class, Moo.born().append("parent", null), MCur.born().asc("name"));
+		return dao.find(Label.class, Moo.born("parent", null), MCur.born().asc("name"));
 	}
 
 	@Override
 	public List<Label> getChildren(String labelName) {
-		return dao.find(Label.class, Moo.born().append("parent", labelName), MCur.born()
-																					.asc("name"));
+		return dao.find(Label.class, Moo.born("parent", labelName), MCur.born().asc("name"));
 	}
 
 	@Override
 	public List<Label> addIfNoExists(String... labelNames) {
+		//TODO 使用addToSet
 		ArrayList<Label> list = new ArrayList<Label>(labelNames.length);
 		for (String labelName : labelNames) {
 			if (hasLabel(labelName))
