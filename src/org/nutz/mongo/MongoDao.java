@@ -9,6 +9,7 @@ import org.nutz.mongo.entity.MongoEntityField;
 import org.nutz.mongo.util.MCur;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.CommandResult;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
@@ -105,7 +106,7 @@ public class MongoDao {
 			moe.fillIdIfNoexits(obj);
 			DBObject dbo = moe.toDBObject(obj);
 			DBCollection coll = db.getCollection(collName);
-			coll.save(dbo);
+			coll.insert(dbo);
 			return obj;
 		}
 		return null;
@@ -405,4 +406,27 @@ public class MongoDao {
 		db.cleanCursors(true);
 	}
 
+	/**
+	 * 直接访问mongodb底层API的回调操作,包含单连接限制 TODO嵌套就有问题
+	 */
+	public void exec(DBCallback callback) {
+		try {
+			db.requestStart();
+			callback.run(db);
+		} finally {
+			db.requestDone();
+		}
+	}
+	
+	public void safeExec(DBCallback callback) {
+		try {
+			db.requestStart();
+			callback.run(db);
+			CommandResult cr = db.getLastError();
+			if (cr.get("err") != null)
+				throw Lang.makeThrow("Fail! %s", cr.getErrorMessage());
+		} finally {
+			db.requestDone();
+		}
+	}
 }

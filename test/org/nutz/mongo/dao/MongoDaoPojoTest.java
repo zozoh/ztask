@@ -5,12 +5,15 @@ import static org.junit.Assert.*;
 import java.util.List;
 
 import org.junit.Test;
+import org.nutz.mongo.DBCallback;
 import org.nutz.mongo.MongoCase;
 import org.nutz.mongo.dao.pojo.Pet;
 import org.nutz.mongo.dao.pojo.PetType;
 import org.nutz.mongo.dao.pojo.SObj;
 import org.nutz.mongo.util.Moo;
 import org.nutz.mongo.util.MCur;
+
+import com.mongodb.DB;
 
 public class MongoDaoPojoTest extends MongoCase {
 
@@ -178,12 +181,14 @@ public class MongoDaoPojoTest extends MongoCase {
 	}
 
 	//测试唯一性索引
-	// XXX 由于mongodb的特性,插入失败并不会报错,除非执行getError
-	@Test
+	@Test(expected=Throwable.class)
 	public void test_index_unique() {
 		dao.create(Pet.class, true);
 		dao.save(Pet.me("XiaoBai", 10, 3));
-		dao.save(Pet.me("XiaoBai", 2, 222));
-		assertEquals(1, dao.count(Pet.class, null));
+		dao.safeExec(new DBCallback() {
+			public void run(DB db) {
+				dao.save(Pet.me("XiaoBai", 2, 222));
+			}
+		});
 	}
 }
