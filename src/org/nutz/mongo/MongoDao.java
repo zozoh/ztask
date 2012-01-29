@@ -416,13 +416,7 @@ public class MongoDao {
 	 *            回调
 	 */
 	public void run(Callback<DB> callback) {
-		try {
-			db.requestStart();
-			callback.invoke(db);
-		}
-		finally {
-			db.requestDone();
-		}
+		Mongos.run(db, callback);
 	}
 
 	/**
@@ -435,16 +429,19 @@ public class MongoDao {
 	 * @param callback
 	 *            回调
 	 */
-	public void runNoError(Callback<DB> callback) {
-		try {
-			db.requestStart();
-			callback.invoke(db);
-			CommandResult cr = db.getLastError();
-			if (cr.get("err") != null)
-				throw Lang.makeThrow("Fail! %s", cr.getErrorMessage());
-		}
-		finally {
-			db.requestDone();
-		}
+	public void runNoError(final Callback<DB> callback) {
+		Mongos.run(db, new Callback<DB>() {
+			
+			public void invoke(DB db) {
+				callback.invoke(db);
+				CommandResult cr = db.getLastError();
+				if (cr.get("err") != null)
+					throw Lang.makeThrow("Fail! %s", cr.getErrorMessage());
+			}
+		});
+	}
+	
+	public CommandResult getLastError() {
+		return db.getLastError();
 	}
 }
