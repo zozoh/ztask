@@ -34,6 +34,8 @@ public class StaticMongoEntity<T> implements MongoEntity<T> {
 	private List<MongoEntityIndex> indexes;
 
 	private MongoEntityField _id;
+	
+	private long cappedSize;
 
 	public StaticMongoEntity(Class<T> type) {
 		this.type = type;
@@ -165,4 +167,15 @@ public class StaticMongoEntity<T> implements MongoEntity<T> {
 		this.collectionName = collectionName;
 	}
 
+	public void setCappedSize(long cappedSize) {
+		this.cappedSize = cappedSize;
+	}
+	
+	public boolean isCapped() {
+		return cappedSize > 0;
+	}
+	
+	public long getCappedSize() {
+		return this.cappedSize;
+	}
 }

@@ -7,6 +7,7 @@ import java.util.List;
 import org.junit.Test;
 import org.nutz.lang.util.Callback;
 import org.nutz.mongo.MongoCase;
+import org.nutz.mongo.dao.pojo.CappedPet;
 import org.nutz.mongo.dao.pojo.Pet;
 import org.nutz.mongo.dao.pojo.PetType;
 import org.nutz.mongo.dao.pojo.SObj;
@@ -190,5 +191,19 @@ public class MongoDaoPojoTest extends MongoCase {
 				dao.save(Pet.me("XiaoBai", 2, 222));
 			}
 		});
+	}
+	
+	// 测试固定集合
+	@Test
+	public void test_capped() {
+		dao.create(CappedPet.class, true); //固定大小是10k,肯定放不到1000个对象
+		for (int i = 0; i < 1000; i++) {
+			CappedPet pet = new CappedPet();
+			pet.setName("V"+System.currentTimeMillis());
+			dao.save(pet);
+		}
+		long size = dao.count(CappedPet.class, null);
+		System.out.println("CappedPet size=" + size);
+		assertNotSame(1000, size);
 	}
 }

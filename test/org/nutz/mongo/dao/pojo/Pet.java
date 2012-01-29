@@ -3,7 +3,7 @@ package org.nutz.mongo.dao.pojo;
 import org.nutz.lang.random.R;
 import org.nutz.mongo.annotation.*;
 
-@Co("pet")
+@Co(value="pet")
 @CoIndexes("!:+name")
 public class Pet {
 
