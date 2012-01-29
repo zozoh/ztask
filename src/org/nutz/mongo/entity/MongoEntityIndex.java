@@ -3,6 +3,7 @@ package org.nutz.mongo.entity;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
 
 /**
@@ -40,8 +41,10 @@ public class MongoEntityIndex {
 			String key = s.substring(1);
 			if (s.startsWith("+"))
 				fields.put(key, 1);
-			else
+			else if (s.startsWith("-"))
 				fields.put(key, -1);
+			else
+				throw Lang.makeThrow("Index field '%s' of '%s' should starts by '+' or '-'", s, str);
 		}
 	}
 
