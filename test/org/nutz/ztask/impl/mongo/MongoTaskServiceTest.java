@@ -39,18 +39,18 @@ public class MongoTaskServiceTest extends ZTaskCase {
 		tasks.createStack(ts("Y"));
 
 		// 两个栈是空的
-		assertEquals(0, tasks.getTopTasks("X").size());
+		assertEquals(0, tasks.getTopTasksInStack("X").size());
 		assertEquals(0, tasks.getStack("X").getCount());
-		assertEquals(0, tasks.getTopTasks("Y").size());
+		assertEquals(0, tasks.getTopTasksInStack("Y").size());
 		assertEquals(0, tasks.getStack("Y").getCount());
 
 		// 压入 X ...
 		tasks.pushToStack(t.get_id(), "X");
 
 		// 验证 ...
-		assertEquals(1, tasks.getTopTasks("X").size());
+		assertEquals(1, tasks.getTopTasksInStack("X").size());
 		assertEquals(1, tasks.getStack("X").getCount());
-		assertEquals(0, tasks.getTopTasks("Y").size());
+		assertEquals(0, tasks.getTopTasksInStack("Y").size());
 		assertEquals(0, tasks.getStack("Y").getCount());
 		assertEquals(TaskStatus.ING, tasks.getTask(t.get_id()).getStatus());
 
@@ -58,9 +58,9 @@ public class MongoTaskServiceTest extends ZTaskCase {
 		tasks.pushToStack(t.get_id(), "Y");
 
 		// 验证 ...
-		assertEquals(0, tasks.getTopTasks("X").size());
+		assertEquals(0, tasks.getTopTasksInStack("X").size());
 		assertEquals(0, tasks.getStack("X").getCount());
-		assertEquals(1, tasks.getTopTasks("Y").size());
+		assertEquals(1, tasks.getTopTasksInStack("Y").size());
 		assertEquals(1, tasks.getStack("Y").getCount());
 		assertEquals(TaskStatus.ING, tasks.getTask(t.get_id()).getStatus());
 
@@ -68,9 +68,9 @@ public class MongoTaskServiceTest extends ZTaskCase {
 		tasks.popFromStack(t.get_id(), true);
 
 		// 验证 ...
-		assertEquals(0, tasks.getTopTasks("X").size());
+		assertEquals(0, tasks.getTopTasksInStack("X").size());
 		assertEquals(0, tasks.getStack("X").getCount());
-		assertEquals(0, tasks.getTopTasks("Y").size());
+		assertEquals(0, tasks.getTopTasksInStack("Y").size());
 		assertEquals(0, tasks.getStack("Y").getCount());
 		assertEquals(TaskStatus.DONE, tasks.getTask(t.get_id()).getStatus());
 
@@ -79,9 +79,9 @@ public class MongoTaskServiceTest extends ZTaskCase {
 		tasks.popFromStack(t.get_id(), false);
 
 		// 验证 ...
-		assertEquals(0, tasks.getTopTasks("X").size());
+		assertEquals(0, tasks.getTopTasksInStack("X").size());
 		assertEquals(0, tasks.getStack("X").getCount());
-		assertEquals(0, tasks.getTopTasks("Y").size());
+		assertEquals(0, tasks.getTopTasksInStack("Y").size());
 		assertEquals(0, tasks.getStack("Y").getCount());
 		assertEquals(TaskStatus.NEW, tasks.getTask(t.get_id()).getStatus());
 	}
@@ -94,7 +94,7 @@ public class MongoTaskServiceTest extends ZTaskCase {
 		Task t1 = tasks.createTask(t("A1"));
 
 		// 顺便测测顺序
-		List<Task> tops = tasks.getTopTasks(null);
+		List<Task> tops = tasks.getTopTasks(null, null);
 		assertEquals(4, tops.size());
 		assertEquals("A", tops.get(0).getTitle());
 		assertEquals("A1", tops.get(1).getTitle());
@@ -107,7 +107,7 @@ public class MongoTaskServiceTest extends ZTaskCase {
 		tasks.setTaskParent(t11.get_id(), t1.get_id());
 
 		// 判断树节点
-		tops = tasks.getTopTasks(null);
+		tops = tasks.getTopTasks(null, null);
 		assertEquals(1, tops.size());
 		assertEquals("A", tops.get(0).getTitle());
 

@@ -68,10 +68,17 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 	}
 
 	@Override
-	public List<Task> getTopTasks(String stackName) {
-		return dao.find(Task.class,
-						Moo.born().append("stack", stackName).append("parentId", null),
-						MCur.born().asc("title"));
+	public List<Task> getTopTasksInStack(String stackName) {
+		this.checkStack(stackName);
+		return getTopTasks(stackName, null);
+	}
+
+	@Override
+	public List<Task> getTopTasks(String stackName, TaskStatus st) {
+		Moo q = Moo.born().append("stack", stackName).append("parentId", null);
+		if (null != st)
+			q.append("status", st);
+		return dao.find(Task.class, q, MCur.born().asc("title"));
 	}
 
 	@Override
@@ -97,7 +104,7 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 
 	@Override
 	public Task removeTask(String taskId, boolean recur) {
-		Task t = _check_task(taskId);
+		Task t = checkTask(taskId);
 		_remove_task(t, recur);
 		return t;
 	}
@@ -123,7 +130,7 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 
 	@Override
 	public Task setTaskOwner(String taskId, String ownerName) {
-		Task t = _check_task(taskId);
+		Task t = checkTask(taskId);
 		dao.updateById(Task.class, taskId, Moo.born().set("owner", ownerName));
 		t.setOwner(ownerName);
 		return t;
@@ -131,7 +138,7 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 
 	@Override
 	public Task setTaskTitle(String taskId, String newTitle) {
-		Task t = _check_task(taskId);
+		Task t = checkTask(taskId);
 		dao.updateById(Task.class, taskId, Moo.born().set("title", newTitle));
 		t.setTitle(newTitle);
 		return t;
@@ -139,7 +146,7 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 
 	@Override
 	public Task setTaskLabels(String taskId, String[] labels) {
-		Task t = _check_task(taskId);
+		Task t = checkTask(taskId);
 		dao.updateById(Task.class, taskId, Moo.born().set("labels", labels));
 		t.setLabels(labels);
 		return t;
@@ -147,7 +154,7 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 
 	@Override
 	public Task setTaskParent(String taskId, String parentId) {
-		Task t = _check_task(taskId);
+		Task t = checkTask(taskId);
 		dao.updateById(Task.class, taskId, Moo.born().set("parentId", parentId));
 		t.setParentId(parentId);
 		return t;
@@ -155,8 +162,8 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 
 	@Override
 	public Task pushToStack(String taskId, String stackName) {
-		_check_stack(stackName);
-		Task t = _check_task(taskId);
+		checkStack(stackName);
+		Task t = checkTask(taskId);
 		// 已经在栈里，就没必要再执行了
 		if (stackName.equals(t.getStack()))
 			return t;
@@ -245,14 +252,16 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 		return ts;
 	}
 
-	private Task _check_task(String taskId) {
+	@Override
+	public Task checkTask(String taskId) {
 		Task t = getTask(taskId);
 		if (null == t)
 			throw Err.T.NO_EXISTS(taskId);
 		return t;
 	}
 
-	private TaskStack _check_stack(String stackName) {
+	@Override
+	public TaskStack checkStack(String stackName) {
 		TaskStack ts = getStack(stackName);
 		if (null == ts)
 			throw Err.S.NO_EXISTS(stackName);
