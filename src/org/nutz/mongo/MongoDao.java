@@ -441,6 +441,9 @@ public class MongoDao {
 		});
 	}
 	
+	/**
+	 * 获取lastError,仅适用于被db.requestStart()和db.requestDone()包裹的情况.其他情况下,无法保证一定是之前连接的lastError
+	 */
 	public CommandResult getLastError() {
 		return db.getLastError();
 	}
