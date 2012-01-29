@@ -2,8 +2,10 @@ package org.nutz.mongo.util;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.nutz.lang.Lang;
+import org.nutz.mongo.Mongos;
 
 /**
  * 数据查询条件或者修改的值链
@@ -12,6 +14,97 @@ import org.nutz.lang.Lang;
  * @author Wendal(wendal1985@gmail.com)
  */
 public class Moo extends MoChain {
+
+	/**
+	 * 判断一个字段的值是否包含在给定数组中
+	 * 
+	 * @param field
+	 *            字段
+	 * @param args
+	 *            变参数组
+	 * @return 新节点
+	 */
+	public Moo in(String field, Object... args) {
+		return inArray(field, args);
+	}
+
+	/**
+	 * 判断一个字段的值是否包含在给定数组中
+	 * 
+	 * @param field
+	 *            字段
+	 * @param array
+	 *            数组
+	 * @return 新节点
+	 */
+	public Moo inArray(String field, Object array) {
+		return append(field, Mongos.map("$in", array));
+	}
+
+	/**
+	 * 判断字段型数组是否与给定的数组匹配
+	 * 
+	 * @param field
+	 *            数组字段
+	 * @param args
+	 *            变参数组
+	 * @return 新节点
+	 */
+	public Moo array(String field, Object... args) {
+		return all(field, args);
+	}
+
+	/**
+	 * 判断字段型数组是否与给定的数组匹配
+	 * 
+	 * @param field
+	 *            数组字段
+	 * @param array
+	 *            参考数组
+	 * @return 新节点
+	 */
+	public Moo all(String field, Object array) {
+		return append(field, Mongos.map("$all", array));
+	}
+
+	/**
+	 * 用正则表达式，查找可以匹配的字段
+	 * 
+	 * @param field
+	 *            字段
+	 * @param regex
+	 *            正则式
+	 * @return 新节点
+	 */
+	public Moo match(String field, String regex) {
+		return append(field, Pattern.compile(regex));
+	}
+
+	/**
+	 * 查找包含的文字
+	 * 
+	 * @param field
+	 *            字段
+	 * @param str
+	 *            字符串
+	 * @return 新节点
+	 */
+	public Moo contains(String field, String str) {
+		return append(field, Pattern.compile("^.*" + str + ".*$"));
+	}
+
+	/**
+	 * 查找开头的文字，它会比 contains 要快点
+	 * 
+	 * @param field
+	 *            字段
+	 * @param str
+	 *            字符串
+	 * @return 新节点
+	 */
+	public Moo startsWith(String field, String str) {
+		return append(field, Pattern.compile("^" + str));
+	}
 
 	/**
 	 * 移除一组字段

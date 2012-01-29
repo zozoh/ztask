@@ -19,6 +19,16 @@ public interface TaskService extends AbstractService {
 	Task getTask(String taskId);
 
 	/**
+	 * 根据条件查询一组任务，条件详细请参见 TaskQuery 接口
+	 * 
+	 * @param tq
+	 *            查询条件
+	 * @return 任务对象列表
+	 * @see org.nutz.ztask.api.TaskQuery
+	 */
+	List<Task> queryTasks(TaskQuery tq);
+
+	/**
 	 * 查询一个 Stack 下面到底有哪些任务，这里仅仅返回根任务
 	 * 
 	 * @param stackName
