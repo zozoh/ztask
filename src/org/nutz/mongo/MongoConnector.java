@@ -69,4 +69,7 @@ public class MongoConnector {
 		mongo.close();
 	}
 
+	public Mongo getMongo() {
+		return mongo;
+	}
 }

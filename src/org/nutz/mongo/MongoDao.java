@@ -16,6 +16,7 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
+import com.mongodb.MongoException;
 import com.mongodb.WriteResult;
 
 /**
@@ -316,7 +317,7 @@ public class MongoDao {
 
 	private DB db;
 
-	MongoDao(DB db) {
+	protected MongoDao(DB db) {
 		this.db = db;
 	}
 
@@ -436,7 +437,7 @@ public class MongoDao {
 				callback.invoke(db);
 				CommandResult cr = db.getLastError();
 				if (cr.get("err") != null)
-					throw Lang.makeThrow("Fail! %s", cr.getErrorMessage());
+					throw Lang.makeThrow(MongoException.class, "Fail! %s", cr.getErrorMessage());
 			}
 		});
 	}
