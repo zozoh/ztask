@@ -9,6 +9,7 @@ import org.nutz.lang.Lang;
  * 数据查询条件或者修改的值链
  * 
  * @author zozoh(zozohtnt@gmail.com)
+ * @author Wendal(wendal1985@gmail.com)
  */
 public class Moo extends MoChain {
 
@@ -137,6 +138,12 @@ public class Moo extends MoChain {
 	 */
 	public static Moo born() {
 		return new Moo();
+	}
+	
+	public static Moo born(String key, Object val) {
+		Moo moo = born();
+		moo.append(key, val);
+		return moo;
 	}
 
 }
