@@ -87,4 +87,7 @@ public interface MongoEntity<T> {
 	 */
 	void fillIdIfNoexits(T obj);
 
+	boolean isCapped();
+	
+	long getCappedSize();
 }

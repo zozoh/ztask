@@ -80,6 +80,9 @@ public class MongoEntityMaker {
 			// 获得集合名称
 			Co co = type.getAnnotation(Co.class);
 			en.setCollectionName(Strings.sBlank(co.value(), type.getName().toLowerCase()));
+			
+			// 获取capped属性,判断是否为固定集合
+			en.setCappedSize(co.cappedSize());
 
 			// 获得集合索引
 			CoIndexes cix = type.getAnnotation(CoIndexes.class);

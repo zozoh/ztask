@@ -379,7 +379,7 @@ public class MongoDao {
 	}
 
 	/**
-	 * 清除一个集合
+	 * 创建一个集合
 	 * 
 	 * @param collName
 	 *            集合名称
@@ -388,13 +388,35 @@ public class MongoDao {
 	 *            true 则如果存在，就 drop
 	 */
 	public void create(String collName, boolean dropIfExists) {
+		create(collName, dropIfExists, -1);
+	}
+	
+	/**
+	 * 创建一个集合
+	 * 
+	 * @param collName
+	 *            集合名称
+	 * 
+	 * @param dropIfExists
+	 *            true 则如果存在，就 drop
+	 *            
+	 * @param cappedSize
+	 * 			   如果大于0,则创建一个固定集合,单位是byte
+	 */
+	public void create(String collName, boolean dropIfExists, long cappedSize) {
 		// 判断集合是否存在
 		if (!dropIfExists && db.collectionExists(collName))
 			return;
 		// 首先移除
 		drop(collName);
 		// TODO 这里可以设置集合一些特殊的设置，比如固定集合等
-		db.createCollection(collName, new BasicDBObject());
+		if (cappedSize > 0) {
+			DBObject colConfig = Mongos.dbo("capped", true);
+			colConfig.put("size", cappedSize);
+			db.createCollection(collName, colConfig);
+		}
+		else
+			db.createCollection(collName, new BasicDBObject());
 	}
 
 	/**
@@ -409,7 +431,7 @@ public class MongoDao {
 	public void create(Class<?> pojoType, boolean dropIfExists) {
 		MongoEntity<?> moe = Mongos.entity(pojoType);
 		String colName = moe.getCollectionName(null);
-		create(colName, dropIfExists);
+		create(colName, dropIfExists, moe.getCappedSize());
 		// 创建索引
 		if (moe.hasIndexes()) {
 			for (MongoEntityIndex mei : moe.getIndexes()) {

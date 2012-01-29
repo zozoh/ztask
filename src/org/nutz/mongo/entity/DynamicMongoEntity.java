@@ -77,4 +77,12 @@ public abstract class DynamicMongoEntity<T> implements MongoEntity<T> {
 		return key;
 	}
 
+	public boolean isCapped() {
+		return false;
+	}
+	
+	@Override
+	public long getCappedSize() {
+		return 0;
+	}
 }
