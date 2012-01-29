@@ -454,7 +454,7 @@ public class MongoDao {
 	 */
 	public void runNoError(final Callback<DB> callback) {
 		Mongos.run(db, new Callback<DB>() {
-			
+
 			public void invoke(DB db) {
 				callback.invoke(db);
 				CommandResult cr = db.getLastError();
@@ -463,9 +463,15 @@ public class MongoDao {
 			}
 		});
 	}
-	
+
 	/**
-	 * 获取lastError,仅适用于被db.requestStart()和db.requestDone()包裹的情况.其他情况下,无法保证一定是之前连接的lastError
+	 * 获取lastError
+	 * <p>
+	 * <b style=color:red>注!!!</b> 仅适用于被db.requestStart()和db.requestDone()包裹的情况.
+	 * <br>
+	 * 其他情况下,无法保证一定是之前连接的lastError
+	 * 
+	 * @return 命令执行结果
 	 */
 	public CommandResult getLastError() {
 		return db.getLastError();

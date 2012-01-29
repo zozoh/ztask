@@ -19,6 +19,19 @@ public interface TaskService extends AbstractService {
 	Task getTask(String taskId);
 
 	/**
+	 * 根据一个 TASK ID 得到一个 TASK 对象
+	 * <p>
+	 * 如果对象不存在抛错
+	 * 
+	 * @param taskId
+	 *            任务ID
+	 * @return 任务对象
+	 * @throws org.nutz.ztask.Err.T
+	 *             #NO_EXISTS
+	 */
+	Task checkTask(String taskId);
+
+	/**
 	 * 根据条件查询一组任务，条件详细请参见 TaskQuery 接口
 	 * 
 	 * @param tq
@@ -32,10 +45,24 @@ public interface TaskService extends AbstractService {
 	 * 查询一个 Stack 下面到底有哪些任务，这里仅仅返回根任务
 	 * 
 	 * @param stackName
-	 *            任务堆栈的名称
+	 *            任务堆栈的名称，null 表示不在任何堆栈中的任务
+	 * @param sta
+	 *            为任务的状态，null 表示不关心这个限制条件
 	 * @return 按照顺序返回任务对象列表，顺序按照 title 字段排序
 	 */
-	List<Task> getTopTasks(String stackName);
+	List<Task> getTopTasks(String stackName, TaskStatus sta);
+
+	/**
+	 * 查询一个 Stack 下面到底有哪些任务，这里仅仅返回根任务
+	 * <p>
+	 * 注，这里的 stack 必须存在，如果不存在，将抛错
+	 * 
+	 * @param stackName
+	 *            任务堆栈的名称，对应的 stack 必须存在
+	 * 
+	 * @return 按照顺序返回任务对象列表，顺序按照 title 字段排序
+	 */
+	List<Task> getTopTasksInStack(String stackName);
 
 	/**
 	 * 得到一个任务所有的子任务
@@ -48,10 +75,14 @@ public interface TaskService extends AbstractService {
 
 	/**
 	 * 创建一个新的任务
+	 * <p>
+	 * 这个函数会自动标识 Task 的时间，以及将状态设置成 NEW
 	 * 
 	 * @param task
 	 *            任务对象
 	 * @return 创建后的任务对象
+	 * 
+	 * @see org.nutz.ztask.api.TaskStatus
 	 */
 	Task createTask(Task task);
 
@@ -148,6 +179,19 @@ public interface TaskService extends AbstractService {
 	 * @return 堆栈对象, null 表示不存在
 	 */
 	TaskStack getStack(String stackName);
+
+	/**
+	 * 根据堆栈的Name，得到一个任务堆栈
+	 * <p>
+	 * 如果对象不存在抛错
+	 * 
+	 * @param stackName
+	 *            任务堆栈的名字
+	 * @return 堆栈对象
+	 * @throws org.nutz.ztask.Err.S
+	 *             #NO_EXISTS
+	 */
+	TaskStack checkStack(String stackName);
 
 	/**
 	 * 创建一个新的任务堆栈

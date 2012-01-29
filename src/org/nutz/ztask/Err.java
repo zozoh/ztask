@@ -23,6 +23,14 @@ public abstract class Err {
 		public static WebException BLANK_TASK() {
 			return create("e.t.blank_task");
 		}
+
+		public static WebException SHORT_TASK(int len) {
+			return create("e.t.short_task").reason(len);
+		}
+
+		public static WebException LONG_TASK(int len) {
+			return create("e.t.long_task").reason(len);
+		}
 	}
 
 	/**
