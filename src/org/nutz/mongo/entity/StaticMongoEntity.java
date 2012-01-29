@@ -7,6 +7,7 @@ import org.nutz.lang.Lang;
 import org.nutz.lang.Mirror;
 import org.nutz.lang.born.Borning;
 import org.nutz.mongo.Mongos;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
@@ -29,7 +30,7 @@ public class StaticMongoEntity<T> implements MongoEntity<T> {
 	private Map<String, MongoEntityField> fields;
 
 	private MongoEntityField _id;
-
+	
 	public StaticMongoEntity(Class<T> type) {
 		this.type = type;
 		this.mirror = Mirror.me(type);
@@ -148,5 +149,6 @@ public class StaticMongoEntity<T> implements MongoEntity<T> {
 	void setCollectionName(String collectionName) {
 		this.collectionName = collectionName;
 	}
+
 
 }

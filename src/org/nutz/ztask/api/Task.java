@@ -41,13 +41,13 @@ public class Task {
 	 * 格式为 yyyy-MM-dd HH:mm:ss 格式的字符串
 	 */
 	@CoField("ct")
-	private String createTime;
+	private String createTime; //TODO 使用Date/或者TimeStemp
 
 	/**
 	 * 格式为 yyyy-MM-dd HH:mm:ss 格式的字符串
 	 */
 	@CoField("lm")
-	private String lastModified;
+	private String lastModified;//TODO 使用Date/或者TimeStemp
 
 	/**
 	 * 所在堆栈的名称

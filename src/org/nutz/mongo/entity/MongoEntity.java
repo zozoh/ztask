@@ -1,5 +1,7 @@
 package org.nutz.mongo.entity;
 
+import java.util.Map;
+
 import com.mongodb.DBObject;
 
 /**
@@ -75,4 +77,5 @@ public interface MongoEntity<T> {
 	 */
 	void fillIdIfNoexits(T obj);
 
+	Map<String, MongoEntityField> getFields() ;
 }

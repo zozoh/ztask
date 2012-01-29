@@ -94,4 +94,13 @@ public class MongoDaoPojoTest extends MongoCase {
 
 	}
 
+	//测试唯一性索引
+	// XXX 由于mongodb的特性,插入失败并不会报错,除非执行getError
+	@Test
+	public void test_index_unique() {
+		dao.create(Pet.class, true);
+		dao.save(Pet.me("XiaoBai", 10, 3));
+		dao.save(Pet.me("XiaoBai", 2, 222));
+		assertEquals(1, dao.count(Pet.class, null));
+	}
 }

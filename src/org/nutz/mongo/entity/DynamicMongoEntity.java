@@ -77,4 +77,7 @@ public abstract class DynamicMongoEntity<T> implements MongoEntity<T> {
 		return key;
 	}
 
+	public Map<String, MongoEntityField> getFields() {
+		return null;
+	}
 }

@@ -22,7 +22,7 @@ public class TaskStack {
 	/**
 	 * 本任务栈的名称 （唯一性约束） TODO 需要添加唯一性约束 ...
 	 */
-	@CoField("nm")
+	@CoField(value="nm",unique=true)
 	private String name;
 
 	/**

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.nutz.lang.Lang;
 import org.nutz.mongo.entity.MongoEntity;
+import org.nutz.mongo.entity.MongoEntityField;
 import org.nutz.mongo.util.MCur;
 
 import com.mongodb.BasicDBObject;
@@ -346,7 +347,24 @@ public class MongoDao {
 	 */
 	public void create(Class<?> pojoType, boolean dropIfExists) {
 		MongoEntity<?> moe = Mongos.entity(pojoType);
-		create(moe.getCollectionName(null), dropIfExists);
+		String colName = moe.getCollectionName(null);
+		create(colName, dropIfExists);
+		if (moe.getFields() != null)
+			for (MongoEntityField field : moe.getFields().values()) {
+				int index = field.getIndex();
+				switch (field.getIndex()) {
+				case 1:
+				case -1:
+					if (field.isUnique())
+						db.getCollection(colName).ensureIndex(Mongos.dbo(field.getDbName(), index), Mongos.dbo("unique", true));
+					else
+						db.getCollection(colName).ensureIndex(Mongos.dbo(field.getDbName(), index));
+					break;
+				default : 
+					if (field.isUnique())
+						db.getCollection(colName).ensureIndex(Mongos.dbo(field.getDbName(), 1), Mongos.dbo("unique", true));
+				}
+			}
 	}
 
 	/**

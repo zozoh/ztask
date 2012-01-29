@@ -4,6 +4,7 @@ package org.nutz.mongo.annotation;
  * 一个 MongoDB 文档的 "_id" 字段可能的形式
  * 
  * @author zozoh(zozohtnt@gmail.com)
+ * @author Wendal(wendal1985@gmail.com)
  */
 public enum CoIdType {
 
@@ -25,6 +26,10 @@ public enum CoIdType {
 	/**
 	 * Java的 UUID 默认表现形式，即 toString 后的形式
 	 */
-	UUID
+	UUID,
 	
+	/**
+	 * 自动增长
+	 */
+	AUTO_INC
 }

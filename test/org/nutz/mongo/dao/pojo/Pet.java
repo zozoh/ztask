@@ -33,7 +33,7 @@ public class Pet {
 	@CoId(CoIdType.UU64)
 	private String id;
 
-	@CoField("nm")
+	@CoField(value="nm",unique=true)
 	private String name;
 
 	@CoField("tp")

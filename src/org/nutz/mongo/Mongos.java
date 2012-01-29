@@ -13,6 +13,7 @@ import org.nutz.mongo.entity.MongoEntityMaker;
 import org.nutz.mongo.util.MoChain;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
 import com.mongodb.DBObject;
 
 /**
@@ -159,4 +160,16 @@ public abstract class Mongos {
 		}
 	}
 
+	/**
+	 * 获取自动增长id
+	 */
+	public static Integer getAutoIncreaseID(DB db, String idName) {
+		BasicDBObject query = new BasicDBObject("name", idName);
+		BasicDBObject update = new BasicDBObject("$inc", new BasicDBObject("id", 1));
+		return (Integer) db.getCollection("inc_ids")
+				.findAndModify(query, null, null, false, update, true, true)
+				.get("id");
+	}
+	
+	
 }

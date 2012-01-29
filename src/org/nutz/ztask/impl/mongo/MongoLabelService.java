@@ -38,7 +38,6 @@ public class MongoLabelService extends AbstractMongoService implements LabelServ
 
 	@Override
 	public boolean hasLabel(String labelName) {
-		//TODO count是更好的选择
 		return get(labelName) != null;
 	}
 
@@ -54,7 +53,7 @@ public class MongoLabelService extends AbstractMongoService implements LabelServ
 
 	@Override
 	public List<Label> addIfNoExists(String... labelNames) {
-		//TODO 使用addToSet
+		//TODO 使用findAndModify
 		ArrayList<Label> list = new ArrayList<Label>(labelNames.length);
 		for (String labelName : labelNames) {
 			if (hasLabel(labelName))

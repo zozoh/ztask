@@ -16,6 +16,10 @@ public class MongoEntityField {
 	private String dbName;
 
 	private CoIdType idType;
+	
+	private int index;
+	
+	private boolean unique;
 
 	private FieldAdaptor adaptor;
 
@@ -94,6 +98,14 @@ public class MongoEntityField {
 	public FieldAdaptor getAdaptor() {
 		return adaptor;
 	}
+	
+	public int getIndex() {
+		return index;
+	}
+	
+	public boolean isUnique() {
+		return unique;
+	}
 
 	public MongoEntityField(FieldInfo fi) {
 		name = fi.getName();
@@ -105,7 +117,10 @@ public class MongoEntityField {
 		// 如果是 _id 那么， dbName 要固定
 		if (isId())
 			dbName = "_id";
-
+		if (fi.getAnnotation() != null) {
+			this.index = fi.getAnnotation().index();
+			this.unique = fi.getAnnotation().unique();
+		}
 		// 得到 In/Ejectint
 		adaptor = fi.getAdaptor();
 	}
