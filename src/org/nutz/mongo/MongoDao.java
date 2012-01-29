@@ -106,7 +106,7 @@ public class MongoDao {
 			moe.fillIdIfNoexits(obj);
 			DBObject dbo = moe.toDBObject(obj);
 			DBCollection coll = db.getCollection(collName);
-			coll.insert(dbo);
+			coll.save(dbo);
 			return obj;
 		}
 		return null;
