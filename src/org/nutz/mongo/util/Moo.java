@@ -235,8 +235,7 @@ public class Moo extends MoChain {
 	
 	public static Moo born(String key, Object val) {
 		Moo moo = born();
-		moo.append(key, val);
-		return moo;
+		return moo.append(key, val);
 	}
 
 }
