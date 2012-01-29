@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.nutz.lang.Lang;
+import org.nutz.lang.util.Callback;
 import org.nutz.mongo.entity.MongoEntity;
 import org.nutz.mongo.entity.MongoEntityField;
 import org.nutz.mongo.util.MCur;
@@ -357,13 +358,16 @@ public class MongoDao {
 				case 1:
 				case -1:
 					if (field.isUnique())
-						db.getCollection(colName).ensureIndex(Mongos.dbo(field.getDbName(), index), Mongos.dbo("unique", true));
+						db.getCollection(colName)
+							.ensureIndex(	Mongos.dbo(field.getDbName(), index),
+											Mongos.dbo("unique", true));
 					else
 						db.getCollection(colName).ensureIndex(Mongos.dbo(field.getDbName(), index));
 					break;
-				default : 
+				default:
 					if (field.isUnique())
-						db.getCollection(colName).ensureIndex(Mongos.dbo(field.getDbName(), 1), Mongos.dbo("unique", true));
+						db.getCollection(colName).ensureIndex(	Mongos.dbo(field.getDbName(), 1),
+																Mongos.dbo("unique", true));
 				}
 			}
 	}
@@ -407,25 +411,42 @@ public class MongoDao {
 	}
 
 	/**
-	 * 直接访问mongodb底层API的回调操作,包含单连接限制 TODO嵌套就有问题
+	 * 最终极的方法，提供给你一个 callback，你可以随意访问 MongoDB 的 DB 这个类
+	 * <p>
+	 * 在你提供的回调内，你的 DB 对象，会保证访问同一个连接
+	 * 
+	 * @param callback
+	 *            回调
 	 */
-	public void exec(DBCallback callback) {
+	public void run(Callback<DB> callback) {
 		try {
 			db.requestStart();
-			callback.run(db);
-		} finally {
+			callback.invoke(db);
+		}
+		finally {
 			db.requestDone();
 		}
 	}
-	
-	public void safeExec(DBCallback callback) {
+
+	/**
+	 * 最终极的方法，提供给你一个 callback，你可以随意访问 MongoDB 的 DB 这个类
+	 * <p>
+	 * 在你提供的回调内，你的 DB 对象，会保证访问同一个连接
+	 * <p>
+	 * 这个方法不容忍错误，即，它调用完你的回调后，会查查，是不是有 lastError，如果有，则抛错
+	 * 
+	 * @param callback
+	 *            回调
+	 */
+	public void runNoError(Callback<DB> callback) {
 		try {
 			db.requestStart();
-			callback.run(db);
+			callback.invoke(db);
 			CommandResult cr = db.getLastError();
 			if (cr.get("err") != null)
 				throw Lang.makeThrow("Fail! %s", cr.getErrorMessage());
-		} finally {
+		}
+		finally {
 			db.requestDone();
 		}
 	}

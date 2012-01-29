@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import java.util.List;
 
 import org.junit.Test;
-import org.nutz.mongo.DBCallback;
+import org.nutz.lang.util.Callback;
 import org.nutz.mongo.MongoCase;
 import org.nutz.mongo.dao.pojo.Pet;
 import org.nutz.mongo.dao.pojo.PetType;
@@ -180,13 +180,13 @@ public class MongoDaoPojoTest extends MongoCase {
 
 	}
 
-	//测试唯一性索引
-	@Test(expected=Throwable.class)
+	// 测试唯一性索引
+	@Test(expected = Throwable.class)
 	public void test_index_unique() {
 		dao.create(Pet.class, true);
 		dao.save(Pet.me("XiaoBai", 10, 3));
-		dao.safeExec(new DBCallback() {
-			public void run(DB db) {
+		dao.runNoError(new Callback<DB>() {
+			public void invoke(DB db) {
 				dao.save(Pet.me("XiaoBai", 2, 222));
 			}
 		});
