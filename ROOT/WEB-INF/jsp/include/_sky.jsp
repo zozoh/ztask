@@ -2,7 +2,7 @@
 String url = request.getRequestURI();
 %>
 <div id="sky">
-    <div id="logo"></div>
+    <div id="logo"><img src="${rs}/img/loading.gif"></div>
     <div id="lnks">
         <a href="${base}/page/stack" <%=url.endsWith("stack.jsp")?"class=\"hlt\"":""%>>
             ${msg['ui.stack']}

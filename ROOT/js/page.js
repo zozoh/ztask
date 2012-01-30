@@ -16,6 +16,12 @@ $(document.body).ready(function() {
     // 监视键盘
     z.watchKeyboard();
 
+    // 注册 ajax 事件
+    $("#logo img").ajaxStart(function() {
+    this.style.visibility = "visible";
+    }).ajaxStop(function() {
+        this.style.visibility = "hidden";
+    });
     // 调整界面布局
     _adjust_layout();
     // 随着窗口变化调整
