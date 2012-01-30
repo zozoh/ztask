@@ -28,4 +28,6 @@ public @interface Co {
 	 * 如果大于0,则设置为一个固定集合
 	 */
 	long cappedSize() default -1;
+	
+	long cappedMax() default -1;
 }

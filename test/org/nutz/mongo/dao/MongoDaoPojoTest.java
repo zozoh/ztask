@@ -242,6 +242,6 @@ public class MongoDaoPojoTest extends MongoCase {
 		}
 		long size = dao.count(CappedPet.class, null);
 		System.out.println("CappedPet size=" + size);
-		assertNotSame(1000, size);
+		assertTrue(100 >= size);
 	}
 }

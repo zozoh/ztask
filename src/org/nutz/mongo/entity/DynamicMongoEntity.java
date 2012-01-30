@@ -26,13 +26,14 @@ public class DynamicMongoEntity implements MongoEntity {
 		return key;
 	}
 
-	public boolean isCapped() {
-		return false;
-	}
-
 	@Override
 	public long getCappedSize() {
-		return 0;
+		return -1;
+	}
+	
+	@Override
+	public long getCappedMax() {
+		return -1;
 	}
 
 	@Override
