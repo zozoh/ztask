@@ -23,7 +23,7 @@
 <html>
 <head>
 	<title>${msg['err.page.title']}</title>
-	<link rel="stylesheet" type="text/css" href="${rs}/css/_zstack.css" />
+	<link rel="stylesheet" type="text/css" href="${rs}/css/zstack.css" />
 	<link rel="stylesheet" type="text/css" href="${rs}/css/jquery.errbox.css" />
 	<script>
 	    var isRe = <%=isRe%>;

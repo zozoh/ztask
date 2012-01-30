@@ -9,6 +9,7 @@ import org.nutz.mongo.util.MCur;
 import org.nutz.mongo.util.Moo;
 import org.nutz.ztask.Err;
 import org.nutz.ztask.ZTasks;
+import org.nutz.ztask.api.GInfo;
 import org.nutz.ztask.api.TaskQuery;
 import org.nutz.ztask.api.TaskStack;
 import org.nutz.ztask.api.Task;
@@ -61,7 +62,7 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 		Moo q = Moo.born().append("stack", stackName).append("parentId", null);
 		if (null != st)
 			q.append("status", st);
-		return dao.find(Task.class, q, MCur.born().asc("title"));
+		return dao.find(Task.class, q, MCur.born().desc("_id"));
 	}
 
 	@Override
@@ -196,6 +197,18 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 	}
 
 	@Override
+	public List<TaskStack> getTopStacks() {
+		return getChildStacks(null);
+	}
+
+	@Override
+	public List<TaskStack> getChildStacks(String stackName) {
+		return dao.find(TaskStack.class, Moo.born("parentName", stackName), MCur.born()
+																				.asc("name")
+																				.desc("_id"));
+	}
+
+	@Override
 	public TaskStack getStack(String stackName) {
 		return dao.findOne(TaskStack.class, Moo.born().append("name", stackName));
 	}
@@ -222,10 +235,13 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 	}
 
 	@Override
-	public TaskStack setTackDescription(String stackName, String des) {
-		TaskStack s = this.checkStack(stackName);
-		s.setDescription(des);
-		dao.updateById(TaskStack.class, s.get_id(), Moo.born().set("description", des));
+	public TaskStack setStackParent(String stackName, String parentName) {
+		checkStack(parentName);
+		TaskStack s = checkStack(stackName);
+		if (!parentName.equals(s.getParentName())) {
+			s.setParentName(parentName);
+			dao.updateById(TaskStack.class, s.get_id(), Moo.born().set("parentName", parentName));
+		}
 		return s;
 	}
 
@@ -297,4 +313,17 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 		// 然后固定按照 title 排序
 		mcur.asc("title");
 	}
+
+	@Override
+	public GInfo getGlobalInfo() {
+		return dao.findOne(GInfo.class, null);
+	}
+
+	@Override
+	public GInfo setGlobalInfo(GInfo info) {
+		info.setLastModified(ZTasks.now());
+		dao.save(info);
+		return info;
+	}
+
 }

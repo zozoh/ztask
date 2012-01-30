@@ -2,11 +2,14 @@ package org.nutz.ztask.web.module.core;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.nutz.ioc.annotation.InjectName;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Strings;
 import org.nutz.mvc.Scope;
+import org.nutz.mvc.adaptor.JsonAdaptor;
 import org.nutz.mvc.annotation.*;
 import org.nutz.web.Webs;
 import org.nutz.web.ajax.AjaxCheckSession;
@@ -84,7 +87,7 @@ public class AjaxModule {
 	}
 
 	@At("/task/children")
-	public List<Task> getChildrenTasks(@Param("tid") String taskId) {
+	public List<Task> getChildrenTasks(@Param("tid") String taskId, HttpServletRequest req) {
 		return tasks.getChildTasks(taskId);
 	}
 
@@ -118,4 +121,27 @@ public class AjaxModule {
 		// 创建
 		return tasks.createTask(t);
 	}
+
+	@AdaptBy(type = JsonAdaptor.class)
+	@At("/g/set")
+	public GInfo setGlobalInfo(GInfo info) {
+		if (null == info)
+			info = new GInfo();
+		if (Strings.isBlank(info.get_id())) {
+			GInfo info2 = tasks.dao().findOne(GInfo.class, null);
+			info.set_id(info2.get_id());
+		}
+		return tasks.setGlobalInfo(info);
+	}
+
+	@At("/g/get")
+	public GInfo getGlobalInfo(@Param("smtp") boolean showSmtp) {
+		GInfo info = tasks.getGlobalInfo();
+		if (null == info)
+			info = new GInfo();
+		if (!showSmtp)
+			info.setSmtp(null);
+		return info;
+	}
+
 }

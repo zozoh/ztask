@@ -8,6 +8,7 @@ import org.bson.types.ObjectId;
 import org.nutz.castor.Castors;
 import org.nutz.json.Json;
 import org.nutz.lang.Lang;
+import org.nutz.lang.Mirror;
 import org.nutz.lang.util.Callback;
 import org.nutz.lang.util.NutMap;
 import org.nutz.mongo.entity.MongoEntity;
@@ -80,8 +81,8 @@ public abstract class Mongos {
 	 */
 	public static DBObject dboId(String ID) {
 		if (isDefaultMongoId(ID))
-			return new BasicDBObject("_id", new ObjectId(ID));
-		return new BasicDBObject("_id", ID);
+			return dbo("_id", new ObjectId(ID));
+		return dbo("_id", ID);
 	}
 
 	/**
@@ -109,11 +110,20 @@ public abstract class Mongos {
 		if (o instanceof CharSequence)
 			return Json.fromJson(NutMap.class, o.toString());
 
+		// 更多判断 ...
+		Mirror<?> mirror = Mirror.me(o.getClass());
+
+		// 普通 Map
+		if (mirror.isMap()) {
+			return new NutMap((Map<String, Object>) o);
+		}
+
+		// POJO
+		if (mirror.isPojo())
+			return new NutMap(Lang.obj2map(o));
+
 		// 其他的，调用 Castors 先变 Map 再说
-		Map<String, Object> objMap = Castors.me().castTo(o, Map.class);
-		NutMap map = new NutMap();
-		map.putAll(objMap);
-		return map;
+		return Castors.me().castTo(o, NutMap.class);
 	}
 
 	/**

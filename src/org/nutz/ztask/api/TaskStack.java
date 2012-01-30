@@ -21,16 +21,16 @@ public class TaskStack {
 	private String _id;
 
 	/**
+	 * 本堆栈的父堆栈
+	 */
+	@CoField("pnm")
+	private String parentName;
+
+	/**
 	 * 本任务栈的名称
 	 */
 	@CoField(value = "nm")
 	private String name;
-
-	/**
-	 * 本任务栈的描述
-	 */
-	@CoField("des")
-	private String description;
 
 	/**
 	 * 任务的数量
@@ -52,20 +52,20 @@ public class TaskStack {
 		this._id = _id;
 	}
 
+	public String getParentName() {
+		return parentName;
+	}
+
+	public void setParentName(String parentName) {
+		this.parentName = parentName;
+	}
+
 	public String getName() {
 		return name;
 	}
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
 	}
 
 	public int getCount() {

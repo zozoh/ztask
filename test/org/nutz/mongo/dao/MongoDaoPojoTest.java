@@ -5,11 +5,13 @@ import static org.junit.Assert.*;
 import java.util.List;
 
 import org.junit.Test;
+import org.nutz.lang.Lang;
 import org.nutz.lang.util.Callback;
 import org.nutz.mongo.MongoCase;
 import org.nutz.mongo.dao.pojo.CappedPet;
 import org.nutz.mongo.dao.pojo.Pet;
 import org.nutz.mongo.dao.pojo.PetType;
+import org.nutz.mongo.dao.pojo.SInner;
 import org.nutz.mongo.dao.pojo.SObj;
 import org.nutz.mongo.util.Moo;
 import org.nutz.mongo.util.MCur;
@@ -20,16 +22,123 @@ import com.mongodb.WriteResult;
 public class MongoDaoPojoTest extends MongoCase {
 
 	@Test
+	public void test_save_inner_pojo() {
+		dao.create(SObj.class, true);
+
+		SObj o = SObj.create("abc");
+		o.setObj(SInner.me(6, 9));
+		dao.save(o);
+
+		SObj o2 = dao.findById(SObj.class, o.getId());
+		assertEquals(o.getName(), o2.getName());
+		assertEquals(6, o2.getObj().getX());
+		assertEquals(9, o2.getObj().getY());
+
+		o.setObj(SInner.me(22, 33));
+		dao.save(o);
+
+		o2 = dao.findById(SObj.class, o.getId());
+		assertEquals(o.getName(), o2.getName());
+		assertEquals(22, o2.getObj().getX());
+		assertEquals(33, o2.getObj().getY());
+
+		dao.updateById(SObj.class, o.getId(), Moo.born().set("obj", SInner.me(44, 55)));
+
+		o2 = dao.findById(SObj.class, o.getId());
+		assertEquals(o.getName(), o2.getName());
+		assertEquals(44, o2.getObj().getX());
+		assertEquals(55, o2.getObj().getY());
+	}
+
+	@Test
+	public void test_save_inner_objarray() {
+		dao.create(SObj.class, true);
+
+		SObj o = SObj.create("abc");
+		o.setInners(Lang.array(SInner.me(45, 90), SInner.me(43, 62)));
+		dao.save(o);
+
+		SObj o2 = dao.findById(SObj.class, o.getId());
+		assertEquals(o.getName(), o2.getName());
+		assertEquals(2, o2.getInners().length);
+		assertEquals(45, o2.getInners()[0].getX());
+		assertEquals(90, o2.getInners()[0].getY());
+		assertEquals(43, o2.getInners()[1].getX());
+		assertEquals(62, o2.getInners()[1].getY());
+
+		o.setInners(Lang.array(SInner.me(3, 5)));
+		dao.save(o);
+
+		o2 = dao.findById(SObj.class, o.getId());
+		assertEquals(o.getName(), o2.getName());
+		assertEquals(1, o2.getInners().length);
+		assertEquals(3, o2.getInners()[0].getX());
+		assertEquals(5, o2.getInners()[0].getY());
+
+		dao.updateById(	SObj.class,
+						o.getId(),
+						Moo.born().set(	"inners",
+										Lang.array(	SInner.me(77, 88),
+													SInner.me(44, 33),
+													SInner.me(55, 66))));
+
+		o2 = dao.findById(SObj.class, o.getId());
+		assertEquals(o.getName(), o2.getName());
+		assertEquals(3, o2.getInners().length);
+		assertEquals(77, o2.getInners()[0].getX());
+		assertEquals(88, o2.getInners()[0].getY());
+		assertEquals(44, o2.getInners()[1].getX());
+		assertEquals(33, o2.getInners()[1].getY());
+		assertEquals(55, o2.getInners()[2].getX());
+		assertEquals(66, o2.getInners()[2].getY());
+
+	}
+
+	@Test
+	public void test_save_inner_map() {
+		dao.create(SObj.class, true);
+
+		SObj o = SObj.create("abc");
+		o.setMap("{x:1, y:36}");
+		dao.save(o);
+
+		SObj o2 = dao.findById(SObj.class, o.getId());
+		assertEquals(o.getName(), o2.getName());
+		assertEquals(1, ((Integer) o2.getMap().get("x")).intValue());
+		assertEquals(36, ((Integer) o2.getMap().get("y")).intValue());
+
+		o.setMap("{x:88, y:93}");
+		dao.save(o);
+
+		o2 = dao.findById(SObj.class, o.getId());
+		assertEquals(o.getName(), o2.getName());
+		assertEquals(88, ((Integer) o2.getMap().get("x")).intValue());
+		assertEquals(93, ((Integer) o2.getMap().get("y")).intValue());
+
+		dao.updateById(SObj.class, o.getId(), Moo.born().set("map", Lang.map("{x:100,y:300}")));
+
+		o2 = dao.findById(SObj.class, o.getId());
+		assertEquals(o.getName(), o2.getName());
+		assertEquals(100, ((Integer) o2.getMap().get("x")).intValue());
+		assertEquals(300, ((Integer) o2.getMap().get("y")).intValue());
+
+	}
+
+	@Test
 	public void test_save_again_by_defaulID() {
 		dao.create(SObj.class, true);
 
+		// Create
 		SObj obj = dao.save(SObj.create("xyz"));
-		obj = dao.findOne(SObj.class, Moo.born("name", "xyz"));
+
+		// Update
 		obj.setNumber(3000);
-
 		dao.save(obj);
-		SObj obj2 = dao.findOne(SObj.class, Moo.born("name", "xyz"));
 
+		// Get back
+		SObj obj2 = dao.findById(SObj.class, obj.getId());
+
+		// Assert
 		assertEquals(3000, obj2.getNumber());
 	}
 

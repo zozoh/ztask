@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.bson.types.ObjectId;
 import org.nutz.lang.Lang;
-import org.nutz.lang.random.R;
 import org.nutz.lang.util.NutMap;
 import org.nutz.mongo.Mongos;
 
@@ -80,7 +79,7 @@ public class DynamicMongoEntity implements MongoEntity {
 	@Override
 	public void fillId(Object obj) {
 		if (null != obj && obj instanceof Map) {
-			((Map) obj).put("_id", R.UU64());
+			((Map) obj).put("_id", new ObjectId());
 			return;
 		}
 		throw _failToFill(obj);
@@ -91,7 +90,7 @@ public class DynamicMongoEntity implements MongoEntity {
 	public void fillIdIfNoexits(Object obj) {
 		if (null != obj && obj instanceof Map) {
 			if (!((Map) obj).containsKey("_id"))
-				((Map) obj).put("_id", R.UU64());
+				((Map) obj).put("_id", new ObjectId());
 			return;
 		}
 		throw _failToFill(obj);

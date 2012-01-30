@@ -318,7 +318,7 @@ public class MongoDao {
 	 * @return 对象
 	 */
 	public <T> T findById(Class<T> type, String id) {
-		return findOne(type, Lang.mapf("{_id:'%s'}", id));
+		return findOne(type, Mongos.dboId(id));
 	}
 
 	/**

@@ -2,7 +2,7 @@
 <html>
 <head>
 <title>${msg['ui.login']} - zTask</title>
-<link type="text/css" rel="stylesheet" href="${rs}/css/_zstack.css"/>
+<link type="text/css" rel="stylesheet" href="${rs}/css/zstack.css"/>
 <link type="text/css" rel="stylesheet" href="${rs}/css/page_login.css"/>
 </head>
 <body>

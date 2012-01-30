@@ -184,7 +184,23 @@ public interface TaskService extends AbstractService {
 	Task popFromStack(String taskId, boolean done);
 
 	/**
-	 * 根据堆栈的Name，得到一个任务堆栈
+	 * 获取按照堆栈升序排序的 stack 列表
+	 * 
+	 * @return 堆栈列表
+	 */
+	List<TaskStack> getTopStacks();
+
+	/**
+	 * 获取一个堆栈下所有的子 stack
+	 * 
+	 * @param stackName
+	 *            堆栈名称
+	 * @return 堆栈列表
+	 */
+	List<TaskStack> getChildStacks(String stackName);
+
+	/**
+	 * 根据堆栈的名称，得到一个任务堆栈
 	 * 
 	 * @param stackName
 	 *            任务堆栈的名字
@@ -193,7 +209,7 @@ public interface TaskService extends AbstractService {
 	TaskStack getStack(String stackName);
 
 	/**
-	 * 根据堆栈的Name，得到一个任务堆栈
+	 * 根据堆栈的名称，得到一个任务堆栈
 	 * <p>
 	 * 如果对象不存在抛错
 	 * 
@@ -226,17 +242,17 @@ public interface TaskService extends AbstractService {
 	TaskStack createStackIfNoExistis(String stackName, String ownerName);
 
 	/**
-	 * 更新任务的描述，如果堆栈不存在，则抛错
+	 * 更新堆栈得父堆栈，如果不存在则抛错
 	 * 
 	 * @param stackName
 	 *            任务堆栈名称
-	 * @param des
-	 *            描述
+	 * @param parentName
+	 *            父堆栈的名称
 	 * @return 堆栈对象
 	 * @throws org.nutz.ztask.Err.S
 	 *             #NO_EXISTS
 	 */
-	TaskStack setTackDescription(String stackName, String des);
+	TaskStack setStackParent(String stackName, String parentName);
 
 	/**
 	 * 移除一个任务堆栈
@@ -246,4 +262,18 @@ public interface TaskService extends AbstractService {
 	 * @return 移除后的任务对象, null 表示堆栈不存在
 	 */
 	TaskStack removeStack(String stackName);
+
+	/**
+	 * @return 整个数据库的全局配置参数
+	 */
+	GInfo getGlobalInfo();
+
+	/**
+	 * 修改全局配置参数
+	 * 
+	 * @param info
+	 *            全局配置参数
+	 * @return 修改后的 GInfo 对象
+	 */
+	GInfo setGlobalInfo(GInfo info);
 }

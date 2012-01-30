@@ -17,7 +17,7 @@ public class EnumAdaptor extends FieldAdaptor {
 	}
 
 	@Override
-	public Object adaptForGet(Object val) {
+	public Object adaptForGet(Object val, boolean check) {
 		if (null == val)
 			return null;
 		return val.toString();

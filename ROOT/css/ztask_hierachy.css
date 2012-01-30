@@ -1,0 +1,13 @@
+.hierachy_arena{
+    width:100%;
+    height:100%;
+    overflow: hidden;
+}
+
+.hierachy_crumb{
+    height:40px;
+}
+
+.hierachy_viewport{
+    overflow:hidden;
+}

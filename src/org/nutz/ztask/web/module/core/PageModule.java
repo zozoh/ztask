@@ -47,6 +47,13 @@ public class PageModule {
 	public void showLogin() {}
 
 	/**
+	 * 系统界面
+	 */
+	@At("/page/sys")
+	@Ok("jsp:jsp.sys")
+	public void showSystemConfiguration() {}
+
+	/**
 	 * 堆栈界面
 	 */
 	@At("/page/stack")

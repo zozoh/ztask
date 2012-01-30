@@ -29,7 +29,7 @@ public class MongoEntityField {
 	protected void fillId(Object obj) {
 		if (null != idType)
 			switch (idType) {
-			// 保证值为 null，这样 MongoDB 会自动设置
+			// 保证值为 null，这样 setToDB 的时候会设置一个 ObjectId
 			case DEFAULT:
 				adaptor.set(obj, null);
 				break;
@@ -49,8 +49,16 @@ public class MongoEntityField {
 
 	protected void setToDB(Object obj, DBObject dbo) {
 		Object v = adaptor.get(obj);
-		if (null == v)
+		if (null == v) {
+			// 如果是 Default Mongo ID，那么为其设置一个值
+			if (isId() && idType == CoIdType.DEFAULT) {
+				ObjectId ID = new ObjectId();
+				dbo.put("_id", ID);
+				// 设置回对象中，以便后续操作
+				adaptor.set(obj, ID);
+			}
 			return;
+		}
 		// 对于默认 ID，则，保证 dbo 中没有 "_id" 以便 MongoDB 自动设值
 		if (isId()) {
 			if (idType == CoIdType.DEFAULT) {
@@ -116,4 +124,7 @@ public class MongoEntityField {
 		adaptor = fi.getAdaptor();
 	}
 
+	public String toString() {
+		return String.format("%s(%s) > %s ", name, dbName, adaptor);
+	}
 }

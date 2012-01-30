@@ -121,7 +121,7 @@ public class StaticMongoEntity implements MongoEntity {
 				throw Lang.makeThrow("Unknow key '%s' in collection '%s'", key, collectionName);
 
 			// 加入值
-			dboMap.put(mef.getDbName(), mef.getAdaptor().adaptForGet(val));
+			dboMap.put(mef.getDbName(), mef.getAdaptor().adaptForGet(val, false));
 		}
 		// 建立返回值
 		DBObject dbo = new BasicDBObject();

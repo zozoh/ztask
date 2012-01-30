@@ -2,8 +2,8 @@
 String url = request.getRequestURI();
 %>
 <div id="sky">
-    <div class="logo"></div>
-    <div class="lnks">
+    <div id="logo"></div>
+    <div id="lnks">
         <a href="${base}/page/stack" <%=url.endsWith("stack.jsp")?"class=\"hlt\"":""%>>
             ${msg['ui.stack']}
         </a><a href="${base}/page/label" <%=url.endsWith("label.jsp")?"class=\"hlt\"":""%>>
@@ -12,10 +12,14 @@ String url = request.getRequestURI();
             ${msg['ui.task']}
         </a><a href="${base}/page/user" <%=url.endsWith("user.jsp")?"class=\"hlt\"":""%>>
             ${msg['ui.user']}
+        </a><a href="${base}/page/faq" <%=url.endsWith("user.jsp")?"class=\"hlt\"":""%>>
+            FAQ
+        </a><a href="${base}/page/sys" <%=url.endsWith("sys.jsp")?"class=\"hlt\"":""%>>
+            ${msg['ui.sys']}
         </a>
     </div>
-    <div class="menu"></div>
-    <div class="info">
+    <div id="menu"></div>
+    <div id="corner">
         <b>${me.name}</b>
         | <a href="${base}/do/logout">${msg['ui.logout']}</a>
     </div>

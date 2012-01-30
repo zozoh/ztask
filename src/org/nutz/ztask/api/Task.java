@@ -3,7 +3,6 @@ package org.nutz.ztask.api;
 import org.nutz.mongo.annotation.Co;
 import org.nutz.mongo.annotation.CoField;
 import org.nutz.mongo.annotation.CoId;
-import org.nutz.mongo.annotation.CoIdType;
 
 /**
  * 描述了一个 TASK 的全部信息
@@ -16,20 +15,20 @@ public class Task {
 	/**
 	 * 任务的 ID
 	 */
-	@CoId(CoIdType.UU64)
+	@CoId
 	private String _id;
-
-	/**
-	 * 本任务的内容简述，内容不要超过 140 个字
-	 */
-	@CoField("tt")
-	private String title;
 
 	/**
 	 * 本任务的父任务，一个任务可以被无限级拆分
 	 */
 	@CoField("pid")
 	private String parentId;
+
+	/**
+	 * 本任务的内容简述，内容不要超过 140 个字
+	 */
+	@CoField("tt")
+	private String title;
 
 	/**
 	 * 一个附加注释的列表
@@ -41,13 +40,14 @@ public class Task {
 	 * 格式为 yyyy-MM-dd HH:mm:ss 格式的字符串
 	 */
 	@CoField("ct")
-	private String createTime; //TODO 使用Date/或者TimeStemp
+	private String createTime; // TODO 使用Date/或者TimeStemp
 
 	/**
 	 * 格式为 yyyy-MM-dd HH:mm:ss 格式的字符串
 	 */
 	@CoField("lm")
-	private String lastModified;//TODO 使用Date/或者TimeStemp
+	private String lastModified;// TODO 使用Date/或者TimeStemp，zzh: 弄个 adaptor 来处理
+								// Timestamp 咯
 
 	/**
 	 * 所在堆栈的名称

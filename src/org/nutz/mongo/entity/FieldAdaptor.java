@@ -2,6 +2,7 @@ package org.nutz.mongo.entity;
 
 import java.lang.reflect.Type;
 
+import org.nutz.lang.Lang;
 import org.nutz.lang.eject.Ejecting;
 import org.nutz.lang.inject.Injecting;
 
@@ -22,13 +23,28 @@ public class FieldAdaptor {
 	}
 
 	/**
-	 * 子类复写：修改 get 后的值，以便设置给 DBObject
+	 * 修改 get 后的值，以便设置给 DBObject，会严格检查值类型是否匹配
 	 * 
 	 * @param val
 	 *            get 后的值
 	 * @return 修改 get 后的值，这个值是 ejecting 从对象中取出的
 	 */
 	public Object adaptForGet(Object val) {
+		return adaptForGet(val, true);
+	}
+
+	/**
+	 * 子类复写：修改 get 后的值，以便设置给 DBObject
+	 * <p>
+	 * 如果不是严格检查的话， adaptor 如果发现自己不能接受这个类型，则可以直接返回输入的对象
+	 * 
+	 * @param val
+	 *            get 后的值
+	 * @param check
+	 *            是否严格检查
+	 * @return 修改 get 后的值，这个值是 ejecting 从对象中取出的
+	 */
+	public Object adaptForGet(Object val, boolean check) {
 		return val;
 	}
 
@@ -61,8 +77,11 @@ public class FieldAdaptor {
 
 	protected Type fieldType;
 
+	protected Class<?> fieldClass;
+
 	public FieldAdaptor setFieldType(Type fieldType) {
 		this.fieldType = fieldType;
+		this.fieldClass = Lang.getTypeClass(fieldType);
 		return this;
 	}
 
@@ -72,5 +91,9 @@ public class FieldAdaptor {
 
 	public void setInjecting(Injecting injecting) {
 		this.injecting = injecting;
+	}
+
+	public String toString() {
+		return String.format("%s:%s", this.getClass().getName(), fieldType);
 	}
 }

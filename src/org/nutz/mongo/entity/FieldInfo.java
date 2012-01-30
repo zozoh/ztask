@@ -10,7 +10,9 @@ import org.nutz.lang.inject.InjectBySetter;
 import org.nutz.lang.util.Callback3;
 import org.nutz.mongo.annotation.CoField;
 import org.nutz.mongo.annotation.CoId;
+import org.nutz.mongo.entity.adaptor.ArrayAdaptor;
 import org.nutz.mongo.entity.adaptor.EnumAdaptor;
+import org.nutz.mongo.entity.adaptor.PojoAdaptor;
 
 /**
  * 提供给解析用的一个实体字段中间描述类，它的构造函数提供一点点分析功能，以便解析类更方便的解析实体
@@ -70,6 +72,17 @@ class FieldInfo {
 		if (mirror.isEnum()) {
 			return new EnumAdaptor().setFieldType(type);
 		}
+		// 数组
+		else if (mirror.isArray()) {
+			return new ArrayAdaptor().setFieldType(type);
+		}
+		// POJO
+		else if (mirror.isPojo()) {
+			return new PojoAdaptor().setFieldType(type);
+		}
+		// TODO 集合
+		// TODO Map
+		// TODO Timestamp
 		// 默认
 		return new FieldAdaptor().setFieldType(type);
 	}

@@ -8,13 +8,25 @@ $(document.body).ready(function() {
         window.main();
     }
 
-    // 调整界面布局
-    if( typeof window.adjustLayout == "function") {
-        // 初次调整
-        adjustLayout();
-        // 随着窗口变化调整
-        window.onresize = adjustLayout;
+    // 初始化菜单
+    if( typeof window.initMenu == "function") {
+        window.initMenu.apply($("#menu"));
     }
-    
+
+    // 监视键盘
+    z.watchKeyboard();
+
+    // 调整界面布局
+    _adjust_layout();
+    // 随着窗口变化调整
+    window.onresize = _adjust_layout;
+
 });
 })(window.jQuery);
+
+function _adjust_layout() {
+    var box = z.winsz();
+    $("#sky").css("width", box.width);
+    if( typeof window.adjustLayout == "function")
+        adjustLayout.apply(box);
+}

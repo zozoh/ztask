@@ -1,6 +1,7 @@
 package org.nutz.ztask.impl.mongo;
 
 import org.nutz.mongo.MongoConnector;
+import org.nutz.ztask.api.GInfo;
 import org.nutz.ztask.api.InitService;
 import org.nutz.ztask.api.Label;
 import org.nutz.ztask.api.Task;
@@ -17,6 +18,7 @@ public class MongoInitService extends AbstractMongoService implements InitServic
 		dao.create(Task.class, false);
 		dao.create(TaskStack.class, false);
 		dao.create(Label.class, false);
+		dao.create(GInfo.class, false);
 	}
 
 }

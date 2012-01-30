@@ -93,13 +93,9 @@ public class MongoTaskServiceTest extends ZTaskCase {
 		Task t11 = tasks.createTask(t("A11"));
 		Task t1 = tasks.createTask(t("A1"));
 
-		// 顺便测测顺序
+		// 现在应该有 4 个 Task 了
 		List<Task> tops = tasks.getTopTasks(null, null);
 		assertEquals(4, tops.size());
-		assertEquals("A", tops.get(0).getTitle());
-		assertEquals("A1", tops.get(1).getTitle());
-		assertEquals("A11", tops.get(2).getTitle());
-		assertEquals("A2", tops.get(3).getTitle());
 
 		// 调整树结构
 		tasks.setTaskParent(t1.get_id(), t.get_id());
