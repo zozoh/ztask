@@ -2,6 +2,7 @@ package org.nutz.mongo;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
 import org.bson.types.ObjectId;
@@ -239,22 +240,20 @@ public abstract class Mongos {
 							.get("id");
 	}
 
-	private static ThreadLocal<Integer> reqs = new ThreadLocal<Integer>();
+	private static ThreadLocal<AtomicInteger> reqs = new ThreadLocal<AtomicInteger>();
 
 	public static void run(DB db, Callback<DB> callback) {
 		try {
-			if (reqs.get() == null) {
-				reqs.set(0);
-				db.requestStart(); // 最顶层
+			if (reqs.get() == null) { // 最顶层
+				reqs.set(new AtomicInteger(0));
+				db.requestStart(); 
 			} else
-				reqs.set(reqs.get() + 1);
+				reqs.get().incrementAndGet();
 			callback.invoke(db);
 		}
 		finally {
-			if (reqs.get() == 0)// 最顶层
+			if (reqs.get().getAndDecrement() == 0)// 最顶层
 				db.requestDone();
-			else
-				reqs.set(reqs.get() - 1);
 		}
 	}
 }

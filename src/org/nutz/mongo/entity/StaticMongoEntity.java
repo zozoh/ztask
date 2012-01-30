@@ -36,6 +36,8 @@ public class StaticMongoEntity implements MongoEntity {
 	private MongoEntityField _id;
 
 	private long cappedSize;
+	
+	private long cappedMax;
 
 	public StaticMongoEntity(Class<?> type) {
 		this.type = type;
@@ -170,11 +172,16 @@ public class StaticMongoEntity implements MongoEntity {
 		this.cappedSize = cappedSize;
 	}
 
-	public boolean isCapped() {
-		return cappedSize > 0;
-	}
-
 	public long getCappedSize() {
 		return this.cappedSize;
 	}
+	
+	public long getCappedMax() {
+		return cappedMax;
+	}
+	
+	public void setCappedMax(long cappedMax) {
+		this.cappedMax = cappedMax;
+	}
+	
 }

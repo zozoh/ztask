@@ -82,6 +82,7 @@ public class MongoEntityMaker {
 
 			// 获取capped属性,判断是否为固定集合
 			en.setCappedSize(co.cappedSize());
+			en.setCappedMax(co.cappedMax());
 
 			// 获得集合索引
 			CoIndexes cix = type.getAnnotation(CoIndexes.class);

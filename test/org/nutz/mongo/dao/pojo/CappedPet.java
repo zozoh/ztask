@@ -5,7 +5,7 @@ import org.nutz.mongo.annotation.CoField;
 import org.nutz.mongo.annotation.CoId;
 
 
-@Co(value="capped_pet", cappedSize=10240)
+@Co(value="capped_pet", cappedSize=10240, cappedMax=100)
 public class CappedPet {
 
 	@CoId

@@ -88,12 +88,9 @@ public interface MongoEntity {
 	void fillIdIfNoexits(Object obj);
 
 	/**
-	 * @return 是否为一个固定集合
-	 */
-	boolean isCapped();
-
-	/**
 	 * @return 固定集合的大小，小于等于 0 表示为非固定集合
 	 */
 	long getCappedSize();
+	
+	long getCappedMax() ;
 }

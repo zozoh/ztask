@@ -42,7 +42,6 @@ public class MongoDao {
 	 * @return 修改结果
 	 */
 	public WriteResult remove(Class<?> type, Object q) {
-		WriteResult wr = null;
 		MongoEntity moe = Mongos.entity(type);
 		// 获得集合
 		String collName = moe.getCollectionName(q);
@@ -52,9 +51,9 @@ public class MongoDao {
 			DBObject dbRef = moe.formatObject(q);
 
 			// 执行删除
-			wr = coll.remove(dbRef);
+			return coll.remove(dbRef);
 		}
-		return wr;
+		return null;
 	}
 
 	/**
@@ -88,12 +87,11 @@ public class MongoDao {
 	 * @return 修改结果
 	 */
 	public WriteResult removeById(String collName, String id) {
-		WriteResult wr = null;
 		if (db.collectionExists(collName)) {
 			DBCollection coll = db.getCollection(collName);
-			wr = coll.remove(Mongos.dboId(id));
+			return coll.remove(Mongos.dboId(id));
 		}
-		return wr;
+		return null;
 	}
 
 	/**
@@ -135,14 +133,13 @@ public class MongoDao {
 	public WriteResult update(Object enref, Object q, Object o) {
 		MongoEntity moe = (MongoEntity) Mongos.entity(enref);
 		String collName = moe.getCollectionName(q);
-		WriteResult wr = null;
 		if (db.collectionExists(collName)) {
 			DBCollection coll = db.getCollection(collName);
 			DBObject dbq = moe.formatObject(q);
 			DBObject dbo = moe.formatObject(o);
-			wr = coll.updateMulti(dbq, dbo);
+			return coll.updateMulti(dbq, dbo);
 		}
-		return wr;
+		return null;
 	}
 
 	/**
@@ -157,14 +154,13 @@ public class MongoDao {
 	 * @return 修改结果
 	 */
 	public WriteResult updateBy(String collName, Object q, Object o) {
-		WriteResult wr = null;
 		if (db.collectionExists(collName)) {
 			DBCollection coll = db.getCollection(collName);
 			DBObject dbq = Mongos.obj2dbo(q);
 			DBObject dbo = Mongos.obj2dbo(o);
-			wr = coll.updateMulti(dbq, dbo);
+			return coll.updateMulti(dbq, dbo);
 		}
-		return wr;
+		return null;
 	}
 
 	/**
@@ -292,7 +288,6 @@ public class MongoDao {
 	 */
 	@SuppressWarnings("unchecked")
 	public <T> T findOne(Class<T> type, Object q) {
-		T re = null;
 		MongoEntity moe = Mongos.entity(type);
 		// 获得集合
 		String collName = moe.getCollectionName(q);
@@ -302,9 +297,9 @@ public class MongoDao {
 			DBObject dbRef = moe.formatObject(q);
 			DBObject dbo = null == dbRef ? coll.findOne() : coll.findOne(dbRef);
 			// 执行转换
-			re = (T) moe.toObject(dbo);
+			return (T) moe.toObject(dbo);
 		}
-		return re;
+		return null;
 	}
 
 	/**
@@ -359,7 +354,7 @@ public class MongoDao {
 	 *            true 则如果存在，就 drop
 	 */
 	public void create(String collName, boolean dropIfExists) {
-		create(collName, dropIfExists, -1);
+		create(collName, dropIfExists, -1, -1);
 	}
 
 	/**
@@ -374,25 +369,26 @@ public class MongoDao {
 	 * @param cappedSize
 	 *            如果大于0,则创建一个固定集合,单位是byte
 	 */
-	public void create(String collName, boolean dropIfExists, long cappedSize) {
+	public void create(String collName, boolean dropIfExists, long cappedSize, long cappedMax) {
 		// 判断集合是否存在，如果存在，且是不需要 drop 的 ...
 		// TODO 如果一个集合是非固定的，想将其变成固定的，这个是不是需要再弄个方法叫 toCapped ?
+		// by wendal : 这是不可逆的操作哦,一般不这样做吧?
 		if (!dropIfExists && db.collectionExists(collName))
 			return;
 
 		// 首先移除
 		drop(collName);
 
-		// 创建固定集合
-		if (cappedSize > 0) {
-			DBObject colConfig = Mongos.dbo("capped", true);
-			colConfig.put("size", cappedSize);
-			db.createCollection(collName, colConfig);
-		}
-		// 创建非固定集合
-		else {
-			db.createCollection(collName, new BasicDBObject());
-		}
+		// 创建固定集合?
+		BasicDBObject cappedConfig = new BasicDBObject();
+		if (cappedSize > 0 || cappedMax > 0)
+			cappedConfig.put("capped", true);
+		if (cappedSize > 0)
+			cappedConfig.put("size", cappedSize);
+		if (cappedMax > 0)
+			cappedConfig.put("max", cappedMax);
+		
+		db.createCollection(collName, cappedConfig);
 	}
 
 	/**
@@ -410,7 +406,7 @@ public class MongoDao {
 
 		// 创建集合
 		String collName = moe.getCollectionName(null);
-		create(collName, dropIfExists, moe.getCappedSize());
+		create(collName, dropIfExists, moe.getCappedSize(), moe.getCappedMax());
 
 		// 创建索引
 		if (moe.hasIndexes()) {
@@ -538,7 +534,7 @@ public class MongoDao {
 					try {
 						callback.invoke(index++, obj, -1);
 					}
-					catch (ContinueLoop e) {
+					catch (ContinueLoop e) { //TODO 为何特别要捕捉ContinueLoop然后又抛出呢?
 						throw Lang.wrapThrow(e);
 					}
 				}
