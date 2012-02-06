@@ -1,0 +1,20 @@
+{
+    "_id" : "4f2a6369744efeb4a220ebb7",
+    "formats" : [{
+            "regex" : "(^|[ ])(#)([0-9]+)([ ]|\n|$)",
+            "tmpl" : "$1<a target=\"_blank\" href=\"http://bugzilla.danoo.com:8881/show_bug.cgi?id=$3\">$2$3</a>$4"
+        }, {
+            "regex" : "(^|[ ])(http[s]?://[^ ]+)([ ]|\n|$)",
+            "tmpl" : "$1<a target=\"_blank\" href=\"$2\">$2</a>$3"
+        }, {
+            "regex" : "(^|[ ])(@)([^ \t\r\n~!@#$%^&*()+=`:{}|\\[\\]\\\\:\"';<>?,./-]+)",
+            "tmpl" : "$1<a target=\"_blank\" href=\"/page/user#$3\">$2$3</a>"
+        }, {
+            "regex" : "([ \t]?//[ \t]*)([0-9]{4}-[01][0-9]-[0-3][0-9][ ][0-2][0-9]:[0-5][0-9]:[0-5][0-9])([ \t]*$)",
+            "tmpl" : "<b class=\"timestamp\"> // $2</b>"
+        }],
+    "smtp" : {
+        "interval" : 0
+    },
+    "lastModified" : "2012-02-07 00:57:28"
+}
