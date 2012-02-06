@@ -37,18 +37,20 @@
 		<delete dir="${DEST}" />
 		<mkdir dir="${TMP}" />
 		<mkdir dir="${DEST}" />
+		<echo ></echo>
 	</target>
 
 	<!--
 	编译 Jar 包
 	-->
 	<target name="compile" depends="init">
-		<javac srcdir="${SRC}" destdir="${TMP}" debuglevel="lines,vars,source" debug="true" 
-			source="${JDK_VERSION}" target="${JDK_VERSION}" encoding="UTF-8" listfiles="off" includeantruntime="false">
+		<mkdir dir="${ROOT}/WEB-INF/classes/"/>
+		<javac srcdir="${SRC}" destdir="${ROOT}/WEB-INF/classes/" debuglevel="lines,vars,source" debug="true" 
+			source="${JDK_VERSION}" target="${JDK_VERSION}" encoding="UTF-8" listfiles="off" includeantruntime="false" verbose="true">
 			<compilerarg value="-Xlint:all" />
-			<classpath refid="CLASSPATH" />
+            <compilerarg value="-extdirs" />
+            <compilerarg value="${DEP_HOME}" />
 		</javac>
-		<jar destfile="${ROOT}/WEB-INF/lib/strato-dapi.jar" basedir="${TMP}" includes="**" />
 		<delete dir="${TMP}" />
 	</target>
 
