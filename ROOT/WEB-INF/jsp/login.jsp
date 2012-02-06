@@ -11,11 +11,11 @@
     <table border="0" cellspacing="4" cellpadding="4">
         <tr>
             <td class="fnm">${msg['login.unm']}</td>
-            <td><input name="nm" value="zozoh"/></td>
+            <td><input name="nm"/></td>
         </tr>
         <tr>
             <td class="fnm">${msg['login.pwd']}</td>
-            <td><input name="pwd" type="password" value="123456"/></td>         
+            <td><input name="pwd" type="password"/></td>         
         </tr>
         <tr>
             <td>&nbsp;</td>
