@@ -649,9 +649,9 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 	}
 
 	@Override
-	public List<TaskStack> getStacksByOwner(String ownerName) {
+	public List<TaskStack> getMyFavoStacks(String ownerName) {
 		return dao.find(TaskStack.class,
-						Moo.NEW("owner", ownerName),
+						Moo.OR(Moo.NEW("owner", ownerName), Moo.NEW("watchers", ownerName)),
 						MCur.ASC("parentName").asc("name"));
 	}
 
@@ -695,6 +695,42 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 		if (!parentName.equals(s.getParentName())) {
 			s.setParentName(parentName);
 			dao.updateById(TaskStack.class, s.get_id(), Moo.NEW().set("parentName", parentName));
+		}
+		return s;
+	}
+
+	@Override
+	public TaskStack watchStack(String stackName, String watcherName) {
+		TaskStack s = this.checkStack(stackName);
+		if (!Strings.isBlank(watcherName)) {
+			if (null == s.getWatchers() || s.getWatchers().length == 0) {
+				s.setWatchers(Lang.array(watcherName));
+			} else {
+				String[] ss = new String[s.getWatchers().length + 1];
+				int i;
+				for (i = 0; i < s.getWatchers().length; i++) {
+					ss[i] = s.getWatchers()[i];
+				}
+				ss[i] = watcherName;
+				s.setWatchers(ss);
+			}
+			dao.updateById(TaskStack.class, s.get_id(), Moo.SET("watchers", s.getWatchers()));
+		}
+		return s;
+	}
+
+	@Override
+	public TaskStack unwatchStack(String stackName, String watcherName) {
+		TaskStack s = this.checkStack(stackName);
+		if (!Strings.isBlank(watcherName)) {
+			if (null != s.getWatchers() && s.getWatchers().length > 0) {
+				List<String> list = new LinkedList<String>();
+				for (String w : s.getWatchers())
+					if (!watcherName.equals(w))
+						list.add(w);
+				s.setWatchers(list.toArray(new String[list.size()]));
+				dao.updateById(TaskStack.class, s.get_id(), Moo.SET("watchers", s.getWatchers()));
+			}
 		}
 		return s;
 	}

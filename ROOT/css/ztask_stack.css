@@ -34,12 +34,26 @@
     font-weight: bolder;
     text-shadow: 1px 1px 1px #666;
     cursor: pointer;
-    min-width:200px;
+    min-width: 200px;
 }
 
 .stack_name:hover {
     color: #CDF;
     text-decoration: underline;
+}
+
+.stack_favo {
+    display: block;
+    float: left;
+    width: 16px;
+    height: 16px;
+    background: url(pics/icons.png) no-repeat -16px -80px;
+    cursor: pointer;
+    margin:6px 8px 6px 4px; 
+}
+
+.stack_favo_on{
+    background-position:0 -80px;
 }
 
 .stack_count {

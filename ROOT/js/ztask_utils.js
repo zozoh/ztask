@@ -11,6 +11,13 @@ function ginfo() {
 }
 
 /**
+ * @return 当前操作的帐号的名称
+ */
+function myname() {
+    return "" + $("#myname").text();
+}
+
+/**
  * 根据给定的 stack 对象，返回该对象的 HTML
  *
  * @param this : 无意义
@@ -18,8 +25,12 @@ function ginfo() {
  * @return HTML 字符串表示一个 Task 对象
  */
 function stack_html(s) {
+    var me = myname();
+    var favoIt = (s.owner == me || z.contains(s.watchers, me));
+    var tip = favoIt ? z.msg("stack.unwatch.tip") : z.msg("stack.watch.tip");
     var html = '<div class="stack">';
     html += '<div class="stack_head">';
+    html += '    <span class="stack_favo ' + ( favoIt ? "stack_favo_on" : "") + '" title="' + tip + '"></span>';
     html += '    <span class="stack_count">' + s.count + '</span>';
     html += '    <span class="stack_name">' + s.name + '</span>';
     html += '    <a class="lnkb stack_owner" href="/page/user#' + s.owner + '" >@' + s.owner + '</a>';

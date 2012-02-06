@@ -239,8 +239,38 @@ public class AjaxModule {
 	}
 
 	@At("/stack/mytops")
-	public List<TaskStack> getTopStacks(@Attr(scope = Scope.SESSION, value = Webs.ME) User me) {
-		return tasks.getStacksByOwner(me.getName());
+	public List<TaskStack> getMyTopStacks(@Attr(scope = Scope.SESSION, value = Webs.ME) User me) {
+		return tasks.getMyFavoStacks(me.getName());
+	}
+
+	/**
+	 * 关注一个堆栈
+	 * 
+	 * @param stackName
+	 *            堆栈名
+	 * @param me
+	 *            当前会话帐号
+	 * @return 堆栈对象
+	 */
+	@At("/stack/do/watch")
+	public TaskStack doWatchStack(	@Param("s") String stackName,
+									@Attr(scope = Scope.SESSION, value = Webs.ME) User me) {
+		return tasks.watchStack(stackName, me.getName());
+	}
+
+	/**
+	 * 取消关注一个堆栈
+	 * 
+	 * @param stackName
+	 *            堆栈名
+	 * @param me
+	 *            当前会话帐号
+	 * @return 堆栈对象
+	 */
+	@At("/stack/do/unwatch")
+	public TaskStack doUnwatchStack(@Param("s") String stackName,
+									@Attr(scope = Scope.SESSION, value = Webs.ME) User me) {
+		return tasks.unwatchStack(stackName, me.getName());
 	}
 
 	@AdaptBy(type = JsonAdaptor.class)

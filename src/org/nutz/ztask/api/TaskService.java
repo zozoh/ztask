@@ -416,13 +416,13 @@ public interface TaskService extends AbstractService {
 	List<TaskStack> getTopStacks();
 
 	/**
-	 * 获得属于某个用户的Stacl
+	 * 获得属于某个用户的Stack， 即所有该用户收藏的，或者 owner 是该用户的堆栈
 	 * 
 	 * @param ownerName
 	 *            用户名
 	 * @return 堆栈列表
 	 */
-	List<TaskStack> getStacksByOwner(String ownerName);
+	List<TaskStack> getMyFavoStacks(String ownerName);
 
 	/**
 	 * 获取一个堆栈下所有的子 stack
@@ -487,6 +487,32 @@ public interface TaskService extends AbstractService {
 	 *             #NO_EXISTS
 	 */
 	TaskStack setStackParent(String stackName, String parentName);
+
+	/**
+	 * 将一个用户设置成本堆栈的关注者
+	 * 
+	 * @param stackName
+	 *            堆栈名
+	 * @param watcherName
+	 *            关注者名
+	 * @return 堆栈对象
+	 * @throws org.nutz.ztask.Err.S
+	 *             #NO_EXISTS
+	 */
+	TaskStack watchStack(String stackName, String watcherName);
+
+	/**
+	 * 取消一个用户对某个堆栈的关注
+	 * 
+	 * @param stackName
+	 *            堆栈名
+	 * @param watcherName
+	 *            关注者名
+	 * @return 堆栈对象
+	 * @throws org.nutz.ztask.Err.S
+	 *             #NO_EXISTS
+	 */
+	TaskStack unwatchStack(String stackName, String watcherName);
 
 	/**
 	 * 移除一个任务堆栈

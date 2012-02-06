@@ -16,7 +16,8 @@ String url = request.getRequestURI();
     </div>
     <div id="menu"></div>
     <div id="corner" class="lnk_menu">
-        <a href="${base}/page/mystack" <%=url.endsWith("/mystack.jsp")?"class=\"hlt\"":""%>>${me.name}</a>
+        <a id="myname" href="${base}/page/mystack" 
+            <%=url.endsWith("/mystack.jsp")?"class=\"hlt\"":""%>>${me.name}</a>
         <a href="${base}/do/logout">${msg['ui.logout']}</a>
     </div>
 </div>

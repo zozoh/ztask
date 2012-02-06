@@ -19,6 +19,25 @@ import org.nutz.ztask.api.TaskStatus;
 public class MongoTaskServiceTest extends ZTaskCase {
 
 	@Test
+	public void test_watch_unwatch_stack() {
+		TaskStack s = tasks.createStackIfNoExistis("S", "zzh");
+		assertNull(s.getWatchers());
+
+		tasks.watchStack(s.getName(), "u0");
+		tasks.watchStack(s.getName(), "u1");
+		tasks.watchStack(s.getName(), "u2");
+		assertEquals(3, tasks.getStack(s.getName()).getWatchers().length);
+		assertEquals("u0", tasks.getStack(s.getName()).getWatchers()[0]);
+		assertEquals("u1", tasks.getStack(s.getName()).getWatchers()[1]);
+		assertEquals("u2", tasks.getStack(s.getName()).getWatchers()[2]);
+
+		tasks.unwatchStack(s.getName(), "u1");
+		assertEquals(2, tasks.getStack(s.getName()).getWatchers().length);
+		assertEquals("u0", tasks.getStack(s.getName()).getWatchers()[0]);
+		assertEquals("u2", tasks.getStack(s.getName()).getWatchers()[1]);
+	}
+
+	@Test
 	public void test_add_remove_edit_comments() {
 		Task a = tasks.createTask(t("A"));
 		tasks.addComment(a.get_id(), "c0");

@@ -117,6 +117,15 @@ window.z = {
         return re;
     },
     //---------------------------------------------------------------------------------------
+    contains: function(array, o) {
+        if(!$.isArray(array) || !o)
+            return false;
+        for(var i = 0; i < array.length; i++)
+        if(array[i] == o)
+            return true;
+        return false;
+    },
+    //---------------------------------------------------------------------------------------
     // 让字符串居左对齐
     alignl: function(s, width, by) {
         if( typeof s != "string")
@@ -559,7 +568,7 @@ window.z = {
             "width": opt.width || me.outerWidth(),
             "height": opt.height || me.outerHeight(),
             "position": "absolute",
-            "z-index" : 999999
+            "z-index": 999999
         };
 
         // 显示输入框
@@ -861,7 +870,7 @@ window.z = {
             $("#div_out").append(newDivIn);
             var divOutS = $("#div_out");
             var divInS = $("#div_in");
-            scrollWidth =                                                                        divOutS.width() -                                                                        divInS.width();
+            scrollWidth =                                                                               divOutS.width() -                                                                               divInS.width();
             $("#div_out").remove();
             $("#div_in").remove();
             SCROLL_BAR_WIDTH = scrollWidth;
