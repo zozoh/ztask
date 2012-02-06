@@ -27,6 +27,7 @@ public class MongoTaskServiceTest extends ZTaskCase {
 		Task a = tasks.createTask(t("A"));
 
 		tasks.pushToStack(a, s);
+		assertEquals(TaskStatus.ING, tasks.getTask(a.get_id()).getStatus());
 		assertEquals("zozoh", a.getOwner());
 		assertEquals("S", a.getStack());
 		assertEquals("zozoh", tasks.getTask(a.get_id()).getOwner());
@@ -35,9 +36,12 @@ public class MongoTaskServiceTest extends ZTaskCase {
 		Task b = tasks.createTask(t(a, "B"));
 
 		assertEquals("S", tasks.getTask(b.get_id()).getStack());
+		assertEquals(TaskStatus.ING, tasks.getTask(b.get_id()).getStatus());
 		assertEquals("S", b.getStack());
+		assertEquals(TaskStatus.ING, b.getStatus());
 
 		assertEquals(ZTasks.NULL_STACK, tasks.getTask(a.get_id()).getStack());
+		assertEquals(TaskStatus.ING, tasks.getTask(a.get_id()).getStatus());
 	}
 
 	@Test

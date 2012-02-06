@@ -180,19 +180,29 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 		}
 		// 保存 parent
 		Task p = getTask(task.getParentId());
+		String stack = task.getStack();
+		if (ZTasks.isBlankStack(stack)) {
+			stack = null == p ? ZTasks.NULL_STACK : p.getStack();
+		}
+		// 首先作为无父，无 stack 的任务插入
+		task.setStack(ZTasks.NULL_STACK);
 		task.setParentId(null);
 		// 设置创建时间
 		task.setStatus(TaskStatus.NEW);
 		task.setCreateTime(ZTasks.now());
 		task.setLastModified(task.getCreateTime());
-		if (!task.isInStack())
-			task.setStack(null == p ? null : p.getStack());
 		// 执行创建
 		dao.save(task);
+
 		// 之后判断一下是否需要 setParent
 		if (null != p) {
 			this._set_task_parent(p, task);
 		}
+		// 如果 parent 已经在堆栈中，那么，就需要主动 push 一下
+		if (!ZTasks.isBlankStack(stack)) {
+			this.pushToStack(task, checkStack(stack));
+		}
+
 		// 返回
 		return task;
 	}
