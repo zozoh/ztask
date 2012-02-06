@@ -9,6 +9,7 @@ import org.nutz.lang.Lang;
 import org.nutz.web.WebException;
 import org.nutz.ztask.Err;
 import org.nutz.ztask.ZTaskCase;
+import org.nutz.ztask.ZTasks;
 import org.nutz.ztask.api.Task;
 import org.nutz.ztask.api.TaskQuery;
 import org.nutz.ztask.api.TaskService;
@@ -16,6 +17,28 @@ import org.nutz.ztask.api.TaskStack;
 import org.nutz.ztask.api.TaskStatus;
 
 public class MongoTaskServiceTest extends ZTaskCase {
+
+	/**
+	 * For Issue#4
+	 */
+	@Test
+	public void test_push_to_task_in_stack() {
+		TaskStack s = tasks.createStackIfNoExistis("S", "zozoh");
+		Task a = tasks.createTask(t("A"));
+
+		tasks.pushToStack(a, s);
+		assertEquals("zozoh", a.getOwner());
+		assertEquals("S", a.getStack());
+		assertEquals("zozoh", tasks.getTask(a.get_id()).getOwner());
+		assertEquals("S", tasks.getTask(a.get_id()).getStack());
+
+		Task b = tasks.createTask(t(a, "B"));
+
+		assertEquals("S", tasks.getTask(b.get_id()).getStack());
+		assertEquals("S", b.getStack());
+
+		assertEquals(ZTasks.NULL_STACK, tasks.getTask(a.get_id()).getStack());
+	}
 
 	@Test
 	public void test_add_comment() {

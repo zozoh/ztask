@@ -179,17 +179,19 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 			throw Err.T.BLANK_TASK();
 		}
 		// 保存 parent
-		String parentId = task.getParentId();
+		Task p = getTask(task.getParentId());
 		task.setParentId(null);
 		// 设置创建时间
 		task.setStatus(TaskStatus.NEW);
 		task.setCreateTime(ZTasks.now());
 		task.setLastModified(task.getCreateTime());
+		if (!task.isInStack())
+			task.setStack(null == p ? null : p.getStack());
 		// 执行创建
 		dao.save(task);
 		// 之后判断一下是否需要 setParent
-		if (!Strings.isBlank(parentId)) {
-			this._set_task_parent(parentId, task);
+		if (null != p) {
+			this._set_task_parent(p, task);
 		}
 		// 返回
 		return task;
@@ -251,10 +253,11 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 
 	@Override
 	public List<Task> setTasksParent(String parentId, String... taskIds) {
-		return _set_task_parent(parentId, checkTasks(taskIds));
+		return _set_task_parent(getTask(parentId), checkTasks(taskIds));
 	}
 
-	private List<Task> _set_task_parent(String pid, Task... ts) {
+	private List<Task> _set_task_parent(Task p, Task... ts) {
+		String pid = null == p ? null : p.get_id();
 		List<Task> list = new ArrayList<Task>(ts.length);
 		List<String> ids = new ArrayList<String>(ts.length);
 		Map<String, Task> oldps = new HashMap<String, Task>();
@@ -273,9 +276,6 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 		// 没必要修改的情况
 		if (list.isEmpty())
 			return list;
-
-		// 可以进行更新，那么检查一下新的父
-		Task p = getTask(pid);
 
 		// 执行更新
 		for (Task t : ts)
