@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="rain" default="copy" basedir=".">
+
+	<!--
+	获取环境变量
+	-->
+	<property environment="env" />
+
+	<!-- JDK 主目录-->
+	<property name="JAVA_HOME" value="${env.JAVA_HOME}" />
+	<!-- 依赖的 Jar 存放的目录 -->
+	<property name="DEP_HOME" value="${env.DEPS}" />
+	<!-- 项目输出的目录，这个目录将作为一个 Context Document Root -->
+	<property name="DEST" value="${env.OUTPUT}" />
+	<!-- 项目工程根目录 -->
+	<property name="PROJECT_HOME" value="${env.PROJECT_HOME}" />
+
+	<!--
+	定以变量
+	-->
+	<property name="SRC" location="${PROJECT_HOME}/src" />
+	<property name="TMP" location="${PROJECT_HOME}/tmp" />
+	<property name="ROOT" location="${DEST}/ROOT" />
+	<property name="JDK_VERSION" value="1.6" />
+	<path id="CLASSPATH">
+		<fileset dir="${DEP_HOME}" casesensitive="no">
+			<include name="*.jar" />
+		</fileset>
+		<pathelement location="${JAVA_HOME}/lib/rt.jar" />
+	</path>
+
+	<!--
+	初始化临时目录，以及清除目标目录
+	-->
+	<target name="init">
+		<delete dir="${RS}" />
+		<delete dir="${DEST}" />
+		<mkdir dir="${TMP}" />
+		<mkdir dir="${DEST}" />
+		<echo ></echo>
+	</target>
+
+	<!--
+	编译 Jar 包
+	-->
+	<target name="compile" depends="init">
+		<mkdir dir="${ROOT}/WEB-INF/classes/"/>
+		<javac srcdir="${SRC}" destdir="${ROOT}/WEB-INF/classes/" debuglevel="lines,vars,source" debug="true" 
+			source="${JDK_VERSION}" target="${JDK_VERSION}" encoding="UTF-8" listfiles="off" includeantruntime="false" verbose="true">
+			<compilerarg value="-Xlint:all" />
+            <compilerarg value="-extdirs" />
+            <compilerarg value="${DEP_HOME}" />
+		</javac>
+		<delete dir="${TMP}" />
+	</target>
+
+	<!--
+	任务进入点: Copy 资源文件
+	-->
+	<target name="copy" depends="compile">
+		<!--
+		依赖的 Jar
+		-->
+		<copy todir="${ROOT}/WEB-INF/lib/">
+			<fileset dir="${DEP_HOME}">
+				<include name="*.jar" />
+			</fileset>
+		</copy>
+		<!--
+		配置文件
+		-->
+		<copy todir="${ROOT}/WEB-INF/classes/">
+			<fileset dir="${PROJECT_HOME}/conf">
+				<include name="**" />
+			</fileset>
+		</copy>
+		<!--
+		ROOT 下的文件
+		-->
+		<copy todir="${ROOT}/">
+			<fileset dir="${PROJECT_HOME}/ROOT/">
+				<include name="**/*.*" />
+			</fileset>
+		</copy>
+	</target>
+
+</project>
