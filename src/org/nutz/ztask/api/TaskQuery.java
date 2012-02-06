@@ -1,6 +1,8 @@
 package org.nutz.ztask.api;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,8 +28,11 @@ import org.nutz.ztask.ZTasks;
  *    '&W(-1:-3)' // 上三周
  * 
  * = 按 Task 的用户字段查询 ====
- *    '@(A, B)'     // owner 为 A 或 B
+ *    '@(A, B)'      // owner 为 A 或 B
  *    '@C(A, B)'     // creater 为 A 或 B
+ * 
+ * = 指定某几种任务状态 ==
+ *    '%(NEW,ING)'   // 状态为给定中的几种，忽略大小写
  * 
  * = 指定一个字段，用正则表达式 ==
  *    即搜索字符串，遇到第一个百分号，之后所有的内容都是正则表达式
@@ -55,6 +60,13 @@ public class TaskQuery {
 	 */
 	public String qText() {
 		return _kwd_.text;
+	}
+
+	/**
+	 * @return 任务状态列表，null 表示没有这个限制条件
+	 */
+	public TaskStatus[] qStatus() {
+		return _kwd_.status;
 	}
 
 	/**
@@ -112,6 +124,8 @@ public class TaskQuery {
 
 		private String[] creaters;
 
+		private TaskStatus[] status;
+
 		private String text;
 
 		KEYWORD(String str) {
@@ -138,6 +152,22 @@ public class TaskQuery {
 				re = find("(@[(])([^)]+)([)])");
 				if (null != re) {
 					owners = Strings.splitIgnoreBlank(re[2], ZTasks.REG_NOWORD);
+				}
+			}
+
+			// 统计: 状态
+			if (text.length() > 0) {
+				re = find("(%[(])([ \ta-zA-Z,]+)([)])");
+				if (null != re) {
+					String[] ss = Strings.splitIgnoreBlank(re[2], ",");
+					List<TaskStatus> ts = new ArrayList<TaskStatus>(ss.length);
+					for (String s : ss) {
+						try {
+							ts.add(TaskStatus.valueOf(s.toUpperCase()));
+						}
+						catch (Exception e) {}
+					}
+					status = ts.isEmpty() ? null : ts.toArray(new TaskStatus[ts.size()]);
 				}
 			}
 
@@ -182,15 +212,16 @@ public class TaskQuery {
 
 		}
 
+		private String[] find(String reg) {
+			return find(Pattern.compile(reg));
+		}
+
 		/**
 		 * @param reg
 		 *            正则表达式
-		 * @param re
-		 *            搜索结果，存放匹配结果得每个 group，0 存放整个匹配的结果
 		 * @return 匹配结果
 		 */
-		String[] find(String reg) {
-			Pattern p = Pattern.compile(reg);
+		private String[] find(Pattern p) {
 			Matcher m = p.matcher(text);
 
 			if (m.find()) {
@@ -204,6 +235,7 @@ public class TaskQuery {
 			}
 			return null;
 		}
+
 	}
 
 	/*----------------------------------------------- 下面是这个类的基本内容 -----*/

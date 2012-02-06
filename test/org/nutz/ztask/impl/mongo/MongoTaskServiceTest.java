@@ -79,6 +79,45 @@ public class MongoTaskServiceTest extends ZTaskCase {
 	}
 
 	@Test
+	public void test_query_by_status() {
+		TaskStack s = tasks.createStackIfNoExistis("S", "zozoh");
+		Task a = tasks.createTask(t("A"));
+		Task b = tasks.createTask(t("B"));
+		Task c = tasks.createTask(t("C"));
+
+		List<Task> ts;
+
+		ts = tasks.queryTasks(TaskQuery.NEW("%(NEW)").asc());
+		assertEquals(3, ts.size());
+		assertEquals("A", ts.get(0).getText());
+		assertEquals("B", ts.get(1).getText());
+		assertEquals("C", ts.get(2).getText());
+
+		tasks.pushToStack(a, s);
+		ts = tasks.queryTasks(TaskQuery.NEW("%(NEW)").asc());
+		assertEquals(2, ts.size());
+		assertEquals("B", ts.get(0).getText());
+		assertEquals("C", ts.get(1).getText());
+
+		tasks.pushToStack(b, s);
+		ts = tasks.queryTasks(TaskQuery.NEW("%(ING)").asc());
+		assertEquals(2, ts.size());
+		assertEquals("A", ts.get(0).getText());
+		assertEquals("B", ts.get(1).getText());
+
+		tasks.popFromStack(a, true);
+		ts = tasks.queryTasks(TaskQuery.NEW("%(NEW,DONE)").asc());
+		assertEquals(2, ts.size());
+		assertEquals("A", ts.get(0).getText());
+		assertEquals("C", ts.get(1).getText());
+
+		tasks.pushToStack(c, s);
+		ts = tasks.queryTasks(TaskQuery.NEW("%(NEW,DONE)").asc());
+		assertEquals(1, ts.size());
+		assertEquals("A", ts.get(0).getText());
+	}
+
+	@Test
 	public void test_query_by_labels_and_names() {
 		tasks.createTask(t_l("AAA", "a", "b", "c"));
 		tasks.createTask(t_l("BAB", "x", "y", "z"));

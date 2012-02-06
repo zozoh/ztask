@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.nutz.castor.Castors;
 import org.nutz.lang.Each;
 import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
@@ -732,6 +733,12 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 		// 处理 owners
 		if (null != tq.qOwners()) {
 			q.inArray("owner", tq.qOwners());
+		}
+
+		// 处理 status
+		if (null != tq.qStatus()) {
+			String[] ss = Castors.me().castTo(tq.qStatus(), String[].class);
+			q.inArray("status", ss);
 		}
 
 		// 处理 creater

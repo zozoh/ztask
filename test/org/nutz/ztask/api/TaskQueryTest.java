@@ -18,19 +18,20 @@ public class TaskQueryTest {
 		assertEquals("ok", tq.qText());
 		assertNull(tq.qRegex());
 		assertNull(tq.qID());
-		ASS(tq.qCreaters(), "abc");
-		ASS(tq.qOwners());
-		ASS(tq.qLabels());
-		ATS(tq.qTimeScope());
+		ASTR(tq.qCreaters(), "abc");
+		ASTR(tq.qOwners());
+		ASTR(tq.qLabels());
+		AD(tq.qTimeScope());
 
-		tq = NEW(" haha @(x,  y  ,z ) ok @C( abc  )  #(A,B,C) &W(0) %REG%:.*");
+		tq = NEW(" haha @(x,  y  ,z )  %(DONE,hungUP) ok @C( abc  )  #(A,B,C) &W(0) %REG%:.*");
 		assertEquals("haha ok", tq.qText());
 		assertEquals(".*", tq.qRegex().pattern());
 		assertNull(tq.qID());
-		ASS(tq.qCreaters(), "abc");
-		ASS(tq.qOwners(), "x", "y", "z");
-		ASS(tq.qLabels(), "A", "B", "C");
-		ATS(tq.qTimeScope(), ZTasks.week(0));
+		ASTR(tq.qCreaters(), "abc");
+		ASTR(tq.qOwners(), "x", "y", "z");
+		ASTR(tq.qLabels(), "A", "B", "C");
+		AD(tq.qTimeScope(), ZTasks.week(0));
+		AS(tq.qStatus(), TaskStatus.DONE, TaskStatus.HUNGUP);
 
 	}
 
@@ -38,117 +39,149 @@ public class TaskQueryTest {
 	public void test_simple_case() {
 		TaskQuery tq;
 
+		tq = NEW("%(Ing)");
+		assertNull(tq.qText());
+		assertNull(tq.qRegex());
+		assertNull(tq.qID());
+		ASTR(tq.qCreaters());
+		ASTR(tq.qOwners());
+		ASTR(tq.qLabels());
+		AD(tq.qTimeScope());
+		AS(tq.qStatus(), TaskStatus.ING);
+
+		tq = NEW("%(Ing, new, DONE)");
+		assertNull(tq.qText());
+		assertNull(tq.qRegex());
+		assertNull(tq.qID());
+		ASTR(tq.qCreaters());
+		ASTR(tq.qOwners());
+		ASTR(tq.qLabels());
+		AD(tq.qTimeScope());
+		AS(tq.qStatus(), TaskStatus.ING, TaskStatus.NEW, TaskStatus.DONE);
+
 		tq = NEW("@C(abc)");
 		assertNull(tq.qText());
 		assertNull(tq.qRegex());
 		assertNull(tq.qID());
-		ASS(tq.qCreaters(), "abc");
-		ASS(tq.qOwners());
-		ASS(tq.qLabels());
-		ATS(tq.qTimeScope());
+		ASTR(tq.qCreaters(), "abc");
+		ASTR(tq.qOwners());
+		ASTR(tq.qLabels());
+		AD(tq.qTimeScope());
+		AS(tq.qStatus());
 
 		tq = NEW("@C(abc,bcd)");
 		assertNull(tq.qText());
 		assertNull(tq.qID());
 		assertNull(tq.qID());
-		ASS(tq.qCreaters(), "abc", "bcd");
-		ASS(tq.qOwners());
-		ASS(tq.qLabels());
-		ATS(tq.qTimeScope());
+		ASTR(tq.qCreaters(), "abc", "bcd");
+		ASTR(tq.qOwners());
+		ASTR(tq.qLabels());
+		AD(tq.qTimeScope());
+		AS(tq.qStatus());
 
 		tq = NEW("@(abc)");
 		assertNull(tq.qText());
 		assertNull(tq.qRegex());
 		assertNull(tq.qID());
-		ASS(tq.qCreaters());
-		ASS(tq.qOwners(), "abc");
-		ASS(tq.qLabels());
-		ATS(tq.qTimeScope());
+		ASTR(tq.qCreaters());
+		ASTR(tq.qOwners(), "abc");
+		ASTR(tq.qLabels());
+		AD(tq.qTimeScope());
+		AS(tq.qStatus());
 
 		tq = NEW("@(abc,bcd)");
 		assertNull(tq.qText());
 		assertNull(tq.qRegex());
 		assertNull(tq.qID());
-		ASS(tq.qCreaters());
-		ASS(tq.qOwners(), "abc", "bcd");
-		ASS(tq.qLabels());
-		ATS(tq.qTimeScope());
+		ASTR(tq.qCreaters());
+		ASTR(tq.qOwners(), "abc", "bcd");
+		ASTR(tq.qLabels());
+		AD(tq.qTimeScope());
+		AS(tq.qStatus());
 
 		tq = NEW("#(x,y)");
 		assertNull(tq.qText());
 		assertNull(tq.qRegex());
 		assertNull(tq.qID());
-		ASS(tq.qCreaters());
-		ASS(tq.qOwners());
-		ASS(tq.qLabels(), "x", "y");
-		ATS(tq.qTimeScope());
+		ASTR(tq.qCreaters());
+		ASTR(tq.qOwners());
+		ASTR(tq.qLabels(), "x", "y");
+		AD(tq.qTimeScope());
+		AS(tq.qStatus());
 
 		tq = NEW("#(x)");
 		assertNull(tq.qText());
 		assertNull(tq.qRegex());
 		assertNull(tq.qID());
-		ASS(tq.qCreaters());
-		ASS(tq.qOwners());
-		ASS(tq.qLabels(), "x");
-		ATS(tq.qTimeScope());
+		ASTR(tq.qCreaters());
+		ASTR(tq.qOwners());
+		ASTR(tq.qLabels(), "x");
+		AD(tq.qTimeScope());
+		AS(tq.qStatus());
 
 		tq = NEW("&W(-1, 4)");
 		assertNull(tq.qText());
 		assertNull(tq.qRegex());
 		assertNull(tq.qID());
-		ASS(tq.qCreaters());
-		ASS(tq.qOwners());
-		ASS(tq.qLabels());
-		ATS(tq.qTimeScope(), ZTasks.weeks(-1, 4));
+		ASTR(tq.qCreaters());
+		ASTR(tq.qOwners());
+		ASTR(tq.qLabels());
+		AD(tq.qTimeScope(), ZTasks.weeks(-1, 4));
+		AS(tq.qStatus());
 
 		tq = NEW("&W(-1, 0)");
 		assertNull(tq.qText());
 		assertNull(tq.qRegex());
 		assertNull(tq.qID());
-		ASS(tq.qCreaters());
-		ASS(tq.qOwners());
-		ASS(tq.qLabels());
-		ATS(tq.qTimeScope(), ZTasks.weeks(-1, 0));
+		ASTR(tq.qCreaters());
+		ASTR(tq.qOwners());
+		ASTR(tq.qLabels());
+		AD(tq.qTimeScope(), ZTasks.weeks(-1, 0));
+		AS(tq.qStatus());
 
 		tq = NEW("&W(0)");
 		assertNull(tq.qText());
 		assertNull(tq.qRegex());
 		assertNull(tq.qID());
-		ASS(tq.qCreaters());
-		ASS(tq.qOwners());
-		ASS(tq.qLabels());
-		ATS(tq.qTimeScope(), ZTasks.week(0));
+		ASTR(tq.qCreaters());
+		ASTR(tq.qOwners());
+		ASTR(tq.qLabels());
+		AD(tq.qTimeScope(), ZTasks.week(0));
+		AS(tq.qStatus());
 
 		tq = NEW("abc");
 		assertEquals("abc", tq.qText());
 		assertNull(tq.qRegex());
 		assertNull(tq.qID());
-		ASS(tq.qCreaters());
-		ASS(tq.qOwners());
-		ASS(tq.qLabels());
-		ATS(tq.qTimeScope());
+		ASTR(tq.qCreaters());
+		ASTR(tq.qOwners());
+		ASTR(tq.qLabels());
+		AD(tq.qTimeScope());
+		AS(tq.qStatus());
 
 		tq = NEW("%REG%:abc");
 		assertNull(tq.qText());
 		assertEquals("abc", tq.qRegex().toString());
 		assertNull(tq.qID());
-		ASS(tq.qCreaters());
-		ASS(tq.qOwners());
-		ASS(tq.qLabels());
-		ATS(tq.qTimeScope());
+		ASTR(tq.qCreaters());
+		ASTR(tq.qOwners());
+		ASTR(tq.qLabels());
+		AD(tq.qTimeScope());
+		AS(tq.qStatus());
 
 		tq = NEW("4f2d104a744ed795071e0367");
 		assertNull(tq.qText());
 		assertNull(tq.qRegex());
 		assertEquals("4f2d104a744ed795071e0367", tq.qID());
-		ASS(tq.qCreaters());
-		ASS(tq.qOwners());
-		ASS(tq.qLabels());
-		ATS(tq.qTimeScope());
+		ASTR(tq.qCreaters());
+		ASTR(tq.qOwners());
+		ASTR(tq.qLabels());
+		AD(tq.qTimeScope());
+		AS(tq.qStatus());
 
 	}
 
-	private static void ASS(String[] ss, String... expects) {
+	private static void ASTR(String[] ss, String... expects) {
 		if (0 == expects.length) {
 			assertNull(ss);
 			return;
@@ -158,11 +191,21 @@ public class TaskQueryTest {
 			assertEquals(expects[i], ss[i]);
 	}
 
-	private static void ATS(Date[] scope) {
-		ATS(scope, null);
+	private static void AS(TaskStatus[] tss, TaskStatus... expects) {
+		if (0 == expects.length) {
+			assertNull(tss);
+			return;
+		}
+		assertEquals(expects.length, tss.length);
+		for (int i = 0; i < tss.length; i++)
+			assertEquals(expects[i], tss[i]);
 	}
 
-	private static void ATS(Date[] scope, Date[] expects) {
+	private static void AD(Date[] scope) {
+		AD(scope, null);
+	}
+
+	private static void AD(Date[] scope, Date[] expects) {
 		if (null == expects) {
 			assertNull(scope);
 			return;
