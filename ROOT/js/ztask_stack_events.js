@@ -30,7 +30,7 @@ function stack_events_on_goin(e) {
         hierachy_add.apply(hie[0], [ee.s.name, ss]);
     };
     // 读取数据，如果有子节点，进入
-    ajax.get("/ajax/stack/children", {
+    ajax.post("/ajax/stack/children", {
         s: ee.s.name
     }, function(re) {
         if(re.data && re.data.length > 0) {

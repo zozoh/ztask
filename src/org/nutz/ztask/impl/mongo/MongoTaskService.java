@@ -611,10 +611,15 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 	}
 
 	@Override
-	public List<TaskStack> getChildStacks(String stackName) {
+	public List<TaskStack> getStacksByOwner(String ownerName) {
 		return dao.find(TaskStack.class,
-						Moo.NEW("parentName", stackName),
-						MCur.ASC("name"));
+						Moo.NEW("owner", ownerName),
+						MCur.ASC("parentName").asc("name"));
+	}
+
+	@Override
+	public List<TaskStack> getChildStacks(String stackName) {
+		return dao.find(TaskStack.class, Moo.NEW("parentName", stackName), MCur.ASC("name"));
 	}
 
 	@Override

@@ -78,9 +78,12 @@ function task_events_on_showDetail(e) {
     $(html).appendTo(jq);
     // 显示右侧内容
     var jComments = $(".task_comments_list", jDetail).empty();
+    
+    var html = "";
     for(var i = 0; i < t.comments.length; i++) {
-        $(task_wrap_comment(t.comments[i])).prependTo(jComments)
+        html += task_wrap_comment(t.comments[i]);
     }
+    jComments.html(html);
 
     // 绑定提交事件
     jq = $(".task_comments_newer a", jDetail);

@@ -91,15 +91,7 @@ function task_format_text(str) {
  * @return 格式化后的字符串
  */
 function task_wrap_comment(str) {
-    var formats = ginfo() ? ginfo().formats : null;
-    if(!str || !$.isArray(formats) || formats.length <= 0)
-        return str;
-    // 循环替换字符串
-    for(var i = 0; i < formats.length; i++) {
-        var f = formats[i];
-        str = str.replace(new RegExp(f.regex, "ig"), f.tmpl);
-    }
-    return '<pre class="task_comment">' + str + '</pre>';
+    return '<pre class="task_comment">' + task_format_text(str) + '</pre>';
 }
 
 /**

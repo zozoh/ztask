@@ -29,13 +29,13 @@ public class PageModule {
 	 */
 	@Filters
 	@At("/")
-	@Ok(">>:/${obj}")
+	@Ok(">>:${obj}")
 	public String autoDispatchRoot(HttpSession sess) {
 		User u = (User) sess.getAttribute(Webs.ME);
 		if (null == u) {
-			return "page/login";
+			return "/page/login";
 		}
-		return "page/stack";
+		return "/page/mystack";
 	}
 
 	/**
@@ -45,6 +45,13 @@ public class PageModule {
 	@At("/page/login")
 	@Ok("jsp:jsp.login")
 	public void showLoginPage() {}
+	
+	/**
+	 * 我的堆栈界面
+	 */
+	@At("/page/mystack")
+	@Ok("jsp:jsp.mystack")
+	public void showMyStackPage() {}
 
 	/**
 	 * 系统界面

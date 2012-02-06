@@ -117,17 +117,17 @@ a.lnkb:hover {
     width: 50%;
 }
 
-#lnks a {
+#sky .lnk_menu a {
     display: inline-block;
     padding: 0 10px;
     font-size: 16px;
 }
 
-#lnks a:hover {
+#sky .lnk_menu a:hover {
     background-color: rgba(255,255,255,0.1);
 }
 
-#lnks a.hlt, #lnks a.hlt:hover {
+#sky .lnk_menu a.hlt, #lnks a.hlt:hover {
     color: #FFF;
     font-weight: bold;
     background-color: #F80;

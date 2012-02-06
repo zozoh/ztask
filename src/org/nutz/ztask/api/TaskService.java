@@ -392,6 +392,15 @@ public interface TaskService extends AbstractService {
 	List<TaskStack> getTopStacks();
 
 	/**
+	 * 获得属于某个用户的Stacl
+	 * 
+	 * @param ownerName
+	 *            用户名
+	 * @return 堆栈列表
+	 */
+	List<TaskStack> getStacksByOwner(String ownerName);
+
+	/**
 	 * 获取一个堆栈下所有的子 stack
 	 * 
 	 * @param stackName

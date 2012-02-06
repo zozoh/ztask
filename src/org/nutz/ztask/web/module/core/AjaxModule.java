@@ -217,6 +217,11 @@ public class AjaxModule {
 		return tasks.getTopStacks();
 	}
 
+	@At("/stack/mytops")
+	public List<TaskStack> getTopStacks(@Attr(scope = Scope.SESSION, value = Webs.ME) User me) {
+		return tasks.getStacksByOwner(me.getName());
+	}
+
 	@AdaptBy(type = JsonAdaptor.class)
 	@At("/g/set")
 	public GInfo setGlobalInfo(GInfo info) {

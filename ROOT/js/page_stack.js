@@ -1,6 +1,7 @@
 function main() {
     // 读取左侧所有的堆栈列表
-    ajax.get("/ajax/stack/tops", function(re) {
+    var topStackUrl = $(document.body).attr("url-stack-top");
+    ajax.get(topStackUrl, function(re) {
         hierachy_init.apply($("#stacks"), [{
             direction: "left",
             append: function(obj) {

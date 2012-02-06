@@ -171,7 +171,6 @@
 .task_lbe {
     position: absolute;
     top: 0;
-    left: 0;
     background-color: rgba(255,255,255,0.8);
     margin-top: 24px;
     padding: 2px 16px 4px 16px;
@@ -426,6 +425,11 @@
     float: right;
 }
 
+
+.hierachy_left .task_lbe{
+    right:0;
+}
+
 .hierachy_left .task_menu {
     left: 4px;
 }
@@ -467,6 +471,11 @@
 
 .hierachy_right .task_labels li {
     float: left;
+}
+
+.hierachy_right .task_lbe{
+    margin-left:70px;
+    left: 0;
 }
 
 .hierachy_right .task_menu {

@@ -16,9 +16,9 @@
 <script language="JavaScript" src="${rs}/js/page_stack.js"></script>
 
 </head>
-<body url-stack-top="${base}/ajax/stack/tops">
-	<% /*==========================================顶部固定条=*/ %>
-	<%@include file="/WEB-INF/jsp/include/_sky.jsp" %>
+<body url-stack-top="${base}/ajax/stack/mytops">
+    <% /*==========================================顶部固定条=*/ %>
+    <%@include file="/WEB-INF/jsp/include/_sky.jsp" %>
     <% /*==========================================左侧堆栈列表=*/ %>
     <div id="stacks" class="hierachy"><div class="hierachy_arena">
         <div id="stacks_crumb" class="hierachy_crumb"></div>
@@ -35,7 +35,7 @@
     </div></div>
     <% /*========================================Task Detail DOM=*/ %>
     <%@include file="/WEB-INF/jsp/include/_task_comment.jsp" %>
-	<% /*==========================================本地化字符串支持=*/ %>	
-	<%@include file="/WEB-INF/jsp/include/_msgs.jsp" %>
+    <% /*==========================================本地化字符串支持=*/ %>   
+    <%@include file="/WEB-INF/jsp/include/_msgs.jsp" %>
 </body>
 </html>
