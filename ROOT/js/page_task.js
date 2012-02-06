@@ -100,16 +100,16 @@ function initLayout() {
             value: "createTime"
         }, {
             text: z.msg('task.lastModified'),
-            value: "createTime"
+            value: "lastModified"
         }, {
             text: z.msg('task.popAt'),
-            value: "createTime"
+            value: "popAt"
         }, {
             text: z.msg('task.pushAt'),
-            value: "createTime"
+            value: "pushAt"
         }, {
             text: z.msg('task.startAt'),
-            value: "createTime"
+            value: "startAt"
         }]
     });
     $(".srch_sort_order", jsrch).droplist({
