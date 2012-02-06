@@ -35,7 +35,7 @@ public class AjaxModule {
 	@Inject("java:$conf.getInt('sys-task-len-max')")
 	private int taskTitleMaxLength;
 
-	@Inject("refer:taskService")
+	@Inject("refer:hookedTaskService")
 	private TaskService tasks;
 
 	@Inject("refer:labelService")

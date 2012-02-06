@@ -89,6 +89,10 @@ public class StaticMongoEntity implements MongoEntity {
 
 	@Override
 	public String getFieldDbName(String key) {
+		// ID 名字的特殊值
+		if ("_id".equals(key))
+			return key;
+		// 根据配置得到数据库中的名字
 		MongoEntityField mef = fields.get(key);
 		if (null == mef)
 			throw Lang.makeThrow("Unknow '%s' in '%s'", key, collectionName);

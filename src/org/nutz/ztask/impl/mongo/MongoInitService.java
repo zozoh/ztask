@@ -160,6 +160,7 @@ public class MongoInitService extends AbstractMongoService implements InitServic
 	}
 
 	private void _init_collections() {
+		dao.create(MongoHook.class, false);
 		dao.create(Task.class, false);
 		dao.create(TaskStack.class, false);
 		dao.create(Label.class, false);
