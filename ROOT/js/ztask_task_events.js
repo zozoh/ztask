@@ -31,13 +31,12 @@ function task_events_bind(selection, opt) {
     selection.delegate(".task_ing", "click", task_events_on_done);
     selection.delegate(".task_label", "click", task_events_on_label);
     selection.delegate(".task_content", "click", task_events_on_showDetail);
-    
+
     // 标签事件
     selection.delegate(".task_lbe", "click", cancel_bubble);
-    selection.delegate(".task_lbe_cancel", "click", _task_lbe_on_cancel_)
-    selection.delegate(".task_lbe_ok", "click", _task_lbe_on_ok_);
-    selection.delegate(".task_lbe input", "change", _task_lbe_on_ok_);
+    selection.delegate(".task_lbe input", "change", _task_lbe_on_change_);
     selection.delegate(".task_lbe input", "keyup", _task_lbe_on_keyup_);
+    selection.delegate(".task_lbe input", "keydown", _task_lbe_on_esc_);
 }
 
 var _TFS = "parentId,_id,stack,owner,creater,status,pushAt,popAt,startAt,hungupAt,createTime,lastModified".split(",");
@@ -78,7 +77,7 @@ function task_events_on_showDetail(e) {
     $(html).appendTo(jq);
     // 显示右侧内容
     var jComments = $(".task_comments_list", jDetail).empty();
-    
+
     var html = "";
     for(var i = 0; i < t.comments.length; i++) {
         html += task_wrap_comment(t.comments[i]);
@@ -139,7 +138,7 @@ function task_events_on_label(e) {
     // 开始显示
     var ee = _task_obj(this);
     var jLbs = $(".task_labels", ee.jTask);
-    
+
     // 获取标签数值
     var lbs = [];
     jLbs.children().each(function() {
@@ -148,42 +147,41 @@ function task_events_on_label(e) {
     // 建立一个 html，插入到标签容器中
     var jq = $(task_html_lbe()).insertBefore(jLbs).attr("old-value", lbs.join(","));
     jq.width(jLbs.innerWidth());
-    
-    // 绑定鼠标点击事件到 body 上
-    $(document.body).one("click", function() {
-        $(".task_lbe_cancel").click();
-    });
+
     // 聚焦
     $("input", jq).val(lbs.join(",")).select();
 }
 
-function _task_lbe_on_ok_(e) {
+function _task_lbe_on_change_(e) {
     var ee = _task_obj(this);
     var t = ee.t;
-    ajax.post("/ajax/task/set/labels", {
-        tid: t._id,
-        lbs: t.labels ? t.labels.join(",") : ""
-    }, function() {
-        $(".task_labels").undelegate();
-        $(".task_lbe").remove();
-    });
+    var oldv = ee.jTask.find(".task_lbe").attr("old-value");
+    var newv = t.labels ? t.labels.join(",") : "";
+    if(oldv != newv) {
+        ajax.post("/ajax/task/set/labels", {
+            tid: t._id,
+            lbs: newv
+        }, function() {
+            $(".task_lbe").remove();
+        });
+    }
+}
+
+function _task_lbe_on_esc_(e) {
+    if(27 == e.which) {
+        _task_lbe_do_cancel_.apply();
+    }
+}
+
+function _task_lbe_do_cancel_() {
+    var jLbs = $(".task_labels");
+    var ee = _task_obj(jLbs);
+    _task_lbe_redraw_labels_.apply(jLbs, [ee.jTask.find(".task_lbe").attr("old-value")]);
+    $(".task_lbe").remove();
 }
 
 function _task_lbe_on_keyup_(e) {
-    if(27 == e.which) {
-        $(".task_lbe_cancel").click();
-        return;
-    }
-    var ee = _task_obj(this);
     _task_lbe_redraw_labels_.apply(this, [$(this).val()]);
-}
-
-function _task_lbe_on_cancel_() {
-    var ee = _task_obj(this);
-    var jLbs = ee.jTask.find(".task_labels")
-    _task_lbe_redraw_labels_.apply(jLbs, [ee.jTask.find(".task_lbe").attr("old-value")]);
-    $(".task_labels").undelegate();
-    $(".task_lbe").remove();
 }
 
 // 这是一个绘制函数，用来绘制 task_labels, this 为 jLbs
@@ -193,7 +191,7 @@ function _task_lbe_redraw_labels_(s) {
     var t = ee.t;
     t.labels = ss;
     // 移除旧的
-    var jLbs = $(".task_labels",ee.jTask);
+    var jLbs = $(".task_labels", ee.jTask);
     jLbs.find(".task_labels_item").remove();
     // 添加新的
     for(var i = 0; i < ss.length; i++) {
