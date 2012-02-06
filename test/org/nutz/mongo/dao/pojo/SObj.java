@@ -8,9 +8,15 @@ import org.nutz.mongo.annotation.*;
 @Co("sobj")
 public class SObj {
 
-	public static SObj create(String name) {
+	public static SObj NEW(String name) {
 		SObj obj = new SObj();
 		obj.setName(name);
+		return obj;
+	}
+
+	public static SObj NUMS(String name, int... numbers) {
+		SObj obj = NEW(name);
+		obj.setNumbers(numbers);
 		return obj;
 	}
 
@@ -21,7 +27,7 @@ public class SObj {
 	private String name;
 
 	@CoField("n")
-	private int number;
+	private int num;
 
 	@CoField("map")
 	private Map<String, Object> map;
@@ -31,6 +37,9 @@ public class SObj {
 
 	@CoField
 	private SInner obj;
+
+	@CoField("ns")
+	private int[] numbers;
 
 	public String getId() {
 		return id;
@@ -48,12 +57,20 @@ public class SObj {
 		this.name = name;
 	}
 
-	public int getNumber() {
-		return number;
+	public int getNum() {
+		return num;
 	}
 
-	public void setNumber(int number) {
-		this.number = number;
+	public void setNum(int number) {
+		this.num = number;
+	}
+
+	public int[] getNumbers() {
+		return numbers;
+	}
+
+	public void setNumbers(int[] numbers) {
+		this.numbers = numbers;
 	}
 
 	public Map<String, Object> getMap() {

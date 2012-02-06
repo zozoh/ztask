@@ -1,5 +1,9 @@
 package org.nutz.ztask;
 
+import static org.junit.Assert.assertEquals;
+
+import java.util.Date;
+
 import org.junit.After;
 import org.junit.Before;
 import org.nutz.ioc.Ioc;
@@ -39,6 +43,11 @@ public class ZTaskCase {
 	public void after() {
 		ioc.depose();
 	}
+	
+	public static void AD(String b, String e, Date[] ds) {
+		assertEquals(b, ZTasks.D(ds[0]));
+		assertEquals(e, ZTasks.D(ds[1]));
+	}
 
 	protected long countStack() {
 		return dao.count(TaskStack.class, null);
@@ -49,15 +58,39 @@ public class ZTaskCase {
 	}
 
 	protected Task t(String title) {
+		return t(null, title);
+	}
+
+	protected Task t(Task p, String title) {
 		Task t = new Task();
-		t.setTitle(title);
+		if (null != p)
+			t.setParentId(p.get_id());
+		t.setText(title);
 		return t;
 	}
 
 	protected Task t_l(String title, String... lbs) {
 		Task t = new Task();
-		t.setTitle(title);
+		t.setText(title);
 		t.setLabels(lbs);
+		return t;
+	}
+
+	protected Task t_u(String title, String userName) {
+		Task t = new Task();
+		t.setText(title);
+		t.setCreater(userName);
+		t.setOwner(userName);
+		return t;
+	}
+
+	protected Task t_u(Task p, String title, String userName) {
+		Task t = new Task();
+		if (null != p)
+			t.setParentId(p.get_id());
+		t.setText(title);
+		t.setCreater(userName);
+		t.setOwner(userName);
 		return t;
 	}
 

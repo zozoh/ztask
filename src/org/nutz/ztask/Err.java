@@ -31,6 +31,10 @@ public abstract class Err {
 		public static WebException LONG_TASK(int len) {
 			return create("e.t.long_task").reason(len);
 		}
+
+		public static WebException SELF_PARENT(String taskId) {
+			return create("e.t.self_parent").reason(taskId);
+		}
 	}
 
 	/**

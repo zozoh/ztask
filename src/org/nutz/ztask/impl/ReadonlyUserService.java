@@ -36,10 +36,11 @@ public class ReadonlyUserService implements UserService {
 			// 执行 ...
 			String[] cols = Strings.splitIgnoreBlank(line, ":");
 			ReadonlyUser u = new ReadonlyUser();
-			u.setName(cols[0]);
-			u.setPassword(cols[1]);
-			u.setEmail(new Email(cols[2]));
-			u.setDescription(cols[3]);
+			u.setSuperUser(cols[0].equalsIgnoreCase("S"));
+			u.setName(cols[1]);
+			u.setPassword(cols[2]);
+			u.setEmail(new Email(cols[3]));
+			u.setDescription(cols[4]);
 			map.put(u.getName(), u);
 		}
 	}

@@ -44,20 +44,34 @@ public class PageModule {
 	@Filters
 	@At("/page/login")
 	@Ok("jsp:jsp.login")
-	public void showLogin() {}
+	public void showLoginPage() {}
 
 	/**
 	 * 系统界面
 	 */
 	@At("/page/sys")
 	@Ok("jsp:jsp.sys")
-	public void showSystemConfiguration() {}
+	public void showSystemConfigurationPage() {}
+
+	/**
+	 * 标签界面
+	 */
+	@At("/page/label")
+	@Ok("jsp:jsp.label")
+	public void showLabelPage() {}
+
+	/**
+	 * 任务界面
+	 */
+	@At("/page/task")
+	@Ok("jsp:jsp.task")
+	public void showTaskPage() {}
 
 	/**
 	 * 堆栈界面
 	 */
 	@At("/page/stack")
 	@Ok("jsp:jsp.stack")
-	public void showMain() {}
+	public void showStackPage() {}
 
 }

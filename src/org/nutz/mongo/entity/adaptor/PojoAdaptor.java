@@ -19,7 +19,7 @@ public class PojoAdaptor extends FieldAdaptor {
 	@Override
 	public Object adaptForSet(Object val) {
 		Map<String, Object> map = (Map<String, Object>) ((DBObject) val).toMap();
-		return Lang.map2Object(map, fieldClass);
+		return Lang.map2Object(map, field.getType());
 	}
 
 }

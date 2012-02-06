@@ -3,15 +3,13 @@
  */
 (function($) {
 $(document.body).ready(function() {
-    // 调用界面主函数
-    if( typeof window.main == "function") {
-        window.main();
+    // 初始化菜单
+    if( typeof window.initLayout == "function") {
+        window.initLayout.apply($("#menu"));
     }
 
-    // 初始化菜单
-    if( typeof window.initMenu == "function") {
-        window.initMenu.apply($("#menu"));
-    }
+    // 初始化 GInfo
+    ginfo();
 
     // 监视键盘
     z.watchKeyboard();
@@ -27,12 +25,23 @@ $(document.body).ready(function() {
     // 随着窗口变化调整
     window.onresize = _adjust_layout;
 
+    // 调用界面主函数
+    if( typeof window.main == "function") {
+        window.main();
+    }
+
 });
 })(window.jQuery);
 
 function _adjust_layout() {
     var box = z.winsz();
+    box.scrollbar = z.scrollBarWidth();
     $("#sky").css("width", box.width);
+    var jDetail = $("#task_detail").css({
+        width: box.width,
+        height: box.height
+    });
+    $(".task_comments_newer", jDetail).css("width", $(".task_comments",jDetail).width());
     if( typeof window.adjustLayout == "function")
         adjustLayout.apply(box);
 }

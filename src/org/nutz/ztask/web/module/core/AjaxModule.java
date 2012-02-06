@@ -1,9 +1,13 @@
 package org.nutz.ztask.web.module.core;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.nutz.dao.Chain;
 import org.nutz.ioc.annotation.InjectName;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
@@ -61,34 +65,93 @@ public class AjaxModule {
 		return tasks.popFromStack(taskId, done);
 	}
 
-	@At("/set/title")
-	public Task doSetTaskTitle(@Param("tid") String taskId, @Param("tt") String newTitle) {
-		return tasks.setTaskTitle(taskId, newTitle);
+	@At("/do/hungup")
+	public Task doHungup(@Param("tid") String taskId) {
+		return tasks.hungupTask(taskId);
 	}
 
-	@At("/set/labels")
+	@At("/do/restart")
+	public Task doRestart(@Param("tid") String taskId) {
+		return tasks.restartTask(taskId);
+	}
+
+	@At("/do/comment")
+	public Task doCommentTask(@Param("tid") String taskId, @Param("cmt") String comment) {
+		return tasks.addComment(taskId, comment);
+	}
+
+	@AdaptBy(type = JsonAdaptor.class)
+	@At("/task/query")
+	public List<Task> queryTask(TaskQuery tq) {
+		return tasks.queryTasks(tq);
+	}
+
+	@At("/task/set/text")
+	public Task doSetTaskTitle(@Param("tid") String taskId, @Param("txt") String newText) {
+		return tasks.setTaskText(taskId, newText);
+	}
+
+	@At("/task/set/labels")
 	public Task doSetTaskLabels(@Param("tid") String taskId, @Param("lbs") String[] lbs) {
 		return tasks.setTaskLabels(taskId, lbs);
 	}
 
-	@At("/set/owner")
+	@At("/task/set/owner")
 	public Task doSetTaskOwner(@Param("tid") String taskId, @Param("ow") String ownerName) {
 		return tasks.setTaskOwner(taskId, ownerName);
 	}
 
-	@At("/set/parent")
-	public Task doSetTaskParent(@Param("tid") String taskId, @Param("pid") String parentId) {
-		return tasks.setTaskParent(taskId, parentId);
+	@At("/task/set/parent")
+	public List<Task> doSetTaskParent(@Param("tids") String[] taskIds, @Param("pid") String parentId) {
+		return tasks.setTasksParent(parentId, taskIds);
 	}
 
-	@At("/task/tops")
-	public List<Task> getTopTasks(@Param("s") String stackName, @Param("a") TaskStatus au) {
-		return tasks.getTopTasks(stackName, au);
+	/**
+	 * 将一个任务上移一层，如果任务本身就是顶层，那么则直接返回
+	 * 
+	 * @param taskId
+	 *            任务 ID
+	 * @return 任务对象
+	 */
+	@At("/task/gout")
+	public Task doGoutTask(@Param("tid") String taskId) {
+		Task t = tasks.checkTask(taskId);
+		if (Strings.isBlank(t.getParentId()))
+			return t;
+		Task p = tasks.checkTask(t.getParentId());
+		tasks.setTasksParent(p.getParentId(), t.get_id());
+		return t;
+	}
+
+	@At("/task/topnews")
+	public List<Task> getTopNewTasks() {
+		return tasks.getTopNewTasks();
 	}
 
 	@At("/task/children")
 	public List<Task> getChildrenTasks(@Param("tid") String taskId, HttpServletRequest req) {
 		return tasks.getChildTasks(taskId);
+	}
+
+	@At("/task/get")
+	public List<Task> getTasks(@Param("tids") String[] taskIds) {
+		if (null == taskIds) {
+			return new LinkedList<Task>();
+		}
+		List<Task> list = new ArrayList<Task>(taskIds.length);
+		for (String taskId : taskIds)
+			list.add(tasks.getTask(taskId));
+		return list;
+	}
+
+	@At("/task/self")
+	public Task getTaskSelfAndChildren(@Param("tid") String taskId) {
+		return tasks.loadTaskChildren(tasks.checkTask(taskId));
+	}
+
+	@At("/task/del")
+	public Task removeTask(@Param("tid") String taskId, @Param("r") boolean recur) {
+		return tasks.removeTask(taskId, recur);
 	}
 
 	@At("/task/save")
@@ -113,8 +176,9 @@ public class AjaxModule {
 
 		// 合适，那么我们来创建它
 		Task t = new Task();
-		t.setTitle(title);
+		t.setText(title);
 		t.setLabels(labels);
+		t.setCreater(me.getName());
 		t.setOwner(me.getName());
 		t.setParentId(null == parent ? null : parent.get_id());
 
@@ -122,12 +186,43 @@ public class AjaxModule {
 		return tasks.createTask(t);
 	}
 
+	/**
+	 * 返回一个堆栈详细的信息，结构为
+	 * 
+	 * <pre>
+	 * {
+	 *    stack : TaskStack,
+	 *    tasks : Task[]
+	 * }
+	 * </pre>
+	 * 
+	 * @param stackName
+	 *            堆栈名称
+	 * @return 详细信息
+	 */
+	@At("/stack/detail")
+	public Map<String, Object> getStackDetail(@Param("s") String stackName) {
+		TaskStack s = tasks.checkStack(stackName);
+		List<Task> ts = tasks.getTasksInStack(s, null);
+		return Chain.make("stack", s).add("tasks", ts).toMap();
+	}
+
+	@At("/stack/children")
+	public List<TaskStack> getChildrenStacks(@Param("s") String stackName) {
+		return tasks.getChildStacks(stackName);
+	}
+
+	@At("/stack/tops")
+	public List<TaskStack> getTopStacks() {
+		return tasks.getTopStacks();
+	}
+
 	@AdaptBy(type = JsonAdaptor.class)
 	@At("/g/set")
 	public GInfo setGlobalInfo(GInfo info) {
 		if (null == info)
 			info = new GInfo();
-		if (Strings.isBlank(info.get_id())) {
+		if (!Strings.isBlank(info.get_id())) {
 			GInfo info2 = tasks.dao().findOne(GInfo.class, null);
 			info.set_id(info2.get_id());
 		}

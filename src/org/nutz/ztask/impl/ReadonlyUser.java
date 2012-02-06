@@ -5,6 +5,8 @@ import org.nutz.ztask.api.User;
 
 public class ReadonlyUser implements User {
 
+	private boolean superUser;
+
 	private String name;
 
 	private String password;
@@ -13,8 +15,16 @@ public class ReadonlyUser implements User {
 
 	private String description;
 
+	public boolean isSuperUser() {
+		return superUser;
+	}
+
+	public void setSuperUser(boolean superUser) {
+		this.superUser = superUser;
+	}
+
 	public String getMainStackName() {
-		return "u_" + name;
+		return name;
 	}
 
 	public String getName() {
@@ -49,4 +59,7 @@ public class ReadonlyUser implements User {
 		this.description = description;
 	}
 
+	public String toString() {
+		return String.format("@%s%s(%s)", this.isSuperUser() ? "*" : "", name, email);
+	}
 }

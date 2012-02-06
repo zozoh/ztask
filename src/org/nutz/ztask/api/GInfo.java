@@ -1,5 +1,7 @@
 package org.nutz.ztask.api;
 
+import java.util.Date;
+
 import org.nutz.mongo.annotation.*;
 
 /**
@@ -29,7 +31,7 @@ public class GInfo {
 	private GSmtp smtp;
 
 	@CoField("lm")
-	private String lastModified;
+	private Date lastModified;
 
 	public String get_id() {
 		return _id;
@@ -63,11 +65,11 @@ public class GInfo {
 		this.smtp = smtp;
 	}
 
-	public String getLastModified() {
+	public Date getLastModified() {
 		return lastModified;
 	}
 
-	public void setLastModified(String lastModified) {
+	public void setLastModified(Date lastModified) {
 		this.lastModified = lastModified;
 	}
 

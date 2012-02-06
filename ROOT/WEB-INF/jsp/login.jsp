@@ -6,21 +6,21 @@
 <link type="text/css" rel="stylesheet" href="${rs}/css/page_login.css"/>
 </head>
 <body>
-<h1>zTask</h1>
+<div align="center"><img src="${rs}/img/ztask_logo_big.png"></div>
 <form method="post" action="${base}/do/login" class="login">
     <table border="0" cellspacing="4" cellpadding="4">
         <tr>
-            <td>${msg['login.unm']}</td>
+            <td class="fnm">${msg['login.unm']}</td>
             <td><input name="nm" value="zozoh"/></td>
         </tr>
         <tr>
-            <td>${msg['login.pwd']}</td>
+            <td class="fnm">${msg['login.pwd']}</td>
             <td><input name="pwd" type="password" value="123456"/></td>         
         </tr>
         <tr>
             <td>&nbsp;</td>
             <td>
-                <input type="submit" value="${msg['login.signup']}"/>
+                <input class="btn" type="submit" value="${msg['login.signup']}"/>
             </td>           
         </tr>
     </table>    

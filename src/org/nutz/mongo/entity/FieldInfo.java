@@ -31,6 +31,8 @@ class FieldInfo {
 
 	private FieldAdaptor adaptor;
 
+	private Mirror<?> mirror;
+
 	/**
 	 * 根据字段得到 Field 信息
 	 * 
@@ -38,13 +40,14 @@ class FieldInfo {
 	 *            字段
 	 */
 	FieldInfo(Field fld) {
-		Mirror<?> mirror = Mirror.me(fld.getDeclaringClass());
+		Mirror<?> typeMirror = Mirror.me(fld.getDeclaringClass());
 		this.name = fld.getName();
+		this.mirror = Mirror.me(fld.getType());
 		this._id = fld.getAnnotation(CoId.class);
 		this.annotation = fld.getAnnotation(CoField.class);
 		this.adaptor = _eval_adaptor(fld.getGenericType());
-		this.adaptor.setEjecting(mirror.getEjecting(fld.getName()));
-		this.adaptor.setInjecting(mirror.getInjecting(fld.getName()));
+		this.adaptor.setEjecting(typeMirror.getEjecting(fld.getName()));
+		this.adaptor.setInjecting(typeMirror.getInjecting(fld.getName()));
 	}
 
 	/**
@@ -58,6 +61,7 @@ class FieldInfo {
 		this.annotation = method.getAnnotation(CoField.class);
 		Mirror.evalGetterSetter(method, ERR_MSG, new Callback3<String, Method, Method>() {
 			public void invoke(String nm, Method getter, Method setter) {
+				mirror = Mirror.me(getter.getGenericReturnType());
 				name = nm;
 				adaptor = _eval_adaptor(getter.getGenericReturnType());
 				adaptor.setEjecting(new EjectByGetter(getter));
@@ -70,21 +74,21 @@ class FieldInfo {
 		Mirror<?> mirror = Mirror.me(type);
 		// 枚举
 		if (mirror.isEnum()) {
-			return new EnumAdaptor().setFieldType(type);
+			return new EnumAdaptor();
 		}
 		// 数组
 		else if (mirror.isArray()) {
-			return new ArrayAdaptor().setFieldType(type);
+			return new ArrayAdaptor();
 		}
 		// POJO
 		else if (mirror.isPojo()) {
-			return new PojoAdaptor().setFieldType(type);
+			return new PojoAdaptor();
 		}
 		// TODO 集合
 		// TODO Map
 		// TODO Timestamp
 		// 默认
-		return new FieldAdaptor().setFieldType(type);
+		return new FieldAdaptor();
 	}
 
 	public FieldAdaptor getAdaptor() {
@@ -93,6 +97,10 @@ class FieldInfo {
 
 	public String getName() {
 		return name;
+	}
+
+	public Mirror<?> getMirror() {
+		return mirror;
 	}
 
 	public CoId get_id() {

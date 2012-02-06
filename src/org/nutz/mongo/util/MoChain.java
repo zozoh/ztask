@@ -1,5 +1,6 @@
 package org.nutz.mongo.util;
 
+import java.lang.reflect.Array;
 import java.util.Map;
 
 import org.nutz.lang.ContinueLoop;
@@ -7,7 +8,9 @@ import org.nutz.lang.Each;
 import org.nutz.lang.ExitLoop;
 import org.nutz.lang.Lang;
 import org.nutz.lang.LoopException;
+import org.nutz.lang.Mirror;
 import org.nutz.lang.util.NutMap;
+import org.nutz.mongo.Mongos;
 
 /**
  * 便于链式赋值的参考对象组装器
@@ -47,13 +50,13 @@ public abstract class MoChain {
 	 * 即
 	 * 
 	 * <pre>
-	 * MoChain.born().set(&quot;abc&quot;, 23).set(&quot;xyz&quot;, &quot;ttt&quot;);
+	 * MoChain.NEW().set(&quot;abc&quot;, 23).set(&quot;xyz&quot;, &quot;ttt&quot;);
 	 * </pre>
 	 * 
 	 * 与
 	 * 
 	 * <pre>
-	 * MoChain.born().setf(&quot;{abc:%d, xyz:'%s'}&quot;, 23, &quot;ttt&quot;);
+	 * MoChain.NEW().setf(&quot;{abc:%d, xyz:'%s'}&quot;, 23, &quot;ttt&quot;);
 	 * </pre>
 	 * 
 	 * 是一样的效果
@@ -61,23 +64,62 @@ public abstract class MoChain {
 	 * @return Map 对象
 	 */
 	public NutMap toMap() {
-		final NutMap map = new NutMap();
+		final NutMap root = new NutMap();
 		each(new Each<MoChain>() {
 			@SuppressWarnings("unchecked")
 			public void invoke(int index, MoChain c, int length) {
-				Object val = c.value;
-				Object mapval = map.get(c.key);
-				// 如果 map 里有，并且值为 Map，则合并
-				if (val instanceof Map<?, ?> && mapval instanceof Map<?, ?>) {
-					((Map<String, Object>) mapval).putAll((Map<? extends String, ? extends Object>) val);
+				Object o = c.value;
+				// null val,直接添加
+				if (null == o) {
+					root.put(c.key, o);
+					return;
+				}
+				/*
+				 * 格式化 val
+				 */
+				Object val = root.get(c.key);
+				// 如果是 MoChain，则变 Map
+				if (o instanceof MoChain) {
+					// 如果是 $not，那么就修改这个 Map，并且将其加入顶层 map
+					if ("$not".equals(c.key)) {
+						NutMap map = ((MoChain) o).toMap();
+						NutMap notMap = new NutMap();
+						for (Map.Entry<String, Object> en : map.entrySet()) {
+							notMap.put(en.getKey(), Mongos.map("$not", en.getValue()));
+						}
+						// 加入顶层
+						root.putAll(notMap);
+						return;
+					}
+					// 否则，直接变 Map
+					else {
+						o = ((MoChain) o).toMap();
+					}
+				}
+				// 如果是集合，且第一个元素是 MoChain， 那么就变数组
+				else if (Mirror.me(o).isColl() && Lang.first(o) instanceof MoChain) {
+					int len = Lang.length(o);
+					Object[] array = new Object[len];
+					for (int i = 0; i < len; i++) {
+						MoChain mo = (MoChain) Array.get(o, i);
+						NutMap map = mo.toMap();
+						Array.set(array, i, map);
+					}
+					o = array;
+				}
+				/*
+				 * 如果已经存在了这个键，且值为 Map，则合并
+				 */
+				if (o instanceof Map<?, ?> && val instanceof Map<?, ?>) {
+					((Map<String, Object>) val).putAll((Map<? extends String, ? extends Object>) o);
 				}
 				// 否则替换值
 				else {
-					map.put(c.key, c.value);
+					root.put(c.key, o);
 				}
 			}
 		});
-		return map;
+		return root;
 	}
 
 	/**
@@ -135,7 +177,7 @@ public abstract class MoChain {
 
 	protected MoChain(MoChain prev, String key, Object value) {
 		// 寻找链表的尾部
-		while(null!=prev.next)
+		while (null != prev.next)
 			prev = prev.next;
 		// 开始设置
 		this.head = prev.head;

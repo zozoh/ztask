@@ -1,6 +1,5 @@
 package org.nutz.mongo;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
@@ -41,6 +40,15 @@ public abstract class Mongos {
 	public static final String SK_DESC = "$desc";
 	public static final String SK_LIMIT = "$limit";
 	public static final String SK_SKIP = "$skip";
+
+	/**
+	 * 快速创建 DBObject 的帮助方法
+	 * 
+	 * @return 一个空的的 DBObject
+	 */
+	public static DBObject dbo() {
+		return new BasicDBObject();
+	}
 
 	/**
 	 * 快速创建 DBObject 的帮助方法
@@ -147,7 +155,7 @@ public abstract class Mongos {
 	 * @return DBObject 对象
 	 */
 	@SuppressWarnings("unchecked")
-	public static DBObject map2dbo(Map<String, ? extends Object> map) {
+	public static DBObject map2dbo(Map<String, Object> map) {
 		DBObject dbo = new BasicDBObject();
 		if (null != map) {
 			for (Map.Entry<String, ? extends Object> en : map.entrySet()) {
@@ -186,8 +194,8 @@ public abstract class Mongos {
 	 *            值
 	 * @return Map 对象
 	 */
-	public static Map<String, Object> map(String key, Object val) {
-		Map<String, Object> map = new HashMap<String, Object>();
+	public static NutMap map(String key, Object val) {
+		NutMap map = new NutMap();
 		map.put(key, val);
 		return map;
 	}
@@ -246,7 +254,7 @@ public abstract class Mongos {
 		try {
 			if (reqs.get() == null) { // 最顶层
 				reqs.set(new AtomicInteger(0));
-				db.requestStart(); 
+				db.requestStart();
 			} else
 				reqs.get().incrementAndGet();
 			callback.invoke(db);

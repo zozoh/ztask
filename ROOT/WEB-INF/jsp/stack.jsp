@@ -4,7 +4,12 @@
 <%@include file="/WEB-INF/jsp/include/_page_metas.jsp" %>
 <%@include file="/WEB-INF/jsp/include/_common_rs.jsp" %>
 
-<link rel="stylesheet" type="text/css" href="${rs}/css/ztask_hierachy.css"/>
+<script language="JavaScript" src="${rs}/js/ztask_stack_events.js"></script>
+<script language="JavaScript" src="${rs}/js/ztask_task_newer.js"></script>
+<script language="JavaScript" src="${rs}/js/ztask_task_events.js"></script>
+
+<link rel="stylesheet" type="text/css" href="${rs}/css/ztask_stack.css"/>
+<link rel="stylesheet" type="text/css" href="${rs}/css/ztask_newer.css"/>
 <link rel="stylesheet" type="text/css" href="${rs}/css/page_stack.css"/>
 
 <script language="JavaScript" src="${rs}/js/page.js"></script>
@@ -28,6 +33,8 @@
             <div id="tasks_scroller" class="hierachy_scroller"></div>    
         </div>
     </div></div>
+    <% /*========================================Task Detail DOM=*/ %>
+    <%@include file="/WEB-INF/jsp/include/_task_comment.jsp" %>
 	<% /*==========================================本地化字符串支持=*/ %>	
 	<%@include file="/WEB-INF/jsp/include/_msgs.jsp" %>
 </body>

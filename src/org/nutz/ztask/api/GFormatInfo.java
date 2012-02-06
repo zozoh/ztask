@@ -13,11 +13,6 @@ public class GFormatInfo {
 	private String regex;
 
 	/**
-	 * 表达式的第几个子表达式的内容要用来填充占位符，0 表示整体用来填充占位符
-	 */
-	private int gnum;
-
-	/**
 	 * 一个字符串模板，其中 "[$$]" 为占位符，比如类似下面的写法
 	 * 
 	 * <pre>
@@ -32,14 +27,6 @@ public class GFormatInfo {
 
 	public void setRegex(String regex) {
 		this.regex = regex;
-	}
-
-	public int getGnum() {
-		return gnum;
-	}
-
-	public void setGnum(int gnum) {
-		this.gnum = gnum;
 	}
 
 	public String getTmpl() {

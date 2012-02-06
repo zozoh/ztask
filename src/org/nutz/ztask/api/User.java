@@ -12,6 +12,8 @@ public interface User {
 	public String getName();
 
 	public String getPassword();
+	
+	public boolean isSuperUser();
 
 	public Email getEmail();
 

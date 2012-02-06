@@ -26,7 +26,7 @@ public class MCur extends MoChain {
 		return append(Mongos.SK_LIMIT, num);
 	}
 
-	public MCur skip(String num) {
+	public MCur skip(int num) {
 		return append(Mongos.SK_SKIP, num);
 	}
 
@@ -72,11 +72,47 @@ public class MCur extends MoChain {
 	}
 
 	/**
+	 * 创建链表，并加入一个偏移节点
+	 * 
+	 * @return 链表对象
+	 */
+	public static MCur SKIP(int num) {
+		return NEW().skip(num);
+	}
+
+	/**
+	 * 创建链表，并加入一个限制数量的节点
+	 * 
+	 * @return 链表对象
+	 */
+	public static MCur LIMIT(int num) {
+		return NEW().limit(num);
+	}
+
+	/**
+	 * 创建链表，并加入一个降序节点
+	 * 
+	 * @return 链表对象
+	 */
+	public static MCur DESC(String field) {
+		return NEW().desc(field);
+	}
+
+	/**
+	 * 创建链表，并加入一个升序节点
+	 * 
+	 * @return 链表对象
+	 */
+	public static MCur ASC(String field) {
+		return NEW().asc(field);
+	}
+
+	/**
 	 * 创建链表的静态方法
 	 * 
 	 * @return 链表对象
 	 */
-	public static MCur born() {
+	public static MCur NEW() {
 		return new MCur();
 	}
 

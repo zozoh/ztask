@@ -58,10 +58,10 @@ public class ArrayAdaptor extends FieldAdaptor {
 		BasicDBList list = (BasicDBList) val;
 		// 首先建立一个数组
 		int len = list.size();
-		Object array = Array.newInstance(fieldClass.getComponentType(), len);
+		Object array = Array.newInstance(field.getType().getComponentType(), len);
 
 		// 将每个项目都转换成当前数组的类型
-		Class<?> eleType = fieldClass.getComponentType();
+		Class<?> eleType = field.getType().getComponentType();
 		for (int i = 0; i < len; i++) {
 			Object v = list.get(i);
 			Object o = null;

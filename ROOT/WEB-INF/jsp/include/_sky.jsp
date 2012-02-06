@@ -1,7 +1,7 @@
 <%
 String url = request.getRequestURI();
 %>
-<div id="sky">
+<div id="sky" rs="${rs}">
     <div id="logo"><img src="${rs}/img/loading.gif"></div>
     <div id="lnks">
         <a href="${base}/page/stack" <%=url.endsWith("stack.jsp")?"class=\"hlt\"":""%>>
@@ -10,10 +10,6 @@ String url = request.getRequestURI();
             ${msg['ui.label']}
         </a><a href="${base}/page/task" <%=url.endsWith("task.jsp")?"class=\"hlt\"":""%>>
             ${msg['ui.task']}
-        </a><a href="${base}/page/user" <%=url.endsWith("user.jsp")?"class=\"hlt\"":""%>>
-            ${msg['ui.user']}
-        </a><a href="${base}/page/faq" <%=url.endsWith("user.jsp")?"class=\"hlt\"":""%>>
-            FAQ
         </a><a href="${base}/page/sys" <%=url.endsWith("sys.jsp")?"class=\"hlt\"":""%>>
             ${msg['ui.sys']}
         </a>

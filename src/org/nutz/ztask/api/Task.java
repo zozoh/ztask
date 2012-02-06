@@ -1,8 +1,13 @@
 package org.nutz.ztask.api;
 
+import java.util.Date;
+import java.util.List;
+
+import org.nutz.lang.Strings;
 import org.nutz.mongo.annotation.Co;
 import org.nutz.mongo.annotation.CoField;
 import org.nutz.mongo.annotation.CoId;
+import org.nutz.ztask.ZTasks;
 
 /**
  * 描述了一个 TASK 的全部信息
@@ -12,8 +17,14 @@ import org.nutz.mongo.annotation.CoId;
 @Co("task")
 public class Task {
 
+	public Task() {
+		number = new int[]{0, 0, 0, 0};
+	}
+
 	/**
-	 * 任务的 ID
+	 * 任务的 ID，必须符合 ObjectId 的定义
+	 * 
+	 * @see org.bson.types.ObjectId
 	 */
 	@CoId
 	private String _id;
@@ -27,8 +38,8 @@ public class Task {
 	/**
 	 * 本任务的内容简述，内容不要超过 140 个字
 	 */
-	@CoField("tt")
-	private String title;
+	@CoField("txt")
+	private String text;
 
 	/**
 	 * 一个附加注释的列表
@@ -40,14 +51,37 @@ public class Task {
 	 * 格式为 yyyy-MM-dd HH:mm:ss 格式的字符串
 	 */
 	@CoField("ct")
-	private String createTime; // TODO 使用Date/或者TimeStemp
+	private Date createTime;
 
 	/**
 	 * 格式为 yyyy-MM-dd HH:mm:ss 格式的字符串
 	 */
 	@CoField("lm")
-	private String lastModified;// TODO 使用Date/或者TimeStemp，zzh: 弄个 adaptor 来处理
-								// Timestamp 咯
+	private Date lastModified;
+
+	/**
+	 * 加入堆栈的时间
+	 */
+	@CoField("at_push")
+	private Date pushAt;
+
+	/**
+	 * 开始的时间
+	 */
+	@CoField("at_s")
+	private Date startAt;
+
+	/**
+	 * 挂起的时间
+	 */
+	@CoField("at_h")
+	private Date hungupAt;
+
+	/**
+	 * 弹出堆栈的时间
+	 */
+	@CoField("at_pop")
+	private Date popAt;
 
 	/**
 	 * 所在堆栈的名称
@@ -62,6 +96,12 @@ public class Task {
 	private String owner;
 
 	/**
+	 * 创建者的帐号
+	 */
+	@CoField("cre")
+	private String creater;
+
+	/**
 	 * 任务状态
 	 */
 	@CoField("sta")
@@ -73,6 +113,55 @@ public class Task {
 	@CoField("lbls")
 	private String[] labels;
 
+	/**
+	 * 保存任务数量的统计
+	 * <ul>
+	 * <li>0 - ALL: 总的子任务数量
+	 * <li>1 - DONE: 完成的子任务数量
+	 * <li>2 - ING: 正在进行的子任务数量
+	 * <li>3 - NEW: 未指派的子任务数量
+	 * <li>4 - HUNGUP: 挂起的子任务数量
+	 * </ul>
+	 */
+	@CoField("num")
+	private int[] number;
+
+	public static final int I_ALL = 0;
+	public static final int I_DONE = 1;
+	public static final int I_ING = 2;
+	public static final int I_NEW = 3;
+	public static final int I_HUNGUP = 4;
+
+	/**
+	 * 缓存自身的 Children 列表
+	 */
+	private List<Task> children;
+
+	/**
+	 * 缓存自身的所有的 parent 节点，第一个元素一定是根节点
+	 */
+	private List<Task> parents;
+
+	public List<Task> getChildren() {
+		return children;
+	}
+
+	public void setChildren(List<Task> children) {
+		this.children = children;
+	}
+
+	public List<Task> getParents() {
+		return parents;
+	}
+
+	public void setParents(List<Task> parents) {
+		this.parents = parents;
+	}
+
+	private int N(int index) {
+		return null == number || index >= number.length ? 0 : number[index];
+	}
+
 	public String get_id() {
 		return _id;
 	}
@@ -81,12 +170,12 @@ public class Task {
 		this._id = _id;
 	}
 
-	public String getTitle() {
-		return title;
+	public String getText() {
+		return text;
 	}
 
-	public void setTitle(String title) {
-		this.title = title;
+	public void setText(String title) {
+		this.text = title;
 	}
 
 	public String getParentId() {
@@ -105,20 +194,52 @@ public class Task {
 		this.comments = comments;
 	}
 
-	public String getCreateTime() {
+	public Date getCreateTime() {
 		return createTime;
 	}
 
-	public void setCreateTime(String createTime) {
+	public void setCreateTime(Date createTime) {
 		this.createTime = createTime;
 	}
 
-	public String getLastModified() {
+	public Date getLastModified() {
 		return lastModified;
 	}
 
-	public void setLastModified(String lastModified) {
+	public void setLastModified(Date lastModified) {
 		this.lastModified = lastModified;
+	}
+
+	public Date getPushAt() {
+		return pushAt;
+	}
+
+	public void setPushAt(Date pushAt) {
+		this.pushAt = pushAt;
+	}
+
+	public Date getStartAt() {
+		return startAt;
+	}
+
+	public void setStartAt(Date startAt) {
+		this.startAt = startAt;
+	}
+
+	public Date getHungupAt() {
+		return hungupAt;
+	}
+
+	public void setHungupAt(Date hungupAt) {
+		this.hungupAt = hungupAt;
+	}
+
+	public Date getPopAt() {
+		return popAt;
+	}
+
+	public void setPopAt(Date popAt) {
+		this.popAt = popAt;
 	}
 
 	public String[] getLabels() {
@@ -130,11 +251,23 @@ public class Task {
 	}
 
 	public String getStack() {
-		return stack;
+		return Strings.sBlank(stack, ZTasks.NULL_STACK);
+	}
+
+	public boolean isInStack() {
+		return !ZTasks.isBlankStack(stack);
 	}
 
 	public void setStack(String stack) {
-		this.stack = stack;
+		this.stack = Strings.sBlank(stack, ZTasks.NULL_STACK);
+	}
+
+	public String getCreater() {
+		return creater;
+	}
+
+	public void setCreater(String createor) {
+		this.creater = createor;
 	}
 
 	public String getOwner() {
@@ -149,8 +282,76 @@ public class Task {
 		return status;
 	}
 
+	public int[] getNumber() {
+		return number;
+	}
+
+	public void setNumber(int[] number) {
+		this.number = number;
+	}
+
 	public void setStatus(TaskStatus status) {
 		this.status = status;
 	}
 
+	public int getNumberAll() {
+		return N(I_ALL);
+	}
+
+	public int getNumberNew() {
+		return N(I_NEW);
+	}
+
+	public int getNumberDone() {
+		return N(I_DONE);
+	}
+
+	public int getNumberIng() {
+		return N(I_ING);
+	}
+
+	public int getNumberHungup() {
+		return N(I_HUNGUP);
+	}
+
+	public int getNumberProcessing() {
+		return N(I_ING) + N(I_HUNGUP);
+	}
+
+	public boolean isChildrenNew() {
+		return getNumberAll() > 0 && getNumberAll() == getNumberNew();
+	}
+
+	public boolean isChildrenProcessing() {
+		return getNumberAll() > 0
+				&& getNumberAll() > getNumberDone()
+				&& getNumberAll() != getNumberNew();
+	}
+
+	public boolean isChildrenDone() {
+		return getNumberAll() > 0 && getNumberAll() == getNumberDone();
+	}
+
+	public boolean isTop() {
+		return Strings.isBlank(this.parentId);
+	}
+
+	public boolean isLeaf() {
+		return 0 == getNumberAll();
+	}
+
+	public String toString() {
+		return String.format(	"#%s@%s<%s> [%s] ( ..%d+%d %d/%d):'%s'",
+								_id,
+								owner,
+								status,
+								stack,
+								getNumberProcessing(),
+								getNumberNew(),
+								getNumberDone(),
+								getNumberAll(),
+								null == text ? "<..EMPTY..>"
+											: text.length() > 10 ? text.substring(0, 8) + "..."
+																: text);
+	}
 }

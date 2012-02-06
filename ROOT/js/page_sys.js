@@ -18,7 +18,7 @@ function onSave() {
     }
 }
 
-function initMenu() {
+function initLayout() {
     // init HTML
     var html = '<ul>';
     html += '<li><a class="save">' + z.msg("sys.save") + '</a></li>';

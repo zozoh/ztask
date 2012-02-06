@@ -1,0 +1,68 @@
+.drop {
+    line-height: 24px;
+    height: 24px;
+    background-color: #CCC;
+    background: -webkit-gradient(linear, 0 0, 0 100%,
+    from(#FFF), to(#EEE),
+    color-stop(.5,#DDD),
+    color-stop(.75,#BBB));
+    background: -moz-linear-gradient(top, #EEE, #DDD 50%, #BBB 75%, #EEE);
+    color: #000;
+    border-radius: 4px;
+    position: relative;
+    cursor: pointer;
+    box-shadow: 1px 1px 2px #000;
+}
+
+.drop:hover {
+    background: #FFF;
+    box-shadow: 0 0 10px #FFF;
+}
+
+.drop_obj {
+    padding-left: 10px;
+}
+
+.drop_btn {
+    position: absolute;
+    top: 2px;
+    right: 4px;
+    width: 16px;
+    height: 16px;
+    background: url(pics/dotteds.png) no-repeat 0px -158px;
+}
+
+.drop_list {
+    display: none;
+    position: absolute;
+    top: -24px;
+    background-color: rgba(0,0,0,0.8);
+    border: 2px solid #000;
+    box-shadow: 0 0 8px rgba(255,255,0,0.4);
+    border-radius: 4px;
+    z-index: 1000;
+    width: 100%;
+    padding: 1px;
+    color: #DDD;
+    font-size: 12px;
+}
+
+.drop_down .drop_list {
+    display: block;
+}
+
+.drop_list_item {
+    padding-left: 20px;
+    cursor: pointer;
+}
+
+.drop_list_item:hover {
+    background-color: rgba(255,200,0,0.2);
+}
+
+.drop_list_item_hlt {
+    background: url(pics/dotteds.png) no-repeat 0 -122px;
+    font-weight: bold;
+    color: #F80;
+    text-shadow: 1px 1px 0 #000;
+}

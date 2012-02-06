@@ -1,0 +1,23 @@
+# 这里存放系统中所有的堆栈
+#
+RD_服务器 @zozoh
+ - ${name} @pangwu
+ - ${name} @wendal
+ - ${name} @zozoh
+RD_客户端 @zft
+ - ${name} @dxni
+ - ${name} @sjie
+ - ${name} @xlei
+ - ${name} @ybin
+ - ${name} @yyang
+ - ${name} @zft
+运维 @amber
+ - ${name} @amber
+ - ${name} @liuhe
+ - ${name} @superman
+市场 @stone
+ - ${name} @cheny
+ - ${name} @livia
+ - ${name} @nwang
+ - ${name} @stone
+ - ${name} @wangq

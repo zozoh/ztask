@@ -18,6 +18,11 @@ public enum TaskStatus {
 	ING,
 
 	/**
+	 * 挂起: 稍候处理
+	 */
+	HUNGUP,
+
+	/**
 	 * 已完成: 与 NEW 一样不在任何栈中，但是它表示任务被标识完成了
 	 */
 	DONE

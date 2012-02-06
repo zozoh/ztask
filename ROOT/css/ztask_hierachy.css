@@ -1,13 +1,100 @@
-.hierachy_arena{
-    width:100%;
-    height:100%;
+.hierachy_erratic {
+    opacity: 0.5;
+}
+
+.hierachy_arena {
+    width: 100%;
+    height: 100%;
     overflow: hidden;
 }
 
-.hierachy_crumb{
-    height:40px;
+.hierachy_viewport {
+    overflow: hidden;
+    position: relative;
 }
 
-.hierachy_viewport{
-    overflow:hidden;
+.hierachy_crumb {
+    height: 34px;
+    padding: 5px 0;
 }
+
+.hierachy_crumb:after {
+    content: ".";
+    display: block;
+    clear: both;
+    visibility: hidden;
+    line-height: 0;
+    height: 0;
+}
+
+.hierachy_crumb_item {
+    font-size: 12px;
+    height: 24px;
+    line-height: 24px;
+    padding: 0 4px;
+    cursor: pointer;
+    color: #888;
+}
+
+.hierachy_crumb_item_hlt {
+    color: #000;
+}
+
+.hierachy_crumb_item:hover {
+    background-color: #EEE;
+}
+
+.hierachy_scroller {
+    width: 999999px;
+    position: absolute;
+    top: 0;
+}
+
+.hierachy_block {
+    height: 100%;
+    overflow: auto;
+    padding-bottom: 40px;
+}
+
+/*--------------------------------------------------------- direction:left --*/
+.hierachy_left .hierachy_block {
+    float: right;
+}
+
+.hierachy_left .hierachy_crumb {
+    padding-right: 6px;
+}
+
+.hierachy_left .hierachy_crumb_item {
+    float: right;
+    background:url(pics/dotteds.png) no-repeat right -92px;
+    padding-right:16px;
+}
+
+.hierachy_left .hierachy_crumb_item_hlt {
+    background-position: right -28px;
+}
+
+.hierachy_left .hierachy_scroller {
+    right: 0;
+}
+
+/*--------------------------------------------------------- direction:right --*/
+.hierachy_right .hierachy_block {
+    float: left;
+}
+
+.hierachy_right .hierachy_crumb {
+    padding-left: 6px;
+}
+
+.hierachy_right .hierachy_crumb_item {
+    float: left;
+    background:url(pics/dotteds.png) no-repeat 0 -60px;
+    padding-left:16px;
+}
+
+.hierachy_right .hierachy_crumb_item_hlt {
+    background-position: 0 4px;
+}
+

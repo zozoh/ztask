@@ -1,9 +1,7 @@
 package org.nutz.mongo.entity.adaptor;
 
-import java.lang.reflect.Type;
-
-import org.nutz.lang.Lang;
 import org.nutz.mongo.entity.FieldAdaptor;
+import org.nutz.mongo.entity.MongoEntityField;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class EnumAdaptor extends FieldAdaptor {
@@ -11,9 +9,9 @@ public class EnumAdaptor extends FieldAdaptor {
 	private Class<Enum> enumType;
 
 	@Override
-	public FieldAdaptor setFieldType(Type fieldType) {
-		enumType = (Class<Enum>) Lang.getTypeClass(fieldType);
-		return super.setFieldType(fieldType);
+	public FieldAdaptor setField(MongoEntityField field) {
+		enumType = (Class<Enum>) field.getType();
+		return super.setField(field);
 	}
 
 	@Override

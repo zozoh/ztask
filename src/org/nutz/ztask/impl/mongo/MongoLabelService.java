@@ -91,7 +91,7 @@ public class MongoLabelService extends AbstractMongoService implements LabelServ
 
 	@Override
 	public Label get(String labelName) {
-		return dao.findOne(Label.class, Moo.born("name", labelName));
+		return dao.findOne(Label.class, Moo.NEW("name", labelName));
 	}
 
 	@Override
@@ -110,12 +110,12 @@ public class MongoLabelService extends AbstractMongoService implements LabelServ
 
 	@Override
 	public List<Label> getTopLabels() {
-		return dao.find(Label.class, Moo.born("parent", null), MCur.born().asc("name"));
+		return dao.find(Label.class, Moo.NEW("parent", null), MCur.NEW().asc("name"));
 	}
 
 	@Override
 	public List<Label> getChildren(String labelName) {
-		return dao.find(Label.class, Moo.born("parent", labelName), MCur.born().asc("name"));
+		return dao.find(Label.class, Moo.NEW("parent", labelName), MCur.NEW().asc("name"));
 	}
 
 	@Override
@@ -138,7 +138,7 @@ public class MongoLabelService extends AbstractMongoService implements LabelServ
 			}
 			// 否则更新
 			else {
-				dao.updateById(Label.class, l.get_id(), Moo.born().set("count", count));
+				dao.updateById(Label.class, l.get_id(), Moo.NEW().set("count", count));
 			}
 
 			list.add(l);
@@ -153,7 +153,7 @@ public class MongoLabelService extends AbstractMongoService implements LabelServ
 			Label l = get(labelName);
 			if (null != parentName && Lang.equals(parentName, l.getParent()))
 				continue;
-			dao.updateById(Label.class, l.get_id(), Moo.born().set("parent", parentName));
+			dao.updateById(Label.class, l.get_id(), Moo.NEW().set("parent", parentName));
 			list.add(l);
 		}
 		return list;

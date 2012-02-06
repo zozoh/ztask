@@ -18,8 +18,8 @@ public class SafeMooMethodInterceptorTest {
 		Ioc ioc = new NutIoc(new JsonLoader("org/nutz/mongo/util/meta/aop.js","ioc"));
 		MongoDao dao = ioc.get(MyMongoDao.class);
 		dao.create(Pet.class, true);
-		dao.save(Pet.me("XiaoBai", 10, 3));
-		dao.save(Pet.me("XiaoBai", 2, 222));//这里会抛异常
+		dao.save(Pet.AGE("XiaoBai", 10, 3));
+		dao.save(Pet.AGE("XiaoBai", 2, 222));//这里会抛异常
 		fail();
 	}
 

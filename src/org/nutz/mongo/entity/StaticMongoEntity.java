@@ -1,12 +1,15 @@
 package org.nutz.mongo.entity;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.nutz.lang.Each;
 import org.nutz.lang.Lang;
 import org.nutz.lang.Mirror;
+import org.nutz.lang.Strings;
 import org.nutz.lang.born.Borning;
 import org.nutz.mongo.Mongos;
 
@@ -36,7 +39,7 @@ public class StaticMongoEntity implements MongoEntity {
 	private MongoEntityField _id;
 
 	private long cappedSize;
-	
+
 	private long cappedMax;
 
 	public StaticMongoEntity(Class<?> type) {
@@ -96,6 +99,11 @@ public class StaticMongoEntity implements MongoEntity {
 	public DBObject formatObject(Object o) {
 		if (null == o)
 			return new BasicDBObject();
+		// 深入解析对象 ...
+		return _format_object(o);
+	}
+
+	private DBObject _format_object(Object o) {
 		// 如果是本类型
 		if (type.isAssignableFrom(o.getClass())) {
 			return toDBObject(o);
@@ -111,19 +119,51 @@ public class StaticMongoEntity implements MongoEntity {
 		for (String key : map.keySet()) {
 			// 那么让我们看看值吧 ...
 			Object val = map.get(key);
-			// 如果值还是一个 Map , 且当前 key 是个修改器
-			if (null != val && key.startsWith("$") && val instanceof Map<?, ?>) {
-				dboMap.put(key, formatObject(val));
-				continue;
+
+			// 判断一下字段的名称，支持 xxxx.$n
+			String[] ss = Strings.splitIgnoreBlank(key, "[.]");
+			String fieldName = ss[0];
+			int arrayOffset = ss.length > 1 ? Integer.parseInt(ss[1]) : -1;
+
+			// 得到实体字段
+			MongoEntityField mef = "_id".equals(key) ? _id : fields.get(fieldName);
+			/*
+			 * 如果是修改器 ...
+			 */
+			if (null != val && key.startsWith("$")) {
+				Mirror<?> mi = Mirror.me(val.getClass());
+				// Map
+				if (mi.isMap()) {
+					dboMap.put(key, _format_object(val));
+					continue;
+				}
+				// 集合
+				else if (mi.isColl()) {
+					int len = Lang.length(val);
+					final Object array = Array.newInstance(Object.class, len);
+					Lang.each(val, new Each<Object>() {
+						public void invoke(int index, Object ele, int length) {
+							// 原生类型，直接加入
+							if (!Mirror.me(ele).isObj()) {
+								Array.set(array, index, ele);
+							}
+							// 否则，试图转换
+							else {
+								Array.set(array, index, _format_object(ele));
+							}
+						}
+					});
+					dboMap.put(key, array);
+					continue;
+				}
 			}
-			// 默认情况
-			MongoEntityField mef = "_id".equals(key) ? _id : fields.get(key);
 			// 未知的键，抛错
 			if (null == mef)
 				throw Lang.makeThrow("Unknow key '%s' in collection '%s'", key, collectionName);
 
 			// 加入值
-			dboMap.put(mef.getDbName(), mef.getAdaptor().adaptForGet(val, false));
+			String dbKey = mef.getDbName() + (arrayOffset >= 0 ? "." + arrayOffset : "");
+			dboMap.put(dbKey, mef.getAdaptor().adaptForFormatQuery(val));
 		}
 		// 建立返回值
 		DBObject dbo = new BasicDBObject();
@@ -175,13 +215,13 @@ public class StaticMongoEntity implements MongoEntity {
 	public long getCappedSize() {
 		return this.cappedSize;
 	}
-	
+
 	public long getCappedMax() {
 		return cappedMax;
 	}
-	
+
 	public void setCappedMax(long cappedMax) {
 		this.cappedMax = cappedMax;
 	}
-	
+
 }

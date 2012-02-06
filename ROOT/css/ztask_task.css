@@ -1,0 +1,478 @@
+#task_detail {
+    position: absolute;
+    left: 0;
+    display: none;
+    background: #FFF;
+    z-index: 1000;
+}
+
+#task_detail_wrapper {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+#task_detail .task_brief {
+    float: left;
+    width: 40%;
+    height: 100%;
+    overflow: auto;
+    border-right: 1px dashed #CCC;
+    background-color: #F0F0F0;
+    padding: 10px;
+}
+
+#task_detail .task_text {
+    padding: 10px;
+    background-color: #FFF;
+    border-radius: 10px;
+    box-shadow: 2px 2px 6px #888;
+    font-size: 14px;
+    min-height: 60px;
+    margin-bottom: 15px;
+}
+
+#task_detail .task_brief_fnm {
+    text-align: right;
+    color: #888;
+}
+
+#task_detail .task_brief_fval {
+    font-size: 14px;
+    font-family: Courier;
+}
+
+#task_detail .task_comments {
+    float: left;
+    width: 60%;
+    height: 100%;
+    position: relative;
+}
+
+#task_detail .task_comment {
+    font-family: Courier;
+    font-size: 14px;
+    line-height: 22px;
+    padding: 8px;
+    margin: 8px;
+    border-top: 1px dashed #EEE;
+}
+
+#task_detail .task_comments_list {
+    height: 100%;
+    width: 100%;
+    overflow: auto;
+    padding: 140px 0;
+}
+
+#task_detail .task_comments_newer {
+    padding: 10px 60px 10px 10px;
+    min-width: 400px;
+    height: 100px;
+    position: absolute;
+    top: 0;
+    text-align: right;
+    background-color: rgba(255,255,255,0.8);
+}
+
+#task_detail .task_comments_newer textarea {
+    width: 100%;
+    height: 100%;
+    border: 4px solid #CCC;
+    padding: 4px;
+    font-size: 14px;
+}
+
+#task_detail .task_comments_newer a {
+    display: inline-block;
+    height: 32px;
+    line-height: 32px;
+    width: 120px;
+    text-align: center;
+    color: #000;
+    background-color: #8AD;
+    font-size: 16px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+#task_detail .task_comments_newer a:hover {
+    background-color: #ACF;
+}
+
+#task_detail .task_detail_closer {
+    width: 32px;
+    height: 32px;
+    display: block;
+    position: absolute;
+    right: 18px;
+    top: 1px;
+    background: url(pics/icons.png) no-repeat 0 -32px;
+    cursor: pointer;
+}
+
+#task_detail .task_detail_closer:hover {
+    background-position: -32px -32px;
+}
+
+.task {
+    margin: 0;
+    padding: 1px;
+    border-top: 1px dotted #DDD;
+    position: relative;
+}
+
+.task_checked {
+    background-color: #FEA;
+}
+
+.task_menu {
+    position: absolute;
+    top: 2px;
+}
+
+.task_menu a {
+    display: inline-block;
+    float: right;
+    font-size: 9px;
+    cursor: pointer;
+    margin: 0 1px;
+    padding: 0 2px;
+}
+
+.task_labels {
+    list-style: none;
+    margin: 0;
+    padding: 0 4px 3px 0;
+    min-height: 22px;
+    position: relative;
+}
+
+.task_labels:after {
+    content: ".";
+    display: block;
+    clear: both;
+    visibility: hidden;
+    line-height: 0;
+    height: 0;
+}
+
+.task_labels_item {
+    margin: 1px 0 1px 1px;
+    padding: 0 6px;
+    color: #A00;
+    font-size: 9px;
+    height: 16px;
+    line-height: 16px;
+    background-color: #FEA;
+    border-radius: 4px;
+}
+
+.task_lbe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: rgba(255,255,255,0.8);
+    margin-top: 24px;
+    padding: 2px 16px 4px 16px;
+    z-index: 1000;
+    border-radius: 0 0 8px 8px;
+    width: 500px;
+    font-size: 12px;
+}
+
+.task_lbe input {
+    width: 100%;
+    font-size: 14px;
+    padding: 4px;
+    border: 1px solid #666;
+    border-radius: 4px;
+    box-shadow: 1px 1px 5px #888;
+}
+
+.task_lbe_tip {
+    color: #080;
+    padding: 0 4px;
+    background-color: #FFF;
+}
+
+.task_lbe_btns {
+    text-align: center;
+}
+
+.task_lbe_btns a {
+    display: inline-block;
+    text-align: center;
+    font-size: 14px;
+    height: 20px;
+    line-height: 20px;
+    background-color: #F80;
+    border-radius: 6px;
+    margin: 2px 4px;
+    padding: 0 10px;
+    color: #FFF;
+    cursor: pointer;
+}
+
+.task_content {
+    font-size: 14px;
+    line-height: 20px;
+    min-height: 42px;
+    padding: 1px 6px 12px 6px;
+    cursor: pointer;
+}
+
+.task_content:hover {
+    background-color: #F8F8F8;
+}
+
+.task_content_hlt, .task_content_hlt:hover {
+    background-color: #FF0;
+}
+
+.task_uinfo {
+    padding: 0 8px;;
+    margin: 0 0 4px 0;
+    color: #AAA;
+    font-size: 10px;
+    line-height: 16px;
+}
+
+.task_uinfo span {
+    display: inline-block;
+    padding-left: 4px;
+}
+
+.task_uinfo .task_stack b {
+    color: #F80;
+    font-size: 12px;
+}
+
+.task_uinfo .task_ID {
+    color: #BBB;
+}
+
+.task_uinfo .task_ID a {
+    font-family: Courier;
+    color: #888;
+    text-decoration: none;
+}
+
+.task_uinfo .task_ID a:hover {
+    color: #08F;
+    text-decoration: underline;
+}
+
+.task_uinfo .task_ID * {
+    margin-left: 6px;
+}
+
+.task_uinfo .task_ID u {
+    margin-left: 5px;
+    border-left: 0;
+    text-decoration: none;
+}
+
+.task_btn {
+    position: absolute;
+    top: 24px;
+    width: 50px;
+    min-height: 32px;
+    border-radius: 4px;
+    color: #FFF;
+    cursor: pointer;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.task_push {
+    background-color: #47F;
+}
+
+.task_push:hover {
+    background-color: #69F;
+}
+
+.task_wait {
+    background-color: #8BA;
+}
+
+.task_done {
+    background-color: #999;
+    color: #DDD;
+    text-decoration: line-through;
+}
+
+.task_ing {
+    background-color: #080;
+}
+
+.task_ing:hover {
+    background-color: #4A4;
+}
+
+.task_pause {
+    background-color: #94C;
+}
+
+.task_pause:hover {
+    background-color: #B6E;
+}
+
+.task_status {
+    padding: 7px 0 2px 0;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.task_nums {
+    position: absolute;
+    top: 57px;
+    text-align: center;
+    font-size: 9px;
+    font-weight: normal;
+    color: #FFF;
+    background-color: #CCC;
+    height: 18px;
+    line-height: 18px;
+}
+
+.task_nums * {
+    float: left;
+    padding: 0 4px;
+    border-left-style: solid;
+    border-left-color: #FFF;
+}
+
+.task_num_ing {
+    background-color: #69F;
+}
+
+.task_num_done {
+    background-color: #4A4;
+    border-left-width: 1px;
+}
+
+.task_num_all {
+    background-color: #AAA;
+    font-weight: bold;
+    font-size: 16px;
+    text-shadow: 1px 1px 0 #888;
+    border-left-width: 1px;
+}
+
+.task_goin {
+    display: block;
+    position: absolute;
+    top: 24px;
+    width: 32px;
+    height: 32px;
+    line-height: 32px;
+    font-size: 13px;
+    text-align: center;
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: -1px 1px 4px #888;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.task_detail {
+    border-color: #EEA;
+    color: #C44;
+    background-color: #FFC;
+}
+
+.task_detail:hover {
+    color: #A22;
+    text-shadow: 0 0 3px #F00;
+    background-color: #FEA;
+}
+
+/*--------------------------------------------------------- direction:left --*/
+.hierachy_left .task_nums {
+    right: 12px;
+}
+
+.hierachy_left .task_content {
+    margin: 0 64px 0 20px;
+}
+
+.hierachy_left .task_goin {
+    left: 8px;
+    border-radius: 10px 2px 2px 10px;
+}
+
+.hierachy_left .task_btn {
+    right: 10px;
+    overflow: hidden;
+}
+
+.hierachy_left .task_uinfo {
+    border-radius: 0 10px 10px 0;
+    left: 0px;
+}
+
+.hierachy_left .task_labels {
+    margin: 0 70px 0 30px;
+}
+
+.hierachy_left .task_labels li {
+    float: right;
+}
+
+.hierachy_left .task_menu {
+    left: 4px;
+}
+
+.hierachy_left .task_menu a {
+    border-right: 1px dotted #DDD;
+}
+
+/*--------------------------------------------------------- direction:right --*/
+.hierachy_right .task_nums {
+    left: 8px;
+}
+
+.hierachy_right .task_content {
+    margin: 0 44px 0 64px;
+}
+
+.hierachy_right .task_uinfo {
+    text-align: right;
+}
+
+.hierachy_right .task_goin {
+    right: 8px;
+    border-radius: 2px 10px 10px 2px;
+}
+
+.hierachy_right .task_btn {
+    left: 10px;
+}
+
+.hierachy_right .task_uinfo {
+    border-radius: 10px 0 0 10px;
+    right: 0px;
+}
+
+.hierachy_right .task_labels {
+    margin: 0 120px 0 70px;
+}
+
+.hierachy_right .task_labels li {
+    float: left;
+}
+
+.hierachy_right .task_menu {
+    right: 4px;
+}
+
+.hierachy_right .task_menu a {
+    border-left: 1px dotted #DDD;
+}

@@ -12,7 +12,12 @@ var ioc = {
 	 */
 	initService : {
 		parent : 'mongoService',
-		type : 'org.nutz.ztask.impl.mongo.MongoInitService'
+		type : 'org.nutz.ztask.impl.mongo.MongoInitService',
+		fields : {
+			users : { refer : "userService" },
+			tasks : { refer : 'taskService' },
+			stacksPath : 'stacks.txt',
+			autosync : true }
 	// ~ End bean
 	},
 	/*

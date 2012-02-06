@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.nutz.castor.Castors;
 import org.nutz.lang.Lang;
 import org.nutz.mongo.Mongos;
 
@@ -14,6 +15,171 @@ import org.nutz.mongo.Mongos;
  * @author Wendal(wendal1985@gmail.com)
  */
 public class Moo extends MoChain {
+
+	/**
+	 * 提供 $not 修改符
+	 * 
+	 * @param q
+	 *            值链
+	 * @return 新节点
+	 */
+	public Moo not(Moo q) {
+		return append("$not", q);
+	}
+
+	/**
+	 * 提供 $or 修改符
+	 * 
+	 * @param qs
+	 *            值链
+	 * @return 新节点
+	 */
+	public Moo or(Moo... qs) {
+		return append("$or", qs);
+	}
+
+	/**
+	 * 判断一个日期字段是否不等于给定值
+	 * 
+	 * @param field
+	 *            字段
+	 * @param d
+	 *            日期，格式为 yyyy-MM-dd HH:mm:ss
+	 * @return 新节点
+	 */
+	public Moo d_ne(String field, String d) {
+		return append(field, Mongos.dbo("$ne", Castors.me().castTo(d, java.util.Date.class)));
+	}
+
+	/**
+	 * 判断一个日期字段是否大于等于给定值
+	 * 
+	 * @param field
+	 *            字段
+	 * @param d
+	 *            日期，格式为 yyyy-MM-dd HH:mm:ss
+	 * @return 新节点
+	 */
+	public Moo d_gte(String field, String d) {
+		return append(field, Mongos.dbo("$gte", Castors.me().castTo(d, java.util.Date.class)));
+	}
+
+	/**
+	 * 判断一个日期字段是否大于给定值
+	 * 
+	 * @param field
+	 *            字段
+	 * @param d
+	 *            日期，格式为 yyyy-MM-dd HH:mm:ss
+	 * @return 新节点
+	 */
+	public Moo d_gt(String field, String d) {
+		return append(field, Mongos.dbo("$gt", Castors.me().castTo(d, java.util.Date.class)));
+	}
+
+	/**
+	 * 判断一个日期字段是否小于等于给定值
+	 * 
+	 * @param field
+	 *            字段
+	 * @param d
+	 *            日期，格式为 yyyy-MM-dd HH:mm:ss
+	 * @return 新节点
+	 */
+	public Moo d_lte(String field, String d) {
+		return append(field, Mongos.dbo("$lte", Castors.me().castTo(d, java.util.Date.class)));
+	}
+
+	/**
+	 * 判断一个日期字段是否小于给定值
+	 * 
+	 * @param field
+	 *            字段
+	 * @param d
+	 *            日期，格式为 yyyy-MM-dd HH:mm:ss
+	 * @return 新节点
+	 */
+	public Moo d_lt(String field, String d) {
+		return append(field, Mongos.dbo("$lt", Castors.me().castTo(d, java.util.Date.class)));
+	}
+
+	/**
+	 * 判断一个日期字段是否等于给定值
+	 * 
+	 * @param field
+	 *            字段
+	 * @param d
+	 *            日期，格式为 yyyy-MM-dd HH:mm:ss
+	 * @return 新节点
+	 */
+	public Moo d_equals(String field, String d) {
+		return append(field, Castors.me().castTo(d, java.util.Date.class));
+	}
+
+	/**
+	 * 判断一个字段是否不等于给定值
+	 * 
+	 * @param field
+	 *            字段
+	 * @param obj
+	 *            值
+	 * @return 新节点
+	 */
+	public Moo ne(String field, Object obj) {
+		return append(field, Mongos.dbo("$ne", obj));
+	}
+
+	/**
+	 * 判断一个字段是否大于等于给定值
+	 * 
+	 * @param field
+	 *            字段
+	 * @param n
+	 *            数值
+	 * @return 新节点
+	 */
+	public Moo gte(String field, long n) {
+		return append(field, Mongos.dbo("$gte", n));
+	}
+
+	/**
+	 * 判断一个字段是否大于给定值
+	 * 
+	 * @param field
+	 *            字段
+	 * @param n
+	 *            数值
+	 * @return 新节点
+	 */
+	public Moo gt(String field, long n) {
+		return append(field, Mongos.dbo("$gt", n));
+	}
+
+	/**
+	 * 判断一个字段是否小于等于给定值
+	 * 
+	 * @param field
+	 *            字段
+	 * @param n
+	 *            数值
+	 * @return 新节点
+	 */
+	public Moo lte(String field, long n) {
+		return append(field, Mongos.dbo("$lte", n));
+	}
+
+	/**
+	 * 判断一个字段是否小于给定值
+	 * 
+	 * @param field
+	 *            字段
+	 * @param n
+	 *            数值
+	 * @return 新节点
+	 */
+	public Moo lt(String field, long n) {
+		return append(field, Mongos.dbo("$lt", n));
+	}
 
 	/**
 	 * 判断一个字段的值是否包含在给定数组中
@@ -77,7 +243,20 @@ public class Moo extends MoChain {
 	 * @return 新节点
 	 */
 	public Moo match(String field, String regex) {
-		return append(field, Pattern.compile(regex));
+		return match(field, Pattern.compile(regex));
+	}
+
+	/**
+	 * 用正则表达式，查找可以匹配的字段
+	 * 
+	 * @param field
+	 *            字段
+	 * @param regex
+	 *            正则式
+	 * @return 新节点
+	 */
+	public Moo match(String field, Pattern regex) {
+		return append(field, regex);
 	}
 
 	/**
@@ -118,6 +297,58 @@ public class Moo extends MoChain {
 		for (String field : fields)
 			map.put(field, 1);
 		return modi("$unset", map);
+	}
+
+	/**
+	 * 修改器: 向数组增加值
+	 * 
+	 * @param field
+	 *            字段
+	 * @param objs
+	 *            值
+	 * @return 新节点
+	 */
+	public Moo push(String field, Object... objs) {
+		if (null == objs)
+			return this;
+		if (1 == objs.length)
+			return modi("$push", field, objs[0]);
+		return modi("$pushAll", field, objs);
+	}
+
+	/**
+	 * 修改器: 删除数组最后一个值
+	 * 
+	 * @param field
+	 *            字段
+	 * @return 新节点
+	 */
+	public Moo pop(String field) {
+		return modi("$pop", field, 1);
+	}
+
+	/**
+	 * 修改器: 删除数组第一个值
+	 * 
+	 * @param field
+	 *            字段
+	 * @return 新节点
+	 */
+	public Moo popHead(String field) {
+		return modi("$pop", field, -11);
+	}
+
+	/**
+	 * 修改器: 删除数组中某一个值
+	 * 
+	 * @param field
+	 *            字段
+	 * @param obj
+	 *            值。 数组中与这个值相同的值将都被删除
+	 * @return 新节点
+	 */
+	public Moo pull(String field, Object obj) {
+		return modi("$pull", field, obj);
 	}
 
 	/**
@@ -225,16 +456,181 @@ public class Moo extends MoChain {
 	}
 
 	/**
+	 * 创建链表，同时增加一个 $or 节点
+	 * 
+	 * @param qs
+	 *            值链列表
+	 * @return 链表对象
+	 */
+	public static Moo OR(Moo... qs) {
+		return NEW().or(qs);
+	}
+
+	/**
+	 * 创建链表，同时增加一个 $not 节点
+	 * 
+	 * @param q
+	 *            值链
+	 * @return 链表对象
+	 */
+	public static Moo NOT(Moo q) {
+		return NEW().not(q);
+	}
+
+	/**
+	 * 创建链表，同时增加一个 in 节点
+	 * 
+	 * @param field
+	 *            字段名
+	 * @param args
+	 *            变参数组
+	 * @return 链表对象
+	 */
+	public static Moo IN(String field, Object... args) {
+		return NEW().in(field, args);
+	}
+
+	/**
+	 * 创建链表，同时增加一个 d_gt 节点
+	 * 
+	 * @param field
+	 *            字段名
+	 * @param d
+	 *            日期，格式为 yyyy-MM-dd HH:mm:ss
+	 * @return 链表对象
+	 */
+	public static Moo D_GT(String field, String d) {
+		return NEW().d_gt(field, d);
+	}
+
+	/**
+	 * 创建链表，同时增加一个 d_gte 节点
+	 * 
+	 * @param field
+	 *            字段名
+	 * @param d
+	 *            日期，格式为 yyyy-MM-dd HH:mm:ss
+	 * @return 链表对象
+	 */
+	public static Moo D_GTE(String field, String d) {
+		return NEW().d_gte(field, d);
+	}
+
+	/**
+	 * 创建链表，同时增加一个 d_lt 节点
+	 * 
+	 * @param field
+	 *            字段名
+	 * @param d
+	 *            日期，格式为 yyyy-MM-dd HH:mm:ss
+	 * @return 链表对象
+	 */
+	public static Moo D_LT(String field, String d) {
+		return NEW().d_lt(field, d);
+	}
+
+	/**
+	 * 创建链表，同时增加一个 d_lte 节点
+	 * 
+	 * @param field
+	 *            字段名
+	 * @param d
+	 *            日期，格式为 yyyy-MM-dd HH:mm:ss
+	 * @return 链表对象
+	 */
+	public static Moo D_LTE(String field, String d) {
+		return NEW().d_lte(field, d);
+	}
+
+	/**
+	 * 创建链表，同时增加一个 d_equals 节点
+	 * 
+	 * @param field
+	 *            字段名
+	 * @param d
+	 *            日期，格式为 yyyy-MM-dd HH:mm:ss
+	 * @return 链表对象
+	 */
+	public static Moo D_EQUALS(String field, String d) {
+		return NEW().d_equals(field, d);
+	}
+
+	/**
+	 * 创建链表，同时增加一个 gte 节点
+	 * 
+	 * @param field
+	 *            字段名
+	 * @param n
+	 *            值
+	 * @return 链表对象
+	 */
+	public static Moo GTE(String field, long n) {
+		return NEW().gte(field, n);
+	}
+
+	/**
+	 * 创建链表，同时增加一个 gt 节点
+	 * 
+	 * @param field
+	 *            字段名
+	 * @param n
+	 *            值
+	 * @return 链表对象
+	 */
+	public static Moo GT(String field, long n) {
+		return NEW().gt(field, n);
+	}
+
+	/**
+	 * 创建链表，同时增加一个 lte 节点
+	 * 
+	 * @param field
+	 *            字段名
+	 * @param n
+	 *            值
+	 * @return 链表对象
+	 */
+	public static Moo LTE(String field, long n) {
+		return NEW().lte(field, n);
+	}
+
+	/**
+	 * 创建链表，同时增加一个 lt 节点
+	 * 
+	 * @param field
+	 *            字段名
+	 * @param n
+	 *            值
+	 * @return 链表对象
+	 */
+	public static Moo LT(String field, long n) {
+		return NEW().lt(field, n);
+	}
+
+	/**
+	 * 创建链表，同时增加一个 set 节点
+	 * 
+	 * @param field
+	 *            字段名
+	 * @param val
+	 *            值
+	 * @return 链表对象
+	 */
+	public static Moo SET(String field, Object val) {
+		return NEW().set(field, val);
+	}
+
+	/**
 	 * 创建链表的静态方法
 	 * 
 	 * @return 链表对象
 	 */
-	public static Moo born() {
+	public static Moo NEW() {
 		return new Moo();
 	}
 
 	/**
-	 * 创建链表的静态方法，同时 append 一个节点
+	 * 创建链表，同时增加一个节点
 	 * 
 	 * @param key
 	 *            键
@@ -242,9 +638,8 @@ public class Moo extends MoChain {
 	 *            值
 	 * @return 链表对象
 	 */
-	public static Moo born(String key, Object val) {
-		Moo moo = born();
-		return moo.append(key, val);
+	public static Moo NEW(String key, Object val) {
+		return NEW().append(key, val);
 	}
 
 }

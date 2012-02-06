@@ -1,31 +1,40 @@
 package org.nutz.mongo.dao.pojo;
 
+import java.util.Date;
+
+import org.nutz.castor.Castors;
 import org.nutz.lang.random.R;
 import org.nutz.mongo.annotation.*;
 
-@Co(value="pet")
+@Co(value = "pet")
 @CoIndexes("!:+name")
 public class Pet {
 
-	public static Pet me(PetType type, String name) {
-		return me(type, name, R.random(3, 20), R.random(0, 16));
+	public static Pet BIRTHDAY(String name, String birthday) {
+		Pet p = NEW(name);
+		p.setBirthday(Castors.me().castTo(birthday, java.util.Date.class));
+		return p;
 	}
 
-	public static Pet me(String name) {
-		return me(null, name);
+	public static Pet NEW(PetType type, String name) {
+		return NEW(type, name, R.random(3, 20), R.random(0, 16));
 	}
 
-	public static Pet mel(String name, String... lbs) {
-		Pet pet = me(null, name);
+	public static Pet NEW(String name) {
+		return NEW(null, name);
+	}
+
+	public static Pet LBS(String name, String... lbs) {
+		Pet pet = NEW(null, name);
 		pet.labels = lbs;
 		return pet;
 	}
 
-	public static Pet me(String name, int age, int count) {
-		return me(null, name, age, count);
+	public static Pet AGE(String name, int age, int count) {
+		return NEW(null, name, age, count);
 	}
 
-	public static Pet me(PetType type, String name, int age, int count) {
+	public static Pet NEW(PetType type, String name, int age, int count) {
 		Pet p = new Pet();
 		p.setType(type);
 		p.setName(name);
@@ -43,7 +52,7 @@ public class Pet {
 	@CoField("tp")
 	private PetType type;
 
-	@CoField
+	@CoField("ag")
 	private int age;
 
 	@CoField("lbs")
@@ -51,6 +60,9 @@ public class Pet {
 
 	@CoField("cun")
 	private int count;
+
+	@CoField("bth")
+	private Date birthday;
 
 	public String getId() {
 		return id;
@@ -74,6 +86,14 @@ public class Pet {
 
 	public void setType(PetType type) {
 		this.type = type;
+	}
+
+	public Date getBirthday() {
+		return birthday;
+	}
+
+	public void setBirthday(Date birthday) {
+		this.birthday = birthday;
 	}
 
 	public int getAge() {

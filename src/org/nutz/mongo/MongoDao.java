@@ -14,6 +14,7 @@ import org.nutz.lang.util.NutMap;
 import org.nutz.mongo.entity.MongoEntity;
 import org.nutz.mongo.entity.MongoEntityIndex;
 import org.nutz.mongo.util.MCur;
+import org.nutz.mongo.util.MKeys;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.CommandResult;
@@ -208,12 +209,31 @@ public class MongoDao {
 	 * @return 对象列表
 	 */
 	public <T> List<T> find(Class<T> type, Object q, MCur mcur) {
+		return find(type, q, null, mcur);
+	}
+
+	/**
+	 * 根据 Map 或者 JSON 字符串或者 POJO 执行查询
+	 * 
+	 * @param <T>
+	 * @param type
+	 *            对象类型，除了 POJO 也可以是 Map 或者 String
+	 * @param q
+	 *            查询条件，可以是 POJO, String,Map,或者 Moo
+	 * @param keys
+	 *            字段过滤设定
+	 * @param mcur
+	 *            对游标的排序等方式的修改
+	 * 
+	 * @return 对象列表
+	 */
+	public <T> List<T> find(Class<T> type, Object q, MKeys keys, MCur mcur) {
 		final LinkedList<T> list = new LinkedList<T>();
 		each(new Each<T>() {
 			public void invoke(int index, T obj, int length) {
 				list.add(obj);
 			}
-		}, type, q, mcur);
+		}, type, q, keys, mcur);
 		return list;
 	}
 
@@ -230,12 +250,30 @@ public class MongoDao {
 	 * @return 对象列表
 	 */
 	public List<NutMap> find(String collName, Object q, MCur mcur) {
+		return find(collName, q, null, mcur);
+	}
+
+	/**
+	 * 根据 Map 或者 JSON 字符串执行查询
+	 * 
+	 * @param <T>
+	 * @param collName
+	 *            集合名称
+	 * @param q
+	 *            查询条件，可以是 POJO, String,Map,或者 Moo
+	 * @param keys
+	 *            字段过滤设定
+	 * @param mcur
+	 *            对游标的排序等方式的修改
+	 * @return 对象列表
+	 */
+	public List<NutMap> find(String collName, Object q, MKeys keys, MCur mcur) {
 		final LinkedList<NutMap> list = new LinkedList<NutMap>();
 		each(new Each<NutMap>() {
 			public void invoke(int index, NutMap obj, int length) {
 				list.add(obj);
 			}
-		}, collName, q, mcur);
+		}, collName, q, keys, mcur);
 		return list;
 	}
 
@@ -254,8 +292,27 @@ public class MongoDao {
 	 *            对游标的排序等方式的修改
 	 */
 	public <T> void each(Each<T> callback, Class<T> type, Object q, MCur mcur) {
+		each(callback, type, q, null, mcur);
+	}
+
+	/**
+	 * 迭代某个集合里的数据，这个适合比较大的数据时，不能一次返回一个 List 的场景
+	 * 
+	 * @param <T>
+	 * @param callback
+	 *            回调，由于不知到数据的总体大小(为了效率)，所以 length 一项永远为 -1
+	 * @param type
+	 *            对象类型，除了 POJO 也可以是 Map 或者 String
+	 * @param q
+	 *            查询条件，可以是 POJO, String,Map,或者 Moo
+	 * @param keys
+	 *            字段过滤设定
+	 * @param mcur
+	 *            对游标的排序等方式的修改
+	 */
+	public <T> void each(Each<T> callback, Class<T> type, Object q, MKeys keys, MCur mcur) {
 		MongoEntity moe = Mongos.entity(type);
-		_each(callback, moe.getCollectionName(q), moe, q, mcur);
+		_each(callback, moe.getCollectionName(q), moe, q, keys, mcur);
 	}
 
 	/**
@@ -272,8 +329,27 @@ public class MongoDao {
 	 * @return 对象列表
 	 */
 	public void each(Each<NutMap> callback, String collName, Object q, MCur mcur) {
+		each(callback, collName, q, null, mcur);
+	}
+
+	/**
+	 * 根据 Map 或者 JSON 字符串迭代某个集合里的数据， <br>
+	 * 这个适合比较大的数据时，不能一次返回一个 List 的场景
+	 * 
+	 * @param <T>
+	 * @param callback
+	 *            回调，由于不知到数据的总体大小(为了效率)，所以 length 一项永远为 -1
+	 * @param q
+	 *            查询条件，可以是 POJO, String,Map,或者 Moo
+	 * @param keys
+	 *            字段过滤设定
+	 * @param mcur
+	 *            对游标的排序等方式的修改
+	 * @return 对象列表
+	 */
+	public void each(Each<NutMap> callback, String collName, Object q, MKeys keys, MCur mcur) {
 		MongoEntity moe = Mongos.entity(q);
-		_each(callback, collName, moe, q, mcur);
+		_each(callback, collName, moe, q, keys, mcur);
 	}
 
 	/**
@@ -387,7 +463,7 @@ public class MongoDao {
 			cappedConfig.put("size", cappedSize);
 		if (cappedMax > 0)
 			cappedConfig.put("max", cappedMax);
-		
+
 		db.createCollection(collName, cappedConfig);
 	}
 
@@ -511,14 +587,27 @@ public class MongoDao {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T> void _each(Each<T> callback, String collName, MongoEntity moe, Object q, MCur mcur) {
+	private <T> void _each(	Each<T> callback,
+							String collName,
+							MongoEntity moe,
+							Object q,
+							MKeys keys,
+							MCur mcur) {
 		if (db.collectionExists(collName)) {
 			DBCollection coll = db.getCollection(collName);
 			// 将 ref 对象转换成 DBObject
-			DBObject dbRef = moe.formatObject(q);
+			DBObject dbQ = moe.formatObject(q);
+
+			// 将 keys 对象转换成 DBObject
+			DBObject dbKeys = moe.formatObject(keys);
 
 			// 执行查询
-			DBCursor cur = null == dbRef ? coll.find() : coll.find(dbRef);
+			DBCursor cur = null;
+			if (dbQ == null) {
+				cur = (null == dbKeys ? coll.find() : coll.find(Mongos.dbo(), dbKeys));
+			} else {
+				cur = (null == dbKeys ? coll.find(dbQ) : coll.find(dbQ, dbKeys));
+			}
 
 			// 设置排序条件
 			if (null != mcur) {
@@ -534,9 +623,7 @@ public class MongoDao {
 					try {
 						callback.invoke(index++, obj, -1);
 					}
-					catch (ContinueLoop e) { //TODO 为何特别要捕捉ContinueLoop然后又抛出呢?
-						throw Lang.wrapThrow(e);
-					}
+					catch (ContinueLoop e) {}
 				}
 			}
 			catch (ExitLoop e) {}

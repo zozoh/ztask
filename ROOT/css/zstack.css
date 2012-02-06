@@ -11,8 +11,8 @@
     overflow: hidden;
 }
 
-.blank{
-    color:#CCC;
+.blank {
+    color: #AAA;
 }
 
 .hdn {
@@ -30,6 +30,43 @@ body {
     overflow: hidden;
 }
 
+a.lnk {
+    text-decoration: none;
+    color: #08F;
+}
+
+a.lnk:hover {
+    text-decoration: underline;
+    color: #4AF;
+}
+
+a.lnkb {
+    text-decoration: none;
+    color: #ADF;
+}
+
+a.lnkb:hover {
+    text-decoration: underline;
+    color: #FFF;
+}
+
+
+.menu {
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.menu a {
+    color: #33E;
+    text-decoration: none;
+}
+
+.menu a:hover {
+    color: #88F;
+}
+
 #sky {
     position: fixed;
     background-color: rgba(0,0,0,0.6);
@@ -41,7 +78,7 @@ body {
     -khtml-user-select: none;
     -webkit-user-select: none;
     user-select: none;
-    z-index:100;
+    z-index: 100;
 }
 
 #sky a {
@@ -68,16 +105,16 @@ body {
     box-shadow: 0px 0px 10px #666;
 }
 
-#logo img{
-    width:43px;
-    height:43px;
-    margin:8px 30px;
+#logo img {
+    width: 43px;
+    height: 43px;
+    margin: 8px 30px;
     visibility: hidden;
 }
 
 #lnks {
-    float:left;
-    width:50%;
+    float: left;
+    width: 50%;
 }
 
 #lnks a {
@@ -98,9 +135,9 @@ body {
 }
 
 #menu {
-    float:right;
-    width:50%;
-    height:50px;
+    float: right;
+    width: 50%;
+    height: 50px;
 }
 
 #menu ul {

@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import org.bson.types.ObjectId;
 import org.nutz.lang.Lang;
+import org.nutz.lang.Mirror;
 import org.nutz.lang.Strings;
 import org.nutz.lang.random.R;
 import org.nutz.mongo.Mongos;
@@ -20,6 +21,8 @@ public class MongoEntityField {
 	private CoIdType idType;
 
 	private FieldAdaptor adaptor;
+
+	private Mirror<?> mirror;
 
 	protected boolean isNull(Object obj) {
 		Object val = adaptor.get(obj);
@@ -111,7 +114,16 @@ public class MongoEntityField {
 		return adaptor;
 	}
 
+	public Mirror<?> getMirror() {
+		return mirror;
+	}
+	
+	public Class<?> getType(){
+		return mirror.getType();
+	}
+
 	public MongoEntityField(FieldInfo fi) {
+		mirror = fi.getMirror();
 		name = fi.getName();
 		dbName = Strings.sBlank(null == fi.getAnnotation() ? name : fi.getAnnotation().value(),
 								name);
@@ -121,7 +133,7 @@ public class MongoEntityField {
 		if (isId())
 			dbName = "_id";
 		// 得到 In/Ejectint
-		adaptor = fi.getAdaptor();
+		adaptor = fi.getAdaptor().setField(this);
 	}
 
 	public String toString() {

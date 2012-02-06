@@ -1,0 +1,135 @@
+#thierachy {
+    padding: 8px;
+}
+
+#thierachy .task {
+    border-top: 0;
+}
+
+#thierachy .task_refresh {
+    background-color: #F80;
+    color:#FFF;
+}
+
+#thierachy .task_refresh:hover {
+    background-color: #FA3;
+}
+
+#tsubs .hierachy_block {
+    padding-bottom: 100px;
+}
+
+/*-------------------------------------------------Search 设置框--*/
+.srch {
+    padding: 20px 8px 8px 10px;
+    position: relative;
+}
+
+.srch_keyword {
+    padding-right: 103px;
+}
+
+.srch_keyword input {
+    font-size: 14px;
+    padding: 4px;
+    width: 100%;
+}
+
+.srch_do {
+    position: absolute;
+    display: block;
+    top: 21px;
+    right: 8px;
+    width: 100px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    border-radius: 0 4px 4px 0;
+    font-size: 20px;
+    display: inline-block;
+    background: #CCC;
+    cursor: pointer;
+    text-decoration: none;
+    color:#000;
+}
+
+.srch_do:hover {
+    color: #F80;
+    background: #C0C0C0;
+}
+
+.srch_sort {
+    font-size: 10px;
+    text-align: left;
+}
+
+.srch_sort_txt {
+    margin-left: 10px;
+}
+
+/*-------------------------------------------------重载droplist控件样式--*/
+#L .drop {
+    background: none;
+    box-shadow: none;
+    display: inline-block;
+    color: #0041f0;
+    text-align: left;
+}
+
+#L .drop:hover {
+    color: #0086f9;
+}
+
+#L .drop_obj {
+    text-align: center;
+}
+
+#L .drop_btn {
+    display: none;
+}
+
+#L .srch_sort_by .drop_list {
+    width: 160px;
+}
+
+#L .srch_sort_order .drop_list {
+    width: 120px;
+}
+
+/*-------------------------------------------------布局相关--------------*/
+#R .WP {
+    overflow-y: auto;
+}
+
+.B {
+    overflow: auto;
+}
+
+.T {
+    width: 100%;
+    height: 90px;
+}
+
+.WP {
+    width: 100%;
+    height: 100%;
+}
+
+#LT {
+    background: #E0E0E0;
+}
+
+#L {
+    width: 40%;
+    background: #F0F0F0;
+}
+
+#R {
+    width: 60%;
+}
+
+#L, #R {
+    float: left;
+    height: 100%;
+    padding-top: 51px;
+}

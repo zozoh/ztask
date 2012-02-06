@@ -1,0 +1,58 @@
+.stack {
+    margin: 10px;
+    opacity: 0.4;
+}
+
+.stack_hlt, .stack_hlt:hover {
+    opacity: 1.0;
+}
+
+.stack_body {
+    background-color: #FFF;
+    min-height: 20px;
+    margin: 0 6px 20px 32px;
+    box-shadow: 2px 2px 2px #AAA;
+    border-radius: 0 0 6px 6px;
+}
+
+.stack_head {
+    background-color: #AAA;
+    height: 30px;
+    line-height: 30px;
+    padding: 0 4px;
+    border-radius: 4px;
+}
+
+.stack_head a {
+    float: right;
+    margin: 0 4px;
+}
+
+.stack_name {
+    font-size: 16px;
+    color: #FFF;
+    font-weight: bolder;
+    text-shadow: 1px 1px 1px #666;
+    cursor: pointer;
+    min-width:200px;
+}
+
+.stack_name:hover {
+    color: #CDF;
+    text-decoration: underline;
+}
+
+.stack_count {
+    display: block;
+    float: left;
+    min-width: 24px;
+    height: 24px;
+    line-height: 24px;
+    text-align: center;
+    background-color: #F80;
+    box-shadow: 0 0 3px #FFF;
+    color: #FFF;
+    font-size: 10px;
+    border-radius: 4px;
+    margin: 3px 6px 0 0;
+}
