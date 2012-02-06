@@ -9,12 +9,13 @@ function main() {
     $(".srch_do").click(onClickSearch).click();
     // 绑定通用 Task 事件
     task_events_bind(document.body, {
-
+        reject: task_replace,
+        renew: task_replace,
+        done: task_replace
     });
     // 事件: 查看 Task 详情
     $("#L").delegate(".task_detail", "click", onClickDetail);
     $("#R").delegate(".task_refresh", "click", onClickDetail);
-
 }
 
 function drawDetail(t, subTasks) {

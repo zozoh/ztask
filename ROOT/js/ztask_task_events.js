@@ -6,6 +6,10 @@
  * {
  *     reload : function(){...},     # 当需要重新载入数据时的回调。 this 为选区的 jq 对象
  *     reject : function(t){...},    # 当任务被 reject 后的回调，this 为 jTask 对象
+ *     renew : function(t){...},    # 当任务被 renew 后的回调，this 为 jTask 对象
+ *     restart : function(t){...},    # 当任务被 restart 后的回调，this 为 jTask 对象
+ *     done : function(t){...},    # 当任务被 done 后的回调，this 为 jTask 对象
+ *     gout : function(t){...},    # 当任务被 gout 后的回调，this 为 jTask 对象
  *     remove : function(t){...},    # 当任务被 remove 后的回调，this 为 jTask 对象
  * }
  * </pre>
@@ -209,8 +213,10 @@ function task_events_on_done() {
         tid: ee.t._id,
         done: true
     }, function(re) {
-        stack_inc(ee.jTask, -1);
-        z.removeIt(ee.jTask);
+        ee.jTask.data("task", re.data);
+        if( typeof ee.opt.done == "function") {
+            ee.opt.done.apply(ee.jTask, [re.data]);
+        }
     });
 }
 
@@ -223,6 +229,7 @@ function task_events_on_reject() {
         tid: ee.t._id,
         done: false
     }, function(re) {
+        ee.jTask.data("task", re.data);
         if( typeof ee.opt.reject == "function") {
             ee.opt.reject.apply(ee.jTask, [re.data]);
         }
@@ -237,17 +244,10 @@ function task_events_on_restart() {
     ajax.post("/ajax/do/restart", {
         tid: ee.t._id,
     }, function(re) {
-        var jBlock = ee.jTask.parent();
-        // 移除当前的 jTask
-        z.removeIt(ee.jTask, function() {
-            // 生成一个新的 Task 插入队首
-            var newTask = task_html.apply(jBlock, [re.data, {
-                goin: false,
-                mode: "prepend"
-            }]);
-            newTask[0].scrollIntoView(false);
-            z.blinkIt(newTask, 1500);
-        });
+        ee.jTask.data("task", re.data);
+        if( typeof ee.opt.restart == "function") {
+            ee.opt.restart.apply(ee.jTask, [re.data]);
+        }
     });
 }
 
@@ -260,13 +260,10 @@ function task_events_on_renew() {
         tid: ee.t._id,
         done: false
     }, function(re) {
-        var jBlock = ee.jTask.parent();
-        // 生成一个新的 Task 插入队首
-        var newTask = task_html.apply(jBlock, [re.data, {
-            goin: false,
-            mode: "replace"
-        }]);
-        z.blinkIt(newTask, 1500);
+        ee.jTask.data("task", re.data);
+        if( typeof ee.opt.renew == "function") {
+            ee.opt.renew.apply(ee.jTask, [re.data]);
+        }
     });
 }
 
@@ -278,6 +275,7 @@ function task_events_on_hungup() {
     ajax.post("/ajax/do/hungup", {
         tid: ee.t._id,
     }, function(re) {
+        ee.jTask.data("task", re.data);
         var jBlock = ee.jTask.parent();
         // 移除当前的 jTask
         z.removeIt(ee.jTask, function() {
@@ -299,7 +297,7 @@ function task_events_on_gout() {
     var jBlock = ee.jTask.parents(".hierachy_block");
     var leftBlock = jBlock.prev();
     // 看看是否为顶级任务
-    if(leftBlock.size() == 0 || !ee.t.parentId) {
+    if(!ee.t.parentId) {
         alert(z.msg("task.istop"));
         return;
     }
@@ -307,9 +305,14 @@ function task_events_on_gout() {
     ajax.post("/ajax/task/gout", {
         tid: ee.t._id
     }, function(re) {
-        z.removeIt(ee.jTask, {
-            prependTo: leftBlock,
-        });
+        ee.jTask.data("task", re.data);
+        if( typeof ee.opt.gout == "function") {
+            ee.opt.gout.apply(ee.jTask, [re.data]);
+        } else {
+            z.removeIt(ee.jTask, leftBlock.size() > 0 ? {
+                prependTo: leftBlock,
+            } : null);
+        }
     });
 }
 
@@ -335,14 +338,18 @@ function task_events_on_join() {
         tids: tids.join(","),
         pid: ee.t._id
     }, function(re) {
-        $(".hierachy_erratic", ee.selection).remove();
+        ee.jTask.data("task", re.data);
         // 移除掉临时块，以便刷新
-        for(var i = 0; i < re.data.length; i++) { // 移除掉返回的 task 对应的 .task 的 DOM
-            var rt = re.data[i];
-            $(".id_" + rt._id, ee.selection).remove();
+        $(".hierachy_erratic", ee.selection).remove();
+        // 移除掉返回的 task 对应的 .task 的 DOM
+        for(var i = 0; i < tids.length; i++) {
+            $(".id_" + tids[i], ee.selection).remove();
         }
         // 闪烁一下
-        z.blinkIt(ee.jTask, 1200);
+        var jTask = task_html.apply(ee.jTask, [re.data, {
+            mode: "replace"
+        }]);
+        z.blinkIt(jTask, 800);
     });
 }
 

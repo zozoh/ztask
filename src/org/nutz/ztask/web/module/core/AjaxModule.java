@@ -102,8 +102,9 @@ public class AjaxModule {
 	}
 
 	@At("/task/set/parent")
-	public List<Task> doSetTaskParent(@Param("tids") String[] taskIds, @Param("pid") String parentId) {
-		return tasks.setTasksParent(parentId, taskIds);
+	public Task doSetTaskParent(@Param("tids") String[] taskIds, @Param("pid") String parentId) {
+		tasks.setTasksParent(parentId, taskIds);
+		return tasks.getTask(parentId);
 	}
 
 	/**

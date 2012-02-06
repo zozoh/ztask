@@ -18,6 +18,29 @@ import org.nutz.ztask.api.TaskStatus;
 
 public class MongoTaskServiceTest extends ZTaskCase {
 
+	@Test
+	public void test_push_reject() {
+		TaskStack s = tasks.createStackIfNoExistis("S", "zozoh");
+		Task a = tasks.createTask(t("A"));
+
+		a = tasks.pushToStack(a, s);
+		assertEquals("S", a.getStack());
+		assertEquals(TaskStatus.ING, a.getStatus());
+
+		a = tasks.popFromStack(a, false);
+		assertFalse(a.isInStack());
+		assertEquals(TaskStatus.NEW, a.getStatus());
+
+		a = tasks.pushToStack(a, s);
+		assertEquals("S", a.getStack());
+		assertEquals(TaskStatus.ING, a.getStatus());
+
+		a = tasks.popFromStack(a, true);
+		assertFalse(a.isInStack());
+		assertEquals(TaskStatus.DONE, a.getStatus());
+
+	}
+
 	/**
 	 * For Issue#4
 	 */

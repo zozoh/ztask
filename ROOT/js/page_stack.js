@@ -79,6 +79,25 @@ function main() {
                     }
                 }
             });
+        },
+        restart: function(t) {
+            var ee = _task_obj(this);
+            var jBlock = ee.jTask.parent();
+            // 移除当前的 jTask
+            z.removeIt(ee.jTask, function() {
+                // 生成一个新的 Task 插入队首
+                var newTask = task_html.apply(jBlock, [t, {
+                    goin: false,
+                    mode: "prepend"
+                }]);
+                newTask[0].scrollIntoView(false);
+                z.blinkIt(newTask, 1500);
+            });
+        },
+        done: function(t) {
+            var ee = _task_obj(this);
+            stack_inc(ee.jTask, -1);
+            z.removeIt(ee.jTask);
         }
     });
     // 事件 : 任务 ...

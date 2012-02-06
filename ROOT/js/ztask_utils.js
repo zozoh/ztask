@@ -127,7 +127,8 @@ var _TASK_MENU_ = {
     "task_push": "edit,join,del,gout,check,label",
     "task_ing": "label,edit,reject,hungup",
     "task_pause": "label,edit,reject",
-    "task_done": "label,del,edit,join,check"
+    "task_done": "label,del,edit,join,check",
+    "task_wait": "label,edit"
 };
 
 /**
@@ -269,6 +270,23 @@ function task_html(t, opt) {
     }
 
     return jq.data("task", t);
+}
+
+/**
+ * 根据给定的 jTask , 重新绘制自身
+ *
+ * @param this : jTask
+ * @param t : 新的任务对象
+ * @param blink : 闪烁时间，单位毫秒，小于等于0，则无视。
+ */
+function task_replace(t, blink) {
+    var t = this.data("task");
+    var jTask = task_html.apply(this, [t, {
+        mode: "replace"
+    }]);
+    if(blink <= 0)
+        return;
+    z.blinkIt(jTask, blink || 800);
 }
 
 /**
