@@ -492,7 +492,8 @@ window.z = {
             "opacity": 0.8,
             "position": "fixed",
             "top": off.top,
-            "left": off.left
+            "left": off.left,
+            "z-index": 9999999
         };
         // 建立闪烁层
         var lg = $(opt.html || '<div class="z_blink_light">&nbsp;</div>');
@@ -557,7 +558,8 @@ window.z = {
         var css = {
             "width": opt.width || me.outerWidth(),
             "height": opt.height || me.outerHeight(),
-            "position": "absolute"
+            "position": "absolute",
+            "z-index" : 999999
         };
 
         // 显示输入框
@@ -859,7 +861,7 @@ window.z = {
             $("#div_out").append(newDivIn);
             var divOutS = $("#div_out");
             var divInS = $("#div_in");
-            scrollWidth =                                                                       divOutS.width() -                                                                       divInS.width();
+            scrollWidth =                                                                        divOutS.width() -                                                                        divInS.width();
             $("#div_out").remove();
             $("#div_in").remove();
             SCROLL_BAR_WIDTH = scrollWidth;

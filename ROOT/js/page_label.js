@@ -60,6 +60,8 @@ function initLayout() {
     // 初始化事件
     $("#menu").delegate(".lb_do_sync", "click", doSyncLabels);
     $("#menu").delegate(".lb_do_reload", "click", doReloadLabels);
+    // 绑定 Task Comment 事件
+    task_detail_bind();
 }
 
 function adjustLayout() {

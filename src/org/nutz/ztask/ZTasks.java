@@ -4,6 +4,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
@@ -17,6 +18,8 @@ public abstract class ZTasks {
 
 	public static final String REG_NOWORD = "[ \t\r\b\n~!@#$%^&*()+=`:{}|\\[\\]\\\\:\"';<>?,./-]";
 
+	public static final String REG_D = "[0-9]{4}-[01][0-9]-[0-3][0-9][ ][0-2][0-9]:[0-5][0-9]:[0-5][0-9]";
+
 	private static final DateFormat date_format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 	private static final long MS_DAY = 3600 * 24 * 1000;
@@ -28,6 +31,54 @@ public abstract class ZTasks {
 	public static final String NULL_STACK = "--";
 
 	/**
+	 * 将一段 comment 文本进行包裹，在其开头加上 '@xxx:', 在其结尾加上时间戳
+	 * <p>
+	 * 比如:
+	 * 
+	 * <pre>
+	 * 文本 :  "Hello"  包裹后将变成 "@zzh: Hello //2012-02-07 00:00:00"
+	 * 文本 :  "@zzh: Hello"  包裹后将变成 "@zzh: Hello //2012-02-07 00:00:00"
+	 * 文本 :  "@zzh: Hello //2011-12-07 06:12:00"  包裹后将变成 "@zzh: Hello //2012-02-07 00:00:00"
+	 * </pre>
+	 * 
+	 * @param text
+	 *            要被包裹的文本
+	 * @param unm
+	 *            用户，如果为 null，将不处理前缀
+	 * @param d
+	 *            时间戳，如果为 null，将不处理后缀
+	 * @return 包裹后的字符串
+	 */
+	public static String wrapComment(String text, String unm, Date d) {
+		// 处理空串
+		text = Strings.sNull(Strings.trim(text), "");
+		// 处理前缀
+		if (!Strings.isBlank(unm)) {
+			text = "@" + unm + ": " + text.replaceAll("^@[^ :,]+: ", "");
+		}
+		// 处理后缀
+		if (null != d) {
+			String ds = ZTasks.D(d);
+			text = text.replaceAll("[ \t]?//[ \t]*" + REG_D + "$", "") + " //" + ds;
+		}
+		return text;
+	}
+
+	/**
+	 * 用当前时间作为时间戳，包裹 comment 文本
+	 * 
+	 * @param text
+	 *            要被包裹的文本
+	 * @param unm
+	 *            用户，如果为 null，将不处理前缀
+	 * @return @return 包裹后的字符串
+	 * @see org.nutz.ztask.ZTasks#wrapComment(String, String, Date)
+	 */
+	public static String wrapComment(String text, String unm) {
+		return wrapComment(text, unm, now());
+	}
+
+	/**
 	 * 以本周为基础获得某一周的时间范围
 	 * 
 	 * @param off
@@ -37,7 +88,7 @@ public abstract class ZTasks {
 	 * 
 	 * @see org.nutz.ztask.ZTasks#weeks(long, int, int)
 	 */
-	public static java.util.Date[] week(int off) {
+	public static Date[] week(int off) {
 		return week(System.currentTimeMillis(), off);
 	}
 
@@ -53,7 +104,7 @@ public abstract class ZTasks {
 	 * 
 	 * @see org.nutz.ztask.ZTasks#weeks(long, int, int)
 	 */
-	public static java.util.Date[] week(long base, int off) {
+	public static Date[] week(long base, int off) {
 		return weeks(base, off, off);
 	}
 
@@ -69,7 +120,7 @@ public abstract class ZTasks {
 	 * 
 	 * @see org.nutz.ztask.ZTasks#weeks(long, int, int)
 	 */
-	public static java.util.Date[] weeks(int offL, int offR) {
+	public static Date[] weeks(int offL, int offR) {
 		return weeks(System.currentTimeMillis(), offL, offR);
 	}
 
@@ -89,14 +140,14 @@ public abstract class ZTasks {
 	 * 
 	 * @return 时间范围(毫秒级别)
 	 */
-	public static java.util.Date[] weeks(long base, int offL, int offR) {
+	public static Date[] weeks(long base, int offL, int offR) {
 		int from = Math.min(offL, offR);
 		int len = Math.abs(offL - offR);
 		// 现在
 		Calendar c = Calendar.getInstance();
 		c.setTimeInMillis(base);
 
-		java.util.Date[] re = new java.util.Date[2];
+		Date[] re = new Date[2];
 
 		// 计算开始
 		c.setTimeInMillis(c.getTimeInMillis() + MS_WEEK * from);
@@ -120,8 +171,8 @@ public abstract class ZTasks {
 	/**
 	 * @return 服务器当前时间
 	 */
-	public static java.util.Date now() {
-		return new java.util.Date(System.currentTimeMillis());
+	public static Date now() {
+		return new Date(System.currentTimeMillis());
 	}
 
 	/**
@@ -131,7 +182,7 @@ public abstract class ZTasks {
 	 *            时间字符串, 格式为 yyyy-MM-dd HH:mm:ss
 	 * @return 时间
 	 */
-	public static java.util.Date D(String d) {
+	public static Date D(String d) {
 		try {
 			return date_format.parse(d);
 		}
@@ -147,7 +198,7 @@ public abstract class ZTasks {
 	 *            日期时间对象
 	 * @return 时间字符串 , 格式为 yyyy-MM-dd HH:mm:ss
 	 */
-	public static String D(java.util.Date d) {
+	public static String D(Date d) {
 		return date_format.format(d);
 	}
 

@@ -1,6 +1,7 @@
 package org.nutz.ztask.impl.mongo;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -20,10 +21,10 @@ import org.nutz.mongo.util.Moo;
 import org.nutz.ztask.Err;
 import org.nutz.ztask.ZTasks;
 import org.nutz.ztask.api.GInfo;
-import org.nutz.ztask.api.TaskQuery;
-import org.nutz.ztask.api.TaskStack;
 import org.nutz.ztask.api.Task;
+import org.nutz.ztask.api.TaskQuery;
 import org.nutz.ztask.api.TaskService;
+import org.nutz.ztask.api.TaskStack;
 import org.nutz.ztask.api.TaskStatus;
 
 public class MongoTaskService extends AbstractMongoService implements TaskService {
@@ -51,6 +52,32 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 	public Task addComment(String taskId, String comment) {
 		Task t = checkTask(taskId);
 		dao.updateById(Task.class, t.get_id(), Moo.NEW().push("comments", comment));
+		return t;
+	}
+
+	@Override
+	public Task setComment(String taskId, int index, String newText) {
+		dao.updateById(Task.class, taskId, Moo.SET("comments." + index, newText));
+		return getTask(taskId);
+	}
+
+	@Override
+	public Task deleteComments(String taskId, int... indexes) {
+		Task t = this.checkTask(taskId);
+		if (null != t.getComments() && null != indexes && indexes.length > 0) {
+			List<String> cmts = new ArrayList<String>(t.getComments().length);
+			// 先排个序
+			Arrays.sort(indexes);
+			// 然后循环查找
+			for (int i = 0; i < t.getComments().length; i++) {
+				if (Arrays.binarySearch(indexes, i) < 0) {
+					cmts.add(t.getComments()[i]);
+				}
+			}
+			// 最后更新
+			t.setComments(cmts.toArray(new String[cmts.size()]));
+			dao.updateById(Task.class, t.get_id(), Moo.SET("comments", t.getComments()));
+		}
 		return t;
 	}
 

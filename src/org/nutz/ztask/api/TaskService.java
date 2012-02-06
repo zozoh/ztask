@@ -45,6 +45,30 @@ public interface TaskService extends AbstractService {
 	Task addComment(String taskId, String comment);
 
 	/**
+	 * 移除任务的一组注释说明
+	 * 
+	 * @param taskId
+	 *            任务 ID
+	 * @param indexes
+	 *            说明的下标，0 base
+	 * @return 重新取回 Task 对象
+	 */
+	Task deleteComments(String taskId, int... indexes);
+
+	/**
+	 * 修改某一个 comment
+	 * 
+	 * @param taskId
+	 *            任务 ID
+	 * @param index
+	 *            comment 的位置
+	 * @param newText
+	 *            新文本
+	 * @return 重新取回 Task 对象
+	 */
+	Task setComment(String taskId, int index, String newText);
+
+	/**
 	 * 根据一个 TASK ID 得到当前任务的根任务，如果当前的任务就是根，那么就返回
 	 * <p>
 	 * 本函数会保证给定的 Task 的所有 Parent 都存在，如果不存在，则抛错

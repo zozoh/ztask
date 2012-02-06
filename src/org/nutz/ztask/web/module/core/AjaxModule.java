@@ -18,6 +18,7 @@ import org.nutz.mvc.annotation.*;
 import org.nutz.web.Webs;
 import org.nutz.web.ajax.AjaxCheckSession;
 import org.nutz.ztask.Err;
+import org.nutz.ztask.ZTasks;
 import org.nutz.ztask.api.*;
 
 @Filters(@By(type = AjaxCheckSession.class, args = Webs.ME))
@@ -75,9 +76,28 @@ public class AjaxModule {
 		return tasks.restartTask(taskId);
 	}
 
-	@At("/do/comment")
-	public Task doCommentTask(@Param("tid") String taskId, @Param("cmt") String comment) {
-		return tasks.addComment(taskId, comment);
+	@At("/do/comment/add")
+	public String doAddComment(	@Param("tid") String taskId,
+								@Param("txt") String text,
+								@Attr(scope = Scope.SESSION, value = Webs.ME) User me) {
+		text = ZTasks.wrapComment(text, me.getName());
+		tasks.addComment(taskId, text);
+		return text;
+	}
+
+	@At("/do/comment/del")
+	public Task doDeleteComment(@Param("tid") String taskId, @Param("i") int index) {
+		return tasks.deleteComments(taskId, index);
+	}
+
+	@At("/do/comment/set")
+	public String doSetComment(	@Param("tid") String taskId,
+								@Param("i") int index,
+								@Param("txt") String text,
+								@Attr(scope = Scope.SESSION, value = Webs.ME) User me) {
+		text = ZTasks.wrapComment(text, me.getName());
+		tasks.setComment(taskId, index, ZTasks.wrapComment(text, me.getName()));
+		return text;
 	}
 
 	@AdaptBy(type = JsonAdaptor.class)

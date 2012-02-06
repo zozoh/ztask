@@ -1,0 +1,188 @@
+#task_detail {
+    position: absolute;
+    left: 0;
+    display: none;
+    background: #FFF;
+    z-index: 1000;
+}
+
+#task_detail_wrapper {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+#task_detail .task_brief {
+    float: left;
+    width: 40%;
+    height: 100%;
+    overflow: auto;
+    border-right: 1px dashed #CCC;
+    background-color: #F0F0F0;
+    padding: 10px;
+}
+
+#task_detail .task_text {
+    padding: 10px;
+    background-color: #FFF;
+    border-radius: 10px;
+    box-shadow: 2px 2px 6px #888;
+    font-size: 14px;
+    min-height: 60px;
+    margin-bottom: 15px;
+}
+
+#task_detail .task_brief_fnm {
+    text-align: right;
+    color: #888;
+}
+
+#task_detail .task_brief_fval {
+    font-size: 14px;
+    font-family: Courier;
+}
+
+#task_detail .task_cmt {
+    float: left;
+    width: 60%;
+    height: 100%;
+    position: relative;
+}
+
+#task_detail .task_cmt_item {
+    border-top: 1px dashed #DDD;
+    padding: 8px 0 0 0;
+    position: relative;
+}
+
+#task_detail .task_cmt_item_menu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    top: 3px;
+    right: 4px;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+#task_detail .task_cmt_item_menu li {
+    float: right;
+    font-size: 10px;
+    color: #33E;
+    cursor: pointer;
+    padding: 0 8px;
+    border-left: 1px dotted #CCC;
+}
+
+#task_detail .task_cmt_item_menu li:hover {
+    color: #88F;
+}
+
+#task_detail .task_cmt_item pre {
+    font-family: Courier;
+    font-size: 14px;
+    line-height: 22px;
+    padding: 4px;
+    margin: 4px;
+}
+
+#task_detail .task_cmt_list {
+    height: 100%;
+    width: 100%;
+    overflow: auto;
+    padding: 140px 0;
+}
+
+#task_detail .task_cmt_newer {
+    padding: 10px 60px 10px 10px;
+    margin-right: 20px;
+    min-width: 400px;
+    height: 100px;
+    position: absolute;
+    top: 0;
+    text-align: right;
+    background-color: rgba(255,255,255,0.8);
+    z-index: 1000;
+}
+
+#task_detail .task_cmt_newer textarea {
+    width: 100%;
+    height: 100%;
+    line-height: 18px;
+    border: 4px solid #CCC;
+    padding: 4px;
+    font-size: 14px;
+    background-color: #FFF;
+}
+
+#task_detail .task_cmt_add {
+    display: block;
+    float: right;
+    height: 26px;
+    line-height: 26px;
+    padding: 0 20px;
+    text-align: center;
+    color: #000;
+    background-color: #EEE;
+    font-size: 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 2px 2px 4px #AAA;
+}
+
+#task_detail .task_cmt_add:hover {
+    background-color: #F80;
+    color: #FFF;
+}
+
+#task_detail .task_cmt_sort {
+    list-style: none;
+    padding: 10px 2px;
+    margin: 0px;
+    background-color: rgba(255,255,255,0.9);
+}
+
+#task_detail .task_cmt_sort:after {
+    content: ".";
+    display: block;
+    clear: both;
+    visibility: hidden;
+    line-height: 0;
+    height: 0;
+}
+
+#task_detail .task_cmt_sort li {
+    float: left;
+    margin-left: 10px;
+    cursor: pointer;
+    color: #AAA;
+}
+
+#task_detail .task_cmt_sort li:hover {
+    color: #08F;
+}
+
+#task_detail .task_cmt_sort li.hlt, #task_detail .task_cmt_sort li.hlt:hover {
+    font-size: 16px;
+    font-weight: bold;
+    color: #000;
+}
+
+#task_detail .task_detail_closer {
+    width: 32px;
+    height: 32px;
+    display: block;
+    position: absolute;
+    right: 1px;
+    top: 1px;
+    background: url(pics/icons.png) no-repeat 0 -32px;
+    cursor: pointer;
+    z-index: 2000;
+}
+
+#task_detail .task_detail_closer:hover {
+    background-position: -32px -32px;
+}

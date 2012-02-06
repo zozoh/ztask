@@ -94,6 +94,10 @@ function appendTask(jTasks, t, menu) {
 }
 
 function initLayout() {
+    // 绑定 Task Comment 事件
+    task_detail_bind();
+    
+    // 初始化下拉菜单
     var jsrch = $("#LT");
     $(".srch_sort_by", jsrch).droplist({
         data: [{

@@ -43,90 +43,15 @@ function task_events_bind(selection, opt) {
     selection.delegate(".task_lbe input", "keydown", _task_lbe_on_esc_);
 }
 
-var _TFS = "parentId,_id,stack,owner,creater,status,pushAt,popAt,startAt,hungupAt,createTime,lastModified".split(",");
 /**
  * 事件处理: 显示一个任务详细信息，包括 comments
  */
 function task_events_on_showDetail(e) {
-    //
     var ee = _task_obj(this);
     var t = ee.t;
     t.comments = t.comments || [];
     // 只有纯 .task_content 被点击才有效
-    if(!$(e.target).hasClass("task_content"))
-        return;
-    // 标记一下 class
-    $(".task_content_hlt", ee.selection).removeClass("task_content_hlt");
-    $(this).addClass("task_content_hlt");
-
-    // 显示 task_detail
-    var jDetail = $("#task_detail").attr("task-id", t._id);
-    var box = z.winsz();
-    jDetail.css("display", "block").css("top", box.height).animate({
-        "top": 0,
-        "opacity": 1
-    }, 200, function() {
-        _adjust_layout();
-        $(".task_comments_newer textarea", this).toggleInput(z.msg("task.comment.add.tip"));
-    });
-    // 显示左侧内容
-    var jq = $(".task_brief", jDetail).empty();
-    $('<div class="task_text">' + task_format_text(t.text) + '</div>').appendTo(jq);
-    var html = '<table border="0" cellspacing="2" cellpadding="4"><tbody>';
-    for(var i = 0; i < _TFS.length; i++) {
-        html += '<tr><td class="task_brief_fnm">' + z.msg("task.f." + _TFS[i]) + '</td>';
-        html += '<td class="task_brief_fval">' + z.sNull(t[_TFS[i]], "--") + '</td></tr>';
-    }
-    html += '</tbody></table>';
-    $(html).appendTo(jq);
-    // 显示右侧内容
-    var jComments = $(".task_comments_list", jDetail).empty();
-
-    var html = "";
-    for(var i = 0; i < t.comments.length; i++) {
-        html += task_wrap_comment(t.comments[i]);
-    }
-    jComments.html(html);
-
-    // 绑定提交事件
-    jq = $(".task_comments_newer a", jDetail);
-    if(!jq.attr("click-binded")) {
-        jq.attr("click-binded",true).click(function() {
-            var jDetail = $(this).parents("#task_detail");
-            var tid = jDetail.attr("task-id");
-            var txt = $.trim($(".task_comments_newer textarea",jDetail).val());
-            if(!txt || txt.length < 5) {
-                alert(z.msg("task.comment.short"));
-                return;
-            }
-            ajax.post("/ajax/do/comment", {
-                tid: tid,
-                cmt: txt
-            }, function() {
-                $(".task_comment_newer textarea",jDetail).val("");
-                t.comments.push(txt);
-                var jCmt = $(task_wrap_comment(txt)).prependTo(jComments);
-                z.blinkIt(jCmt, 800);
-            });
-        });
-    }
-
-    // 绑定关闭事件
-    var func = function() {
-        $("#task_detail").animate({
-            opacity: 0
-        }, function() {
-            $(this).css("top", 100000);
-        });
-    };
-    $(".task_detail_closer",jDetail).one("click", func);
-    if(!$(document.body).attr("task-comment-newer-esc")) {
-        $(document.body).keydown(function(e) {
-            if(27 == e.which)
-                func();
-        });
-        $(document.body).attr("task-comment-newer-esc", true);
-    }
+    task_detail_show(t);
 }
 
 /**
@@ -394,10 +319,7 @@ function task_events_on_edit() {
                     // 找到所有对应的 TASK，进行数据修改
                     $(".id_"+ee.t._id).each(function() {
                         var jq = $(".task_content", this).html(task_format_text(newval));
-                        var t = jq.data("task");
-                        if(t) {
-                            t.text = newval;
-                        }
+                        ee.t.text = newval;
                         z.blinkIt(this);
                     });
                 });

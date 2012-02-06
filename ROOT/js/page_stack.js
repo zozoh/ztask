@@ -71,6 +71,7 @@ function main() {
                     var rightTaskId = $("#tasks .hierachy_crumb_item_hlt").attr("task-id");
                     if((!t.parentId && !rightTaskId) || t.parentId == rightTaskId) {
                         var oldTask = $("." + t._id, jBlock);
+                        var ta = oldTask.size() == 0 ? jBlock : oldTask;
                         var jq = task_html.apply(ta, [t, {
                             mode: (oldTask.size() == 0 ? "prepend" : "replace")
                         }]);
@@ -155,6 +156,8 @@ function doReloadTasks(taskId) {
 
 function initLayout() {
     task_newer_appendTo("#tasks");
+    // 绑定 Task Comment 事件
+    task_detail_bind();
 }
 
 function adjustLayout() {

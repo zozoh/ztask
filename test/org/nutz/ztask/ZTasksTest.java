@@ -10,6 +10,27 @@ import org.junit.Test;
 public class ZTasksTest {
 
 	@Test
+	public void test_wrap_comment() {
+		Date d = ZTasks.D("2012-02-07 00:29:22");
+		String s;
+
+		s = ZTasks.wrapComment("Hello", "zzh", d);
+		assertEquals("@zzh: Hello //2012-02-07 00:29:22", s);
+
+		s = ZTasks.wrapComment("@zzh: Hello", "zzh", d);
+		assertEquals("@zzh: Hello //2012-02-07 00:29:22", s);
+
+		s = ZTasks.wrapComment("@abc Hello", "zzh", d);
+		assertEquals("@zzh: @abc Hello //2012-02-07 00:29:22", s);
+
+		s = ZTasks.wrapComment("@abc: Hello //2011-11-09 16:36:25", "zzh", d);
+		assertEquals("@zzh: Hello //2012-02-07 00:29:22", s);
+
+		s = ZTasks.wrapComment("@zzh: Hello //2011-11-09 16:36:25 !", "zzh", d);
+		assertEquals("@zzh: Hello //2011-11-09 16:36:25 ! //2012-02-07 00:29:22", s);
+	}
+
+	@Test
 	public void test_d() {
 		Date d = new Date(System.currentTimeMillis());
 		assertEquals(ZTasks.now().getTime() / 1000, ZTasks.D(ZTasks.D(d)).getTime() / 1000);

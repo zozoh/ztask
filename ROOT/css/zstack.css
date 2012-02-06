@@ -15,6 +15,14 @@
     color: #AAA;
 }
 
+.timestamp{
+    font-size: 10px;
+    color:#CCC;
+    font-weight: normal;
+    font-style: italic;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
 .hdn {
     display: none;
 }

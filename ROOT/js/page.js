@@ -41,7 +41,8 @@ function _adjust_layout() {
         width: box.width,
         height: box.height
     });
-    $(".task_comments_newer", jDetail).css("width", $(".task_comments",jDetail).width());
+    var detailWidth = $(".task_cmt",jDetail).width();
+    $(".task_cmt_newer", jDetail).css("width", detailWidth - box.scrollbar);
     if( typeof window.adjustLayout == "function")
         adjustLayout.apply(box);
 }
