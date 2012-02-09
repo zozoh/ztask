@@ -8,7 +8,7 @@
 
 #thierachy .task_refresh {
     background-color: #F80;
-    color:#FFF;
+    color: #FFF;
 }
 
 #thierachy .task_refresh:hover {
@@ -50,7 +50,7 @@
     background: #CCC;
     cursor: pointer;
     text-decoration: none;
-    color:#000;
+    color: #000;
 }
 
 .srch_do:hover {

@@ -9,12 +9,13 @@ function main() {
     $(".srch_do").click(onClickSearch).click();
     // 绑定通用 Task 事件
     task_events_bind(document.body, {
-
+        reject: task_replace,
+        renew: task_replace,
+        done: task_replace
     });
     // 事件: 查看 Task 详情
     $("#L").delegate(".task_detail", "click", onClickDetail);
     $("#R").delegate(".task_refresh", "click", onClickDetail);
-
 }
 
 function drawDetail(t, subTasks) {
@@ -93,6 +94,10 @@ function appendTask(jTasks, t, menu) {
 }
 
 function initLayout() {
+    // 绑定 Task Comment 事件
+    task_detail_bind();
+    
+    // 初始化下拉菜单
     var jsrch = $("#LT");
     $(".srch_sort_by", jsrch).droplist({
         data: [{
@@ -100,16 +105,16 @@ function initLayout() {
             value: "createTime"
         }, {
             text: z.msg('task.lastModified'),
-            value: "createTime"
+            value: "lastModified"
         }, {
             text: z.msg('task.popAt'),
-            value: "createTime"
+            value: "popAt"
         }, {
             text: z.msg('task.pushAt'),
-            value: "createTime"
+            value: "pushAt"
         }, {
             text: z.msg('task.startAt'),
-            value: "createTime"
+            value: "startAt"
         }]
     });
     $(".srch_sort_order", jsrch).droplist({

@@ -45,6 +45,30 @@ public interface TaskService extends AbstractService {
 	Task addComment(String taskId, String comment);
 
 	/**
+	 * 移除任务的一组注释说明
+	 * 
+	 * @param taskId
+	 *            任务 ID
+	 * @param indexes
+	 *            说明的下标，0 base
+	 * @return 重新取回 Task 对象
+	 */
+	Task deleteComments(String taskId, int... indexes);
+
+	/**
+	 * 修改某一个 comment
+	 * 
+	 * @param taskId
+	 *            任务 ID
+	 * @param index
+	 *            comment 的位置
+	 * @param newText
+	 *            新文本
+	 * @return 重新取回 Task 对象
+	 */
+	Task setComment(String taskId, int index, String newText);
+
+	/**
 	 * 根据一个 TASK ID 得到当前任务的根任务，如果当前的任务就是根，那么就返回
 	 * <p>
 	 * 本函数会保证给定的 Task 的所有 Parent 都存在，如果不存在，则抛错
@@ -52,7 +76,7 @@ public interface TaskService extends AbstractService {
 	 * @param taskId
 	 *            任务 ID
 	 * @return 任务对象
-	 * @throws org.nutz.ztask.Err.T
+	 * @throws org.nutz.ztask.util.Err.T
 	 *             #NO_EXISTS
 	 */
 	Task checkTopTask(String taskId);
@@ -65,7 +89,7 @@ public interface TaskService extends AbstractService {
 	 * @param taskId
 	 *            任务ID
 	 * @return 验证后的任务对象
-	 * @throws org.nutz.ztask.Err.T
+	 * @throws org.nutz.ztask.util.Err.T
 	 *             #NO_EXISTS
 	 */
 	Task checkTask(String taskId);
@@ -78,7 +102,7 @@ public interface TaskService extends AbstractService {
 	 * @param taskIds
 	 *            任务ID
 	 * @return 验证后的任务对象列表
-	 * @throws org.nutz.ztask.Err.T
+	 * @throws org.nutz.ztask.util.Err.T
 	 *             #NO_EXISTS
 	 */
 	Task[] checkTasks(String... taskIds);
@@ -303,7 +327,7 @@ public interface TaskService extends AbstractService {
 	 * @param stackName
 	 *            堆栈名
 	 * @return 修改后的任务对象，null 表示该任务不存在
-	 * @throws org.nutz.ztask.Err.S
+	 * @throws org.nutz.ztask.util.Err.S
 	 *             #NO_EXISTS
 	 */
 	Task pushToStack(String taskId, String stackName);
@@ -318,7 +342,7 @@ public interface TaskService extends AbstractService {
 	 * @param stack
 	 *            堆栈
 	 * @return 修改后的任务对象，null 表示该任务不存在
-	 * @throws org.nutz.ztask.Err.S
+	 * @throws org.nutz.ztask.util.Err.S
 	 *             #NO_EXISTS
 	 */
 	Task pushToStack(Task task, TaskStack stack);
@@ -392,6 +416,15 @@ public interface TaskService extends AbstractService {
 	List<TaskStack> getTopStacks();
 
 	/**
+	 * 获得属于某个用户的Stack， 即所有该用户收藏的，或者 owner 是该用户的堆栈
+	 * 
+	 * @param ownerName
+	 *            用户名
+	 * @return 堆栈列表
+	 */
+	List<TaskStack> getMyFavoStacks(String ownerName);
+
+	/**
 	 * 获取一个堆栈下所有的子 stack
 	 * 
 	 * @param stackName
@@ -417,7 +450,7 @@ public interface TaskService extends AbstractService {
 	 * @param stackName
 	 *            任务堆栈的名字
 	 * @return 堆栈对象
-	 * @throws org.nutz.ztask.Err.S
+	 * @throws org.nutz.ztask.util.Err.S
 	 *             #NO_EXISTS
 	 */
 	TaskStack checkStack(String stackName);
@@ -450,10 +483,36 @@ public interface TaskService extends AbstractService {
 	 * @param parentName
 	 *            父堆栈的名称
 	 * @return 堆栈对象
-	 * @throws org.nutz.ztask.Err.S
+	 * @throws org.nutz.ztask.util.Err.S
 	 *             #NO_EXISTS
 	 */
 	TaskStack setStackParent(String stackName, String parentName);
+
+	/**
+	 * 将一个用户设置成本堆栈的关注者
+	 * 
+	 * @param stackName
+	 *            堆栈名
+	 * @param watcherName
+	 *            关注者名
+	 * @return 堆栈对象
+	 * @throws org.nutz.ztask.util.Err.S
+	 *             #NO_EXISTS
+	 */
+	TaskStack watchStack(String stackName, String watcherName);
+
+	/**
+	 * 取消一个用户对某个堆栈的关注
+	 * 
+	 * @param stackName
+	 *            堆栈名
+	 * @param watcherName
+	 *            关注者名
+	 * @return 堆栈对象
+	 * @throws org.nutz.ztask.util.Err.S
+	 *             #NO_EXISTS
+	 */
+	TaskStack unwatchStack(String stackName, String watcherName);
 
 	/**
 	 * 移除一个任务堆栈

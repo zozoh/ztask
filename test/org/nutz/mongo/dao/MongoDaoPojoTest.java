@@ -26,6 +26,22 @@ import com.mongodb.WriteResult;
 public class MongoDaoPojoTest extends MongoCase {
 
 	@Test
+	public void test_two_asc() {
+		dao.create(Pet.class, true);
+		dao.save(Pet.AGE("A", 4, 1));
+		dao.save(Pet.AGE("B", 3, 2));
+		dao.save(Pet.AGE("C", 2, 2));
+		dao.save(Pet.AGE("D", 1, 3));
+
+		List<Pet> pets = dao.find(Pet.class, null, MCur.ASC("count").asc("age"));
+		assertEquals("A", pets.get(0).getName());
+		assertEquals("C", pets.get(1).getName());
+		assertEquals("B", pets.get(2).getName());
+		assertEquals("D", pets.get(3).getName());
+
+	}
+
+	@Test
 	public void test_simple_push_pop_array_field() {
 		dao.create(Pet.class, true);
 		Pet a = dao.save(Pet.NEW("A"));

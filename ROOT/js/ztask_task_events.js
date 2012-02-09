@@ -6,6 +6,10 @@
  * {
  *     reload : function(){...},     # 当需要重新载入数据时的回调。 this 为选区的 jq 对象
  *     reject : function(t){...},    # 当任务被 reject 后的回调，this 为 jTask 对象
+ *     renew : function(t){...},    # 当任务被 renew 后的回调，this 为 jTask 对象
+ *     restart : function(t){...},    # 当任务被 restart 后的回调，this 为 jTask 对象
+ *     done : function(t){...},    # 当任务被 done 后的回调，this 为 jTask 对象
+ *     gout : function(t){...},    # 当任务被 gout 后的回调，this 为 jTask 对象
  *     remove : function(t){...},    # 当任务被 remove 后的回调，this 为 jTask 对象
  * }
  * </pre>
@@ -31,96 +35,26 @@ function task_events_bind(selection, opt) {
     selection.delegate(".task_ing", "click", task_events_on_done);
     selection.delegate(".task_label", "click", task_events_on_label);
     selection.delegate(".task_content", "click", task_events_on_showDetail);
-    
+
     // 标签事件
     selection.delegate(".task_lbe", "click", cancel_bubble);
-    selection.delegate(".task_lbe_cancel", "click", _task_lbe_on_cancel_)
-    selection.delegate(".task_lbe_ok", "click", _task_lbe_on_ok_);
-    selection.delegate(".task_lbe input", "change", _task_lbe_on_ok_);
+    selection.delegate(".task_lbe input", "change", _task_lbe_on_change_);
     selection.delegate(".task_lbe input", "keyup", _task_lbe_on_keyup_);
+    selection.delegate(".task_lbe input", "keydown", _task_lbe_on_esc_);
 }
 
-var _TFS = "parentId,_id,stack,owner,creater,status,pushAt,popAt,startAt,hungupAt,createTime,lastModified".split(",");
 /**
  * 事件处理: 显示一个任务详细信息，包括 comments
  */
 function task_events_on_showDetail(e) {
-    //
     var ee = _task_obj(this);
     var t = ee.t;
     t.comments = t.comments || [];
     // 只有纯 .task_content 被点击才有效
     if(!$(e.target).hasClass("task_content"))
         return;
-    // 标记一下 class
-    $(".task_content_hlt", ee.selection).removeClass("task_content_hlt");
-    $(this).addClass("task_content_hlt");
-
-    // 显示 task_detail
-    var jDetail = $("#task_detail").attr("task-id", t._id);
-    var box = z.winsz();
-    jDetail.css("display", "block").css("top", box.height).animate({
-        "top": 0,
-        "opacity": 1
-    }, 200, function() {
-        _adjust_layout();
-        $(".task_comments_newer textarea", this).toggleInput(z.msg("task.comment.add.tip"));
-    });
-    // 显示左侧内容
-    var jq = $(".task_brief", jDetail).empty();
-    $('<div class="task_text">' + task_format_text(t.text) + '</div>').appendTo(jq);
-    var html = '<table border="0" cellspacing="2" cellpadding="4"><tbody>';
-    for(var i = 0; i < _TFS.length; i++) {
-        html += '<tr><td class="task_brief_fnm">' + z.msg("task.f." + _TFS[i]) + '</td>';
-        html += '<td class="task_brief_fval">' + z.sNull(t[_TFS[i]], "--") + '</td></tr>';
-    }
-    html += '</tbody></table>';
-    $(html).appendTo(jq);
-    // 显示右侧内容
-    var jComments = $(".task_comments_list", jDetail).empty();
-    for(var i = 0; i < t.comments.length; i++) {
-        $(task_wrap_comment(t.comments[i])).prependTo(jComments)
-    }
-
-    // 绑定提交事件
-    jq = $(".task_comments_newer a", jDetail);
-    if(!jq.attr("click-binded")) {
-        jq.attr("click-binded",true).click(function() {
-            var jDetail = $(this).parents("#task_detail");
-            var tid = jDetail.attr("task-id");
-            var txt = $.trim($(".task_comments_newer textarea",jDetail).val());
-            if(!txt || txt.length < 5) {
-                alert(z.msg("task.comment.short"));
-                return;
-            }
-            ajax.post("/ajax/do/comment", {
-                tid: tid,
-                cmt: txt
-            }, function() {
-                $(".task_comment_newer textarea",jDetail).val("");
-                t.comments.push(txt);
-                var jCmt = $(task_wrap_comment(txt)).prependTo(jComments);
-                z.blinkIt(jCmt, 800);
-            });
-        });
-    }
-
-    // 绑定关闭事件
-    var func = function() {
-        $("#task_detail").animate({
-            opacity: 0
-        }, function() {
-            $(this).css("top", 100000);
-        });
-    };
-    $(".task_detail_closer",jDetail).one("click", func);
-    if(!$(document.body).attr("task-comment-newer-esc")) {
-        $(document.body).keydown(function(e) {
-            if(27 == e.which)
-                func();
-        });
-        $(document.body).attr("task-comment-newer-esc", true);
-    }
+    // 显示
+    task_detail_show(t);
 }
 
 /**
@@ -136,7 +70,7 @@ function task_events_on_label(e) {
     // 开始显示
     var ee = _task_obj(this);
     var jLbs = $(".task_labels", ee.jTask);
-    
+
     // 获取标签数值
     var lbs = [];
     jLbs.children().each(function() {
@@ -145,42 +79,41 @@ function task_events_on_label(e) {
     // 建立一个 html，插入到标签容器中
     var jq = $(task_html_lbe()).insertBefore(jLbs).attr("old-value", lbs.join(","));
     jq.width(jLbs.innerWidth());
-    
-    // 绑定鼠标点击事件到 body 上
-    $(document.body).one("click", function() {
-        $(".task_lbe_cancel").click();
-    });
+
     // 聚焦
     $("input", jq).val(lbs.join(",")).select();
 }
 
-function _task_lbe_on_ok_(e) {
+function _task_lbe_on_change_(e) {
     var ee = _task_obj(this);
     var t = ee.t;
-    ajax.post("/ajax/task/set/labels", {
-        tid: t._id,
-        lbs: t.labels ? t.labels.join(",") : ""
-    }, function() {
-        $(".task_labels").undelegate();
-        $(".task_lbe").remove();
-    });
+    var oldv = ee.jTask.find(".task_lbe").attr("old-value");
+    var newv = t.labels ? t.labels.join(",") : "";
+    if(oldv != newv) {
+        ajax.post("/ajax/task/set/labels", {
+            tid: t._id,
+            lbs: newv
+        }, function() {
+            $(".task_lbe").remove();
+        });
+    }
+}
+
+function _task_lbe_on_esc_(e) {
+    if(27 == e.which) {
+        _task_lbe_do_cancel_.apply();
+    }
+}
+
+function _task_lbe_do_cancel_() {
+    var jLbs = $(".task_labels");
+    var ee = _task_obj(jLbs);
+    _task_lbe_redraw_labels_.apply(jLbs, [ee.jTask.find(".task_lbe").attr("old-value")]);
+    $(".task_lbe").remove();
 }
 
 function _task_lbe_on_keyup_(e) {
-    if(27 == e.which) {
-        $(".task_lbe_cancel").click();
-        return;
-    }
-    var ee = _task_obj(this);
     _task_lbe_redraw_labels_.apply(this, [$(this).val()]);
-}
-
-function _task_lbe_on_cancel_() {
-    var ee = _task_obj(this);
-    var jLbs = ee.jTask.find(".task_labels")
-    _task_lbe_redraw_labels_.apply(jLbs, [ee.jTask.find(".task_lbe").attr("old-value")]);
-    $(".task_labels").undelegate();
-    $(".task_lbe").remove();
 }
 
 // 这是一个绘制函数，用来绘制 task_labels, this 为 jLbs
@@ -190,7 +123,7 @@ function _task_lbe_redraw_labels_(s) {
     var t = ee.t;
     t.labels = ss;
     // 移除旧的
-    var jLbs = $(".task_labels",ee.jTask);
+    var jLbs = $(".task_labels", ee.jTask);
     jLbs.find(".task_labels_item").remove();
     // 添加新的
     for(var i = 0; i < ss.length; i++) {
@@ -208,8 +141,10 @@ function task_events_on_done() {
         tid: ee.t._id,
         done: true
     }, function(re) {
-        stack_inc(ee.jTask, -1);
-        z.removeIt(ee.jTask);
+        ee.jTask.data("task", re.data);
+        if( typeof ee.opt.done == "function") {
+            ee.opt.done.apply(ee.jTask, [re.data]);
+        }
     });
 }
 
@@ -222,6 +157,7 @@ function task_events_on_reject() {
         tid: ee.t._id,
         done: false
     }, function(re) {
+        ee.jTask.data("task", re.data);
         if( typeof ee.opt.reject == "function") {
             ee.opt.reject.apply(ee.jTask, [re.data]);
         }
@@ -236,17 +172,10 @@ function task_events_on_restart() {
     ajax.post("/ajax/do/restart", {
         tid: ee.t._id,
     }, function(re) {
-        var jBlock = ee.jTask.parent();
-        // 移除当前的 jTask
-        z.removeIt(ee.jTask, function() {
-            // 生成一个新的 Task 插入队首
-            var newTask = task_html.apply(jBlock, [re.data, {
-                goin: false,
-                mode: "prepend"
-            }]);
-            newTask[0].scrollIntoView(false);
-            z.blinkIt(newTask, 1500);
-        });
+        ee.jTask.data("task", re.data);
+        if( typeof ee.opt.restart == "function") {
+            ee.opt.restart.apply(ee.jTask, [re.data]);
+        }
     });
 }
 
@@ -259,13 +188,10 @@ function task_events_on_renew() {
         tid: ee.t._id,
         done: false
     }, function(re) {
-        var jBlock = ee.jTask.parent();
-        // 生成一个新的 Task 插入队首
-        var newTask = task_html.apply(jBlock, [re.data, {
-            goin: false,
-            mode: "replace"
-        }]);
-        z.blinkIt(newTask, 1500);
+        ee.jTask.data("task", re.data);
+        if( typeof ee.opt.renew == "function") {
+            ee.opt.renew.apply(ee.jTask, [re.data]);
+        }
     });
 }
 
@@ -277,6 +203,7 @@ function task_events_on_hungup() {
     ajax.post("/ajax/do/hungup", {
         tid: ee.t._id,
     }, function(re) {
+        ee.jTask.data("task", re.data);
         var jBlock = ee.jTask.parent();
         // 移除当前的 jTask
         z.removeIt(ee.jTask, function() {
@@ -298,7 +225,7 @@ function task_events_on_gout() {
     var jBlock = ee.jTask.parents(".hierachy_block");
     var leftBlock = jBlock.prev();
     // 看看是否为顶级任务
-    if(leftBlock.size() == 0 || !ee.t.parentId) {
+    if(!ee.t.parentId) {
         alert(z.msg("task.istop"));
         return;
     }
@@ -306,9 +233,14 @@ function task_events_on_gout() {
     ajax.post("/ajax/task/gout", {
         tid: ee.t._id
     }, function(re) {
-        z.removeIt(ee.jTask, {
-            prependTo: leftBlock,
-        });
+        ee.jTask.data("task", re.data);
+        if( typeof ee.opt.gout == "function") {
+            ee.opt.gout.apply(ee.jTask, [re.data]);
+        } else {
+            z.removeIt(ee.jTask, leftBlock.size() > 0 ? {
+                prependTo: leftBlock,
+            } : null);
+        }
     });
 }
 
@@ -334,14 +266,18 @@ function task_events_on_join() {
         tids: tids.join(","),
         pid: ee.t._id
     }, function(re) {
-        $(".hierachy_erratic", ee.selection).remove();
+        ee.jTask.data("task", re.data);
         // 移除掉临时块，以便刷新
-        for(var i = 0; i < re.data.length; i++) { // 移除掉返回的 task 对应的 .task 的 DOM
-            var rt = re.data[i];
-            $(".id_" + rt._id, ee.selection).remove();
+        $(".hierachy_erratic", ee.selection).remove();
+        // 移除掉返回的 task 对应的 .task 的 DOM
+        for(var i = 0; i < tids.length; i++) {
+            $(".id_" + tids[i], ee.selection).remove();
         }
         // 闪烁一下
-        z.blinkIt(ee.jTask, 1200);
+        var jTask = task_html.apply(ee.jTask, [re.data, {
+            mode: "replace"
+        }]);
+        z.blinkIt(jTask, 800);
     });
 }
 
@@ -386,10 +322,7 @@ function task_events_on_edit() {
                     // 找到所有对应的 TASK，进行数据修改
                     $(".id_"+ee.t._id).each(function() {
                         var jq = $(".task_content", this).html(task_format_text(newval));
-                        var t = jq.data("task");
-                        if(t) {
-                            t.text = newval;
-                        }
+                        ee.t.text = newval;
                         z.blinkIt(this);
                     });
                 });

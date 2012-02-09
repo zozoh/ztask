@@ -1,6 +1,7 @@
 package org.nutz.ztask.web.module.core;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -11,14 +12,16 @@ import org.nutz.dao.Chain;
 import org.nutz.ioc.annotation.InjectName;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
+import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
 import org.nutz.mvc.Scope;
 import org.nutz.mvc.adaptor.JsonAdaptor;
 import org.nutz.mvc.annotation.*;
 import org.nutz.web.Webs;
 import org.nutz.web.ajax.AjaxCheckSession;
-import org.nutz.ztask.Err;
 import org.nutz.ztask.api.*;
+import org.nutz.ztask.util.Err;
+import org.nutz.ztask.util.ZTasks;
 
 @Filters(@By(type = AjaxCheckSession.class, args = Webs.ME))
 @InjectName
@@ -34,11 +37,21 @@ public class AjaxModule {
 	@Inject("java:$conf.getInt('sys-task-len-max')")
 	private int taskTitleMaxLength;
 
-	@Inject("refer:taskService")
+	@Inject("refer:hookedTaskService")
 	private TaskService tasks;
 
 	@Inject("refer:labelService")
 	private LabelService labels;
+
+	@Inject("refer:reportor")
+	private TaskReportor reportor;
+
+	@At("/report/year")
+	public List<TaskReport> getReports(@Param("yy") String year) {
+		Calendar from = ZTasks.C(year + "-01-01 00:00:00");
+		Calendar to = ZTasks.C(year + "-12-31 23:59:59");
+		return reportor.getBy(from, to);
+	}
 
 	@At("/label/tops")
 	public List<Label> getTopLabels() {
@@ -75,9 +88,28 @@ public class AjaxModule {
 		return tasks.restartTask(taskId);
 	}
 
-	@At("/do/comment")
-	public Task doCommentTask(@Param("tid") String taskId, @Param("cmt") String comment) {
-		return tasks.addComment(taskId, comment);
+	@At("/do/comment/add")
+	public String doAddComment(	@Param("tid") String taskId,
+								@Param("txt") String text,
+								@Attr(scope = Scope.SESSION, value = Webs.ME) User me) {
+		text = ZTasks.wrapComment(text, me.getName());
+		tasks.addComment(taskId, text);
+		return text;
+	}
+
+	@At("/do/comment/del")
+	public Task doDeleteComment(@Param("tid") String taskId, @Param("i") int index) {
+		return tasks.deleteComments(taskId, index);
+	}
+
+	@At("/do/comment/set")
+	public String doSetComment(	@Param("tid") String taskId,
+								@Param("i") int index,
+								@Param("txt") String text,
+								@Attr(scope = Scope.SESSION, value = Webs.ME) User me) {
+		text = ZTasks.wrapComment(text, me.getName());
+		tasks.setComment(taskId, index, ZTasks.wrapComment(text, me.getName()));
+		return text;
 	}
 
 	@AdaptBy(type = JsonAdaptor.class)
@@ -102,8 +134,9 @@ public class AjaxModule {
 	}
 
 	@At("/task/set/parent")
-	public List<Task> doSetTaskParent(@Param("tids") String[] taskIds, @Param("pid") String parentId) {
-		return tasks.setTasksParent(parentId, taskIds);
+	public Task doSetTaskParent(@Param("tids") String[] taskIds, @Param("pid") String parentId) {
+		tasks.setTasksParent(parentId, taskIds);
+		return tasks.getTask(parentId);
 	}
 
 	/**
@@ -215,6 +248,44 @@ public class AjaxModule {
 	@At("/stack/tops")
 	public List<TaskStack> getTopStacks() {
 		return tasks.getTopStacks();
+	}
+
+	@At("/stack/myfavos")
+	public List<TaskStack> getMyFavoStacks(@Attr(scope = Scope.SESSION, value = Webs.ME) User me) {
+		List<TaskStack> re = tasks.getMyFavoStacks(me.getName());
+		if (re.isEmpty())
+			re = Lang.list(tasks.getStack(me.getName()));
+		return re;
+	}
+
+	/**
+	 * 关注一个堆栈
+	 * 
+	 * @param stackName
+	 *            堆栈名
+	 * @param me
+	 *            当前会话帐号
+	 * @return 堆栈对象
+	 */
+	@At("/stack/do/watch")
+	public TaskStack doWatchStack(	@Param("s") String stackName,
+									@Attr(scope = Scope.SESSION, value = Webs.ME) User me) {
+		return tasks.watchStack(stackName, me.getName());
+	}
+
+	/**
+	 * 取消关注一个堆栈
+	 * 
+	 * @param stackName
+	 *            堆栈名
+	 * @param me
+	 *            当前会话帐号
+	 * @return 堆栈对象
+	 */
+	@At("/stack/do/unwatch")
+	public TaskStack doUnwatchStack(@Param("s") String stackName,
+									@Attr(scope = Scope.SESSION, value = Webs.ME) User me) {
+		return tasks.unwatchStack(stackName, me.getName());
 	}
 
 	@AdaptBy(type = JsonAdaptor.class)

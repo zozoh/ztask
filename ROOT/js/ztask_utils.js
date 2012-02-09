@@ -11,6 +11,13 @@ function ginfo() {
 }
 
 /**
+ * @return 当前操作的帐号的名称
+ */
+function myname() {
+    return "" + $("#myname").text();
+}
+
+/**
  * 根据给定的 stack 对象，返回该对象的 HTML
  *
  * @param this : 无意义
@@ -18,8 +25,12 @@ function ginfo() {
  * @return HTML 字符串表示一个 Task 对象
  */
 function stack_html(s) {
+    var me = myname();
+    var favoIt = z.contains(s.watchers, me);
+    var tip = favoIt ? z.msg("stack.unwatch.tip") : z.msg("stack.watch.tip");
     var html = '<div class="stack">';
     html += '<div class="stack_head">';
+    html += '    <span class="stack_favo ' + ( favoIt ? "stack_favo_on" : "") + '" title="' + tip + '"></span>';
     html += '    <span class="stack_count">' + s.count + '</span>';
     html += '    <span class="stack_name">' + s.name + '</span>';
     html += '    <a class="lnkb stack_owner" href="/page/user#' + s.owner + '" >@' + s.owner + '</a>';
@@ -91,15 +102,17 @@ function task_format_text(str) {
  * @return 格式化后的字符串
  */
 function task_wrap_comment(str) {
-    var formats = ginfo() ? ginfo().formats : null;
-    if(!str || !$.isArray(formats) || formats.length <= 0)
-        return str;
-    // 循环替换字符串
-    for(var i = 0; i < formats.length; i++) {
-        var f = formats[i];
-        str = str.replace(new RegExp(f.regex, "ig"), f.tmpl);
+    var isMine = str.match(new RegExp("^@" + myname() + ":"));
+    var html = '<div class="task_cmt_item">';
+    if(isMine) {
+        html += '<ul class="task_cmt_item_menu">';
+        html += '    <li class="task_cmt_del">' + z.msg("ui.del") + '</li>';
+        html += '    <li class="task_cmt_edit">' + z.msg("ui.edit") + '</li>';
+        html += '</ul>';
     }
-    return '<pre class="task_comment">' + str + '</pre>';
+    html += '<pre>' + task_format_text(str) + '</pre>';
+    html += '</div>';
+    return html;
 }
 
 /**
@@ -135,7 +148,8 @@ var _TASK_MENU_ = {
     "task_push": "edit,join,del,gout,check,label",
     "task_ing": "label,edit,reject,hungup",
     "task_pause": "label,edit,reject",
-    "task_done": "label,del,edit,join,check"
+    "task_done": "label,del,edit,join,check",
+    "task_wait": "label,edit"
 };
 
 /**
@@ -277,6 +291,23 @@ function task_html(t, opt) {
     }
 
     return jq.data("task", t);
+}
+
+/**
+ * 根据给定的 jTask , 重新绘制自身
+ *
+ * @param this : jTask
+ * @param t : 新的任务对象
+ * @param blink : 闪烁时间，单位毫秒，小于等于0，则无视。
+ */
+function task_replace(t, blink) {
+    var t = this.data("task");
+    var jTask = task_html.apply(this, [t, {
+        mode: "replace"
+    }]);
+    if(blink <= 0)
+        return;
+    z.blinkIt(jTask, blink || 800);
 }
 
 /**

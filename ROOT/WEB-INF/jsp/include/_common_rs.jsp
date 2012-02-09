@@ -4,6 +4,7 @@
 <link rel="stylesheet" type="text/css" href="${rs}/css/jquery.droplist.css"/>
 
 <link rel="stylesheet" type="text/css" href="${rs}/css/ztask_task.css"/>
+<link rel="stylesheet" type="text/css" href="${rs}/css/ztask_detail.css"/>
 <link rel="stylesheet" type="text/css" href="${rs}/css/ztask_hierachy.css"/>
 
 <script language="JavaScript" src="${rs}/js/jquery.js"></script>
@@ -17,3 +18,4 @@
 
 <script language="JavaScript" src="${rs}/js/ztask_hierachy.js"></script>
 <script language="JavaScript" src="${rs}/js/ztask_utils.js"></script>
+<script language="JavaScript" src="${rs}/js/ztask_task_detail.js"></script>

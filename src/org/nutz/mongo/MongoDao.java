@@ -586,6 +586,13 @@ public class MongoDao {
 		return db.getLastError();
 	}
 
+	/**
+	 * @return 正在操作的数据库的名称
+	 */
+	public String getDBName() {
+		return db.getName();
+	}
+
 	@SuppressWarnings("unchecked")
 	private <T> void _each(	Each<T> callback,
 							String collName,

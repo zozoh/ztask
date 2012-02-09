@@ -21,7 +21,7 @@ var ioc = {
 	// ~ End bean
 	},
 	/*
-	 * Task 服务类
+	 * 基础服务类
 	 */
 	taskService : {
 		parent : 'mongoService',
@@ -34,6 +34,30 @@ var ioc = {
 	labelService : {
 		parent : 'mongoService',
 		type : 'org.nutz.ztask.impl.mongo.MongoLabelService'
+	// ~ End bean
+	},
+	/*
+	 * 钩子服务类
+	 */
+	hookService : {
+		parent : 'mongoService',
+		type : 'org.nutz.ztask.impl.mongo.MongoHookService',
+		fields : {
+			ioc : { refer : "$Ioc" },
+			labels : { refer : 'labelService' },
+			users : { refer : 'userService' },
+			tasks : { refer : 'taskService' } }
+	// ~ End bean
+	},
+	/*
+	 * 组合钩子的任务服务类
+	 */
+	hookedTaskService : {
+		type : 'org.nutz.ztask.impl.HookedTaskService',
+		fields : {
+			ioc : { refer : "$Ioc" },
+			tasks : { refer : 'taskService' },
+			hooks : { refer : 'hookService' } }
 	// ~ End bean
 	}
 

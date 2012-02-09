@@ -1,0 +1,130 @@
+h1 {
+    padding: 60px 20px 6px 20px;
+    margin: 0 auto;
+    border-bottom: 1px dashed #CCC;
+}
+
+h5 {
+    padding: 4px;
+    margin: 0;
+    font-size: 14px;
+    height: 30px;
+    line-height: 30px;
+    color: #888;
+    border-bottom: 1px dotted #CCC;
+}
+
+#weeks {
+    padding: 20px;
+    overflow: auto;
+    text-align: center;
+}
+
+.cell_m {
+    float: left;
+    width: 16.5%;
+    height: 180px;
+    padding: 0 20px;
+}
+
+.cell_w {
+    position: relative;
+    display: block;
+    height: 24px;
+    line-height: 24px;
+    color: #CCC;
+    cursor: pointer;
+    padding: 0 8px;
+    text-decoration: none;
+}
+
+.cell_w:hover {
+    color: #000;
+    background-color: #EEE;
+}
+
+.cell_w b {
+    text-decoration: line-through;
+    font-style: italic;
+    font-weight: normal;
+}
+
+.cell_w:hover b {
+    text-decoration: none;
+}
+
+.cell_w em {
+    position: absolute;
+    top: 1px;
+    left: 4px;
+    font-size: 10px;
+    font-style: normal;
+    color: #888;
+}
+
+.cell_w:hover em {
+    color: #080;
+    font-size: 16px;
+    -webkit-transition: font-size 0.1s ease-in 0.1s;
+    -moz-transition: font-size 0.1s ease-in 0.1s;
+    -o-transition: font-size 0.1s ease-in 0.1s;
+    transition: font-size 0.1s ease-in 0.1s;
+}
+
+.cell_reported b {
+    color: #08F;
+    text-decoration: none;
+    font-style: normal;
+    font-weight: bold;
+}
+
+.cell_current_week {
+    background: #FF0;
+    font-size: 16px;
+}
+
+.cell_current_week b {
+    color: #F80;
+    text-shadow: 1px 0 0 #950;
+}
+
+.cell_current_week:hover {
+    box-shadow: 0 0 8px #FF0;
+    background: #FF0;
+}
+
+.cell_current_week:hover b {
+    color: #F00;
+}
+
+#year {
+    list-style: none;
+    width: 400px;
+    padding: 0px;
+    margin: 0 auto;
+    font-size: 14px;
+    text-align: center;
+}
+
+#year li {
+    display: inline-block;
+    height: 30px;
+    line-height: 30px;
+    vertical-align: top;
+}
+
+#year_current {
+    font-size: 24px;
+    color: #F80;
+    font-weight: bold;
+    padding: 0 40px;
+}
+
+#year .yybtn a {
+    color: #AAA;
+    text-decoration: none;
+}
+
+#year .yybtn a:hover {
+    color: #08F;
+}

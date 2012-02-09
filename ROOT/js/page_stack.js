@@ -1,6 +1,7 @@
 function main() {
     // 读取左侧所有的堆栈列表
-    ajax.get("/ajax/stack/tops", function(re) {
+    var topStackUrl = $(document.body).attr("url-stack-top");
+    ajax.get(topStackUrl, function(re) {
         hierachy_init.apply($("#stacks"), [{
             direction: "left",
             append: function(obj) {
@@ -70,6 +71,7 @@ function main() {
                     var rightTaskId = $("#tasks .hierachy_crumb_item_hlt").attr("task-id");
                     if((!t.parentId && !rightTaskId) || t.parentId == rightTaskId) {
                         var oldTask = $("." + t._id, jBlock);
+                        var ta = oldTask.size() == 0 ? jBlock : oldTask;
                         var jq = task_html.apply(ta, [t, {
                             mode: (oldTask.size() == 0 ? "prepend" : "replace")
                         }]);
@@ -78,6 +80,25 @@ function main() {
                     }
                 }
             });
+        },
+        restart: function(t) {
+            var ee = _task_obj(this);
+            var jBlock = ee.jTask.parent();
+            // 移除当前的 jTask
+            z.removeIt(ee.jTask, function() {
+                // 生成一个新的 Task 插入队首
+                var newTask = task_html.apply(jBlock, [t, {
+                    goin: false,
+                    mode: "prepend"
+                }]);
+                newTask[0].scrollIntoView(false);
+                z.blinkIt(newTask, 1500);
+            });
+        },
+        done: function(t) {
+            var ee = _task_obj(this);
+            stack_inc(ee.jTask, -1);
+            z.removeIt(ee.jTask);
         }
     });
     // 事件 : 任务 ...
@@ -135,6 +156,8 @@ function doReloadTasks(taskId) {
 
 function initLayout() {
     task_newer_appendTo("#tasks");
+    // 绑定 Task Comment 事件
+    task_detail_bind();
 }
 
 function adjustLayout() {

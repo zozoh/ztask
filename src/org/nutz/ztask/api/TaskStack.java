@@ -44,12 +44,26 @@ public class TaskStack {
 	@CoField("ow")
 	private String owner;
 
+	/**
+	 * 记录当前堆栈都有哪些额外关注者
+	 */
+	@CoField("wch")
+	private String[] watchers;
+
 	public String get_id() {
 		return _id;
 	}
 
 	public void set_id(String _id) {
 		this._id = _id;
+	}
+
+	public String[] getWatchers() {
+		return watchers;
+	}
+
+	public void setWatchers(String[] watchers) {
+		this.watchers = watchers;
 	}
 
 	public String getParentName() {

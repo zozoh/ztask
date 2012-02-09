@@ -1,8 +1,9 @@
-package org.nutz.ztask;
+package org.nutz.ztask.util;
 
 import static org.nutz.web.Webs.Err.*;
 
 import org.nutz.web.WebException;
+import org.nutz.ztask.api.Hook;
 
 /**
  * 封装了本应用全部得错误
@@ -10,6 +11,47 @@ import org.nutz.web.WebException;
  * @author zozoh(zozohtnt@gmail.com)
  */
 public abstract class Err {
+
+	/**
+	 * 报告相关的错误
+	 */
+	public static class R {
+
+	}
+
+	/**
+	 * Timer 相关的错误
+	 */
+	public static class TIMER {
+
+		public static WebException NO_HANDLER(String handler) {
+			return create("e.t.no_handler").reason(handler);
+		}
+
+		public static WebException WRONG_QUARTZ(String qzs) {
+			return create("e.t.wrongqz").reason(qzs);
+		}
+
+	}
+
+	/**
+	 * 钩子服务相关的错误
+	 */
+	public static class H {
+
+		public static WebException NO_HANDLER(String handler) {
+			return create("e.h.no_handler").reason(handler);
+		}
+
+		public static WebException NO_HANDLER(Hook hook) {
+			return create("e.h.no_handler").reason(hook.toString());
+		}
+
+		public static WebException NULL_TYPE(Hook hook) {
+			return create("e.h.null_type").reason(hook.toString());
+		}
+
+	}
 
 	/**
 	 * 任务相关的错误

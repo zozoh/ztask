@@ -6,6 +6,7 @@ import org.nutz.mongo.Mongos;
 import org.nutz.mongo.entity.MongoEntity;
 
 import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
 
 /**
  * 修改 DBCursor 的值链
@@ -31,16 +32,19 @@ public class MCur extends MoChain {
 	}
 
 	public void setupCursor(final DBCursor cur, final MongoEntity moe) {
+		final DBObject sort = Mongos.dbo();
 		each(new Each<MoChain>() {
 			public void invoke(int index, MoChain ele, int length) {
 				String key = ele.key();
 				// ASC
 				if (Mongos.SK_ASC.equals(key)) {
-					cur.sort(Mongos.dbo(moe.getFieldDbName(ele.value().toString()), 1));
+					String dbnm = moe.getFieldDbName(ele.value().toString());
+					sort.put(dbnm, 1);
 				}
 				// DESC
 				else if (Mongos.SK_DESC.equals(key)) {
-					cur.sort(Mongos.dbo(moe.getFieldDbName(ele.value().toString()), -1));
+					String dbnm = moe.getFieldDbName(ele.value().toString());
+					sort.put(dbnm, -1);
 				}
 				// LIMIT
 				else if (Mongos.SK_LIMIT.equals(key)) {
@@ -56,6 +60,10 @@ public class MCur extends MoChain {
 				}
 			}
 		});
+		// 设置排序
+		if (!sort.keySet().isEmpty()) {
+			cur.sort(sort);
+		}
 	}
 
 	@Override

@@ -7,7 +7,7 @@ import org.nutz.lang.Strings;
 import org.nutz.mongo.annotation.Co;
 import org.nutz.mongo.annotation.CoField;
 import org.nutz.mongo.annotation.CoId;
-import org.nutz.ztask.ZTasks;
+import org.nutz.ztask.util.ZTasks;
 
 /**
  * 描述了一个 TASK 的全部信息
@@ -338,6 +338,31 @@ public class Task {
 
 	public boolean isLeaf() {
 		return 0 == getNumberAll();
+	}
+
+	public String toBrief() {
+		String prefix = "..";
+		switch (status) {
+		case DONE:
+			prefix = "OK";
+			break;
+		case ING:
+			prefix = "..";
+			break;
+		case HUNGUP:
+			prefix = "~~";
+			break;
+		case NEW:
+			prefix = "++";
+			break;
+		default:
+			prefix = "??";
+		}
+		return String.format(	"[%s] %s  # %s%s",
+								prefix,
+								Strings.alignLeft(text, 48, ' '),
+								ZTasks.isBlankStack(stack) ? "" : " {" + stack + "} ",
+								ZTasks.SD(lastModified));
 	}
 
 	public String toString() {

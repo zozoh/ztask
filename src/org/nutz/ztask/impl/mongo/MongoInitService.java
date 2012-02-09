@@ -113,6 +113,7 @@ public class MongoInitService extends AbstractMongoService implements InitServic
 			// 不存在，创建
 			if (null == s) {
 				s = tasks.createStackIfNoExistis(stackName, u.getName());
+				tasks.watchStack(s.getName(), u.getName());
 				newID = s.get_id();
 			}
 			// 存在，移除索引
@@ -160,6 +161,7 @@ public class MongoInitService extends AbstractMongoService implements InitServic
 	}
 
 	private void _init_collections() {
+		dao.create(MongoHook.class, false);
 		dao.create(Task.class, false);
 		dao.create(TaskStack.class, false);
 		dao.create(Label.class, false);

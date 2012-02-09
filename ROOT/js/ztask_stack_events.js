@@ -16,6 +16,34 @@ function stack_events_bind(selection, opt) {
     //---------------------------------------------------------
     selection.delegate(".stack_head", "click", stack_events_on_reload);
     selection.delegate(".stack_name", "click", stack_events_on_goin);
+    selection.delegate(".stack_favo", "click", stack_events_on_watchOrNot);
+}
+
+/**
+ * 事件处理: 进入查看一个堆栈的子堆栈
+ */
+function stack_events_on_watchOrNot(e) {
+    e.stopPropagation();
+    var ee = _stack_obj(this);
+    // 收藏或者取消收藏，预先判断一下
+    var jFavo = $(this);
+    var isOn = jFavo.hasClass("stack_favo_on");
+    var url = isOn ? "/ajax/stack/do/unwatch" : "/ajax/stack/do/watch";
+    // 发送请求
+    ajax.post(url, {
+        s: ee.s.name
+    }, function() {
+        // 变取消
+        if(isOn) {
+            jFavo.removeClass("stack_favo_on");
+            jFavo.attr("title", z.msg("stack.unwatch.tip"));
+        }
+        // 变收藏
+        else {
+            jFavo.addClass("stack_favo_on");
+            jFavo.attr("title", z.msg("stack.watch.tip"));
+        }
+    });
 }
 
 /**
@@ -30,7 +58,7 @@ function stack_events_on_goin(e) {
         hierachy_add.apply(hie[0], [ee.s.name, ss]);
     };
     // 读取数据，如果有子节点，进入
-    ajax.get("/ajax/stack/children", {
+    ajax.post("/ajax/stack/children", {
         s: ee.s.name
     }, function(re) {
         if(re.data && re.data.length > 0) {

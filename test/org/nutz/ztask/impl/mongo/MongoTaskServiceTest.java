@@ -7,15 +7,116 @@ import java.util.List;
 import org.junit.Test;
 import org.nutz.lang.Lang;
 import org.nutz.web.WebException;
-import org.nutz.ztask.Err;
 import org.nutz.ztask.ZTaskCase;
 import org.nutz.ztask.api.Task;
 import org.nutz.ztask.api.TaskQuery;
 import org.nutz.ztask.api.TaskService;
 import org.nutz.ztask.api.TaskStack;
 import org.nutz.ztask.api.TaskStatus;
+import org.nutz.ztask.util.Err;
+import org.nutz.ztask.util.ZTasks;
 
 public class MongoTaskServiceTest extends ZTaskCase {
+
+	@Test
+	public void test_watch_unwatch_stack() {
+		TaskStack s = tasks.createStackIfNoExistis("S", "zzh");
+		assertNull(s.getWatchers());
+
+		tasks.watchStack(s.getName(), "u0");
+		tasks.watchStack(s.getName(), "u1");
+		tasks.watchStack(s.getName(), "u2");
+		assertEquals(3, tasks.getStack(s.getName()).getWatchers().length);
+		assertEquals("u0", tasks.getStack(s.getName()).getWatchers()[0]);
+		assertEquals("u1", tasks.getStack(s.getName()).getWatchers()[1]);
+		assertEquals("u2", tasks.getStack(s.getName()).getWatchers()[2]);
+
+		tasks.unwatchStack(s.getName(), "u1");
+		assertEquals(2, tasks.getStack(s.getName()).getWatchers().length);
+		assertEquals("u0", tasks.getStack(s.getName()).getWatchers()[0]);
+		assertEquals("u2", tasks.getStack(s.getName()).getWatchers()[1]);
+	}
+
+	@Test
+	public void test_add_remove_edit_comments() {
+		Task a = tasks.createTask(t("A"));
+		tasks.addComment(a.get_id(), "c0");
+		tasks.addComment(a.get_id(), "c1");
+		tasks.addComment(a.get_id(), "c2");
+		tasks.addComment(a.get_id(), "c3");
+		tasks.addComment(a.get_id(), "c4");
+
+		assertEquals(5, tasks.getTask(a.get_id()).getComments().length);
+		assertEquals("c0", tasks.getTask(a.get_id()).getComments()[0]);
+		assertEquals("c1", tasks.getTask(a.get_id()).getComments()[1]);
+		assertEquals("c2", tasks.getTask(a.get_id()).getComments()[2]);
+		assertEquals("c3", tasks.getTask(a.get_id()).getComments()[3]);
+		assertEquals("c4", tasks.getTask(a.get_id()).getComments()[4]);
+
+		a = tasks.deleteComments(a.get_id(), 5, 1, 3);
+		assertEquals(3, tasks.getTask(a.get_id()).getComments().length);
+		assertEquals("c0", tasks.getTask(a.get_id()).getComments()[0]);
+		assertEquals("c2", tasks.getTask(a.get_id()).getComments()[1]);
+		assertEquals("c4", tasks.getTask(a.get_id()).getComments()[2]);
+
+		a = tasks.deleteComments(a.get_id(), 1);
+		assertEquals(2, a.getComments().length);
+		assertEquals("c0", a.getComments()[0]);
+		assertEquals("c4", a.getComments()[1]);
+
+		a = tasks.setComment(a.get_id(), 1, "haha");
+		assertEquals("haha", a.getComments()[1]);
+		assertEquals("haha", tasks.getTask(a.get_id()).getComments()[1]);
+	}
+
+	@Test
+	public void test_push_reject() {
+		TaskStack s = tasks.createStackIfNoExistis("S", "zozoh");
+		Task a = tasks.createTask(t("A"));
+
+		a = tasks.pushToStack(a, s);
+		assertEquals("S", a.getStack());
+		assertEquals(TaskStatus.HUNGUP, a.getStatus());
+
+		a = tasks.popFromStack(a, false);
+		assertFalse(a.isInStack());
+		assertEquals(TaskStatus.NEW, a.getStatus());
+
+		a = tasks.pushToStack(a, s);
+		assertEquals("S", a.getStack());
+		assertEquals(TaskStatus.HUNGUP, a.getStatus());
+
+		a = tasks.popFromStack(a, true);
+		assertFalse(a.isInStack());
+		assertEquals(TaskStatus.DONE, a.getStatus());
+
+	}
+
+	/**
+	 * For Issue#4
+	 */
+	@Test
+	public void test_push_to_task_in_stack() {
+		TaskStack s = tasks.createStackIfNoExistis("S", "zozoh");
+		Task a = tasks.createTask(t("A"));
+
+		tasks.pushToStack(a, s);
+		assertEquals(TaskStatus.HUNGUP, tasks.getTask(a.get_id()).getStatus());
+		assertEquals("zozoh", a.getOwner());
+		assertEquals("S", a.getStack());
+		assertEquals("zozoh", tasks.getTask(a.get_id()).getOwner());
+		assertEquals("S", tasks.getTask(a.get_id()).getStack());
+
+		Task b = tasks.createTask(t(a, "B"));
+
+		assertEquals("S", tasks.getTask(b.get_id()).getStack());
+		assertEquals(TaskStatus.HUNGUP, tasks.getTask(b.get_id()).getStatus());
+		assertEquals("S", b.getStack());
+		assertEquals(TaskStatus.HUNGUP, b.getStatus());
+
+		assertEquals(ZTasks.NULL_STACK, tasks.getTask(a.get_id()).getStack());
+		assertEquals(TaskStatus.ING, tasks.getTask(a.get_id()).getStatus());
+	}
 
 	@Test
 	public void test_add_comment() {
@@ -26,6 +127,45 @@ public class MongoTaskServiceTest extends ZTaskCase {
 		t = tasks.getTask(a.get_id());
 		assertEquals(1, t.getComments().length);
 		assertEquals("c0", t.getComments()[0]);
+	}
+
+	@Test
+	public void test_query_by_status() {
+		TaskStack s = tasks.createStackIfNoExistis("S", "zozoh");
+		Task a = tasks.createTask(t("A"));
+		Task b = tasks.createTask(t("B"));
+		Task c = tasks.createTask(t("C"));
+
+		List<Task> ts;
+
+		ts = tasks.queryTasks(TaskQuery.NEW("%(NEW)").asc());
+		assertEquals(3, ts.size());
+		assertEquals("A", ts.get(0).getText());
+		assertEquals("B", ts.get(1).getText());
+		assertEquals("C", ts.get(2).getText());
+
+		tasks.pushToStack(a, s);
+		ts = tasks.queryTasks(TaskQuery.NEW("%(NEW)").asc());
+		assertEquals(2, ts.size());
+		assertEquals("B", ts.get(0).getText());
+		assertEquals("C", ts.get(1).getText());
+
+		tasks.pushToStack(b, s);
+		ts = tasks.queryTasks(TaskQuery.NEW("%(HUNGUP)").asc());
+		assertEquals(2, ts.size());
+		assertEquals("A", ts.get(0).getText());
+		assertEquals("B", ts.get(1).getText());
+
+		tasks.popFromStack(a, true);
+		ts = tasks.queryTasks(TaskQuery.NEW("%(NEW,DONE)").asc());
+		assertEquals(2, ts.size());
+		assertEquals("A", ts.get(0).getText());
+		assertEquals("C", ts.get(1).getText());
+
+		tasks.pushToStack(c, s);
+		ts = tasks.queryTasks(TaskQuery.NEW("%(NEW,DONE)").asc());
+		assertEquals(1, ts.size());
+		assertEquals("A", ts.get(0).getText());
 	}
 
 	@Test
@@ -273,8 +413,8 @@ public class MongoTaskServiceTest extends ZTaskCase {
 		a = tasks.pushToStack(a.get_id(), s.getName());
 		assertNotNull(tasks.getTask(a.get_id()).getPushAt());
 		assertNull(tasks.getTask(a.get_id()).getPopAt());
-		assertNotNull(tasks.getTask(a.get_id()).getStartAt());
-		assertNull(tasks.getTask(a.get_id()).getHungupAt());
+		assertNull(tasks.getTask(a.get_id()).getStartAt());
+		assertNotNull(tasks.getTask(a.get_id()).getHungupAt());
 
 		a = tasks.popFromStack(a.get_id(), false);
 		assertNull(tasks.getTask(a.get_id()).getPushAt());
@@ -285,8 +425,8 @@ public class MongoTaskServiceTest extends ZTaskCase {
 		a = tasks.pushToStack(a.get_id(), s.getName());
 		assertNotNull(tasks.getTask(a.get_id()).getPushAt());
 		assertNull(tasks.getTask(a.get_id()).getPopAt());
-		assertNotNull(tasks.getTask(a.get_id()).getStartAt());
-		assertNull(tasks.getTask(a.get_id()).getHungupAt());
+		assertNull(tasks.getTask(a.get_id()).getStartAt());
+		assertNotNull(tasks.getTask(a.get_id()).getHungupAt());
 
 		a = tasks.hungupTask(a.get_id());
 		assertNotNull(tasks.getTask(a.get_id()).getPushAt());
@@ -313,7 +453,7 @@ public class MongoTaskServiceTest extends ZTaskCase {
 		Task a = tasks.createTask(t("A"));
 
 		a = tasks.pushToStack(a.get_id(), s.getName());
-		assertEquals(TaskStatus.ING, a.getStatus());
+		assertEquals(TaskStatus.HUNGUP, a.getStatus());
 
 		a = tasks.popFromStack(a.get_id(), true);
 		assertEquals(TaskStatus.DONE, a.getStatus());
@@ -466,7 +606,7 @@ public class MongoTaskServiceTest extends ZTaskCase {
 		assertEquals(1, tasks.getStack("X").getCount());
 		assertEquals(0, tasks.getTasksInStack("Y").size());
 		assertEquals(0, tasks.getStack("Y").getCount());
-		assertEquals(TaskStatus.ING, tasks.getTask(t.get_id()).getStatus());
+		assertEquals(TaskStatus.HUNGUP, tasks.getTask(t.get_id()).getStatus());
 
 		// 压入 Y ...
 		tasks.pushToStack(t.get_id(), "Y");
@@ -476,7 +616,7 @@ public class MongoTaskServiceTest extends ZTaskCase {
 		assertEquals(0, tasks.getStack("X").getCount());
 		assertEquals(1, tasks.getTasksInStack("Y").size());
 		assertEquals(1, tasks.getStack("Y").getCount());
-		assertEquals(TaskStatus.ING, tasks.getTask(t.get_id()).getStatus());
+		assertEquals(TaskStatus.HUNGUP, tasks.getTask(t.get_id()).getStatus());
 
 		// 弹出
 		tasks.popFromStack(t.get_id(), true);

@@ -33,6 +33,16 @@ public class GInfo {
 	@CoField("lm")
 	private Date lastModified;
 
+	/**
+	 * 声明一组钩子
+	 * <p>
+	 * 每个字符串的格式为 "类型:处理器名"
+	 * <p>
+	 * 比如 "LABEL:syncLabel" , 类型大小写不敏感
+	 */
+	@CoField("hooks")
+	private String[] hooks;
+
 	public String get_id() {
 		return _id;
 	}
@@ -71,6 +81,14 @@ public class GInfo {
 
 	public void setLastModified(Date lastModified) {
 		this.lastModified = lastModified;
+	}
+
+	public String[] getHooks() {
+		return hooks;
+	}
+
+	public void setHooks(String[] hooks) {
+		this.hooks = hooks;
 	}
 
 }

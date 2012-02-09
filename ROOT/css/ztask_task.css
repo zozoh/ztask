@@ -1,120 +1,3 @@
-#task_detail {
-    position: absolute;
-    left: 0;
-    display: none;
-    background: #FFF;
-    z-index: 1000;
-}
-
-#task_detail_wrapper {
-    width: 100%;
-    height: 100%;
-    position: relative;
-}
-
-#task_detail .task_brief {
-    float: left;
-    width: 40%;
-    height: 100%;
-    overflow: auto;
-    border-right: 1px dashed #CCC;
-    background-color: #F0F0F0;
-    padding: 10px;
-}
-
-#task_detail .task_text {
-    padding: 10px;
-    background-color: #FFF;
-    border-radius: 10px;
-    box-shadow: 2px 2px 6px #888;
-    font-size: 14px;
-    min-height: 60px;
-    margin-bottom: 15px;
-}
-
-#task_detail .task_brief_fnm {
-    text-align: right;
-    color: #888;
-}
-
-#task_detail .task_brief_fval {
-    font-size: 14px;
-    font-family: Courier;
-}
-
-#task_detail .task_comments {
-    float: left;
-    width: 60%;
-    height: 100%;
-    position: relative;
-}
-
-#task_detail .task_comment {
-    font-family: Courier;
-    font-size: 14px;
-    line-height: 22px;
-    padding: 8px;
-    margin: 8px;
-    border-top: 1px dashed #EEE;
-}
-
-#task_detail .task_comments_list {
-    height: 100%;
-    width: 100%;
-    overflow: auto;
-    padding: 140px 0;
-}
-
-#task_detail .task_comments_newer {
-    padding: 10px 60px 10px 10px;
-    min-width: 400px;
-    height: 100px;
-    position: absolute;
-    top: 0;
-    text-align: right;
-    background-color: rgba(255,255,255,0.8);
-}
-
-#task_detail .task_comments_newer textarea {
-    width: 100%;
-    height: 100%;
-    border: 4px solid #CCC;
-    padding: 4px;
-    font-size: 14px;
-}
-
-#task_detail .task_comments_newer a {
-    display: inline-block;
-    height: 32px;
-    line-height: 32px;
-    width: 120px;
-    text-align: center;
-    color: #000;
-    background-color: #8AD;
-    font-size: 16px;
-    border-radius: 10px;
-    cursor: pointer;
-}
-
-#task_detail .task_comments_newer a:hover {
-    background-color: #ACF;
-}
-
-#task_detail .task_detail_closer {
-    width: 32px;
-    height: 32px;
-    display: block;
-    position: absolute;
-    right: 18px;
-    top: 1px;
-    background: url(pics/icons.png) no-repeat 0 -32px;
-    cursor: pointer;
-}
-
-#task_detail .task_detail_closer:hover {
-    background-position: -32px -32px;
-}
-
 .task {
     margin: 0;
     padding: 1px;
@@ -171,7 +54,6 @@
 .task_lbe {
     position: absolute;
     top: 0;
-    left: 0;
     background-color: rgba(255,255,255,0.8);
     margin-top: 24px;
     padding: 2px 16px 4px 16px;
@@ -220,10 +102,12 @@
     min-height: 42px;
     padding: 1px 6px 12px 6px;
     cursor: pointer;
+    border-radius: 4px;
 }
 
 .task_content:hover {
-    background-color: #F8F8F8;
+    background-color: #FFD;
+    color:#229;
 }
 
 .task_content_hlt, .task_content_hlt:hover {
@@ -426,6 +310,10 @@
     float: right;
 }
 
+.hierachy_left .task_lbe {
+    right: 0;
+}
+
 .hierachy_left .task_menu {
     left: 4px;
 }
@@ -467,6 +355,11 @@
 
 .hierachy_right .task_labels li {
     float: left;
+}
+
+.hierachy_right .task_lbe {
+    margin-left: 70px;
+    left: 0;
 }
 
 .hierachy_right .task_menu {
