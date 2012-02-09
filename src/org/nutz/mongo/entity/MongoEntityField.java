@@ -23,6 +23,10 @@ public class MongoEntityField {
 	private FieldAdaptor adaptor;
 
 	private Mirror<?> mirror;
+	
+	private boolean ref;
+	
+	private boolean lazy;
 
 	protected boolean isNull(Object obj) {
 		Object val = adaptor.get(obj);
@@ -134,9 +138,21 @@ public class MongoEntityField {
 			dbName = "_id";
 		// 得到 In/Ejectint
 		adaptor = fi.getAdaptor().setField(this);
+		if (fi.getAnnotation() != null) {
+			ref = fi.getAnnotation().ref();
+			lazy = fi.getAnnotation().lazy();
+		}
 	}
 
 	public String toString() {
 		return String.format("%s(%s) > %s ", name, dbName, adaptor);
+	}
+	
+	public boolean isRef() {
+		return ref;
+	}
+	
+	public boolean isLazy() {
+		return lazy;
 	}
 }
