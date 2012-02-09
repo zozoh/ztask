@@ -4,6 +4,12 @@
 <title>${msg['ui.login']} - zTask</title>
 <link type="text/css" rel="stylesheet" href="${rs}/css/zstack.css"/>
 <link type="text/css" rel="stylesheet" href="${rs}/css/page_login.css"/>
+<script>
+    function nmFocus(){
+        document.getElementById('nm').focus();
+    };
+    window.onload = nmFocus;
+</script>
 </head>
 <body>
 <div align="center"><img src="${rs}/img/ztask_logo_big.png"></div>
@@ -11,11 +17,11 @@
     <table border="0" cellspacing="4" cellpadding="4">
         <tr>
             <td class="fnm">${msg['login.unm']}</td>
-            <td><input name="nm" value="zozoh"/></td>
+            <td><input name="nm" value=""/></td>
         </tr>
         <tr>
             <td class="fnm">${msg['login.pwd']}</td>
-            <td><input name="pwd" type="password" value="123456"/></td>         
+            <td><input name="pwd" type="password" value=""/></td>         
         </tr>
         <tr>
             <td>&nbsp;</td>
