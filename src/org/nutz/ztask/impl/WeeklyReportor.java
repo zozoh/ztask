@@ -165,7 +165,7 @@ public class WeeklyReportor implements TaskReportor {
 		doc.addAuthor("weekly-reportor");
 		doc.setTime(ZTasks.now());
 
-		ZBlock p = ZD.p("Task Done or In Procesing:");
+		ZBlock p = ZD.p("Tasks Done or In Procesing:");
 		doneOrIng.joinTo(p);
 		doc.root().add(p);
 

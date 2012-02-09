@@ -34,7 +34,7 @@ function task_events_bind(selection, opt) {
     selection.delegate(".task_done", "click", task_events_on_renew);
     selection.delegate(".task_ing", "click", task_events_on_done);
     selection.delegate(".task_label", "click", task_events_on_label);
-    selection.delegate(".task_content", "dblclick", task_events_on_showDetail);
+    selection.delegate(".task_content", "click", task_events_on_showDetail);
 
     // 标签事件
     selection.delegate(".task_lbe", "click", cancel_bubble);

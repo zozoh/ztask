@@ -102,11 +102,14 @@ function task_format_text(str) {
  * @return 格式化后的字符串
  */
 function task_wrap_comment(str) {
+    var isMine = str.match(new RegExp("^@" + myname() + ":"));
     var html = '<div class="task_cmt_item">';
-    html += '<ul class="task_cmt_item_menu">';
-    html += '    <li class="task_cmt_del">' + z.msg("ui.del") + '</li>';
-    html += '    <li class="task_cmt_edit">' + z.msg("ui.edit") + '</li>';
-    html += '</ul>';
+    if(isMine) {
+        html += '<ul class="task_cmt_item_menu">';
+        html += '    <li class="task_cmt_del">' + z.msg("ui.del") + '</li>';
+        html += '    <li class="task_cmt_edit">' + z.msg("ui.edit") + '</li>';
+        html += '</ul>';
+    }
     html += '<pre>' + task_format_text(str) + '</pre>';
     html += '</div>';
     return html;

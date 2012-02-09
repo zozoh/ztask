@@ -12,6 +12,7 @@ import org.nutz.dao.Chain;
 import org.nutz.ioc.annotation.InjectName;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
+import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
 import org.nutz.mvc.Scope;
 import org.nutz.mvc.adaptor.JsonAdaptor;
@@ -251,7 +252,10 @@ public class AjaxModule {
 
 	@At("/stack/myfavos")
 	public List<TaskStack> getMyFavoStacks(@Attr(scope = Scope.SESSION, value = Webs.ME) User me) {
-		return tasks.getMyFavoStacks(me.getName());
+		List<TaskStack> re = tasks.getMyFavoStacks(me.getName());
+		if (re.isEmpty())
+			re = Lang.list(tasks.getStack(me.getName()));
+		return re;
 	}
 
 	/**

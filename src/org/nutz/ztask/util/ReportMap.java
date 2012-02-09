@@ -29,6 +29,10 @@ public class ReportMap {
 	 *            父块
 	 */
 	public void joinTo(ZBlock block) {
+		if(isEmpty()){
+			block.add(ZD.p(" - NOTHING - "));
+			return;
+		}
 		List<String> keys = sortKeys();
 		for (String key : keys) {
 			List<Task> ts = get(key);
