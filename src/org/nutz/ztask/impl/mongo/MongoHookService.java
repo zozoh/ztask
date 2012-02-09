@@ -9,8 +9,6 @@ import org.nutz.log.Logs;
 import org.nutz.mongo.MongoConnector;
 import org.nutz.mongo.util.MCur;
 import org.nutz.mongo.util.Moo;
-import org.nutz.ztask.Err;
-import org.nutz.ztask.ZTasks;
 import org.nutz.ztask.api.Hook;
 import org.nutz.ztask.api.HookHandler;
 import org.nutz.ztask.api.HookService;
@@ -20,6 +18,8 @@ import org.nutz.ztask.api.LabelService;
 import org.nutz.ztask.api.Task;
 import org.nutz.ztask.api.TaskService;
 import org.nutz.ztask.api.UserService;
+import org.nutz.ztask.util.Err;
+import org.nutz.ztask.util.ZTasks;
 
 /**
  * 本实现将 Hook 的信息存放在 MongoDB 的一个名为 "hook" 的集合里

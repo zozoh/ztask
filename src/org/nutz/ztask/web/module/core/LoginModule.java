@@ -9,9 +9,9 @@ import org.nutz.mvc.annotation.At;
 import org.nutz.mvc.annotation.Ok;
 import org.nutz.mvc.annotation.Param;
 import org.nutz.web.Webs;
-import org.nutz.ztask.Err;
 import org.nutz.ztask.api.User;
 import org.nutz.ztask.api.UserService;
+import org.nutz.ztask.util.Err;
 
 @InjectName
 @IocBean

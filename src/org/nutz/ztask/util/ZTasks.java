@@ -1,4 +1,4 @@
-package org.nutz.ztask;
+package org.nutz.ztask.util;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -20,7 +20,8 @@ public abstract class ZTasks {
 
 	public static final String REG_D = "[0-9]{4}-[01][0-9]-[0-3][0-9][ ][0-2][0-9]:[0-5][0-9]:[0-5][0-9]";
 
-	private static final DateFormat date_format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	private static final DateFormat DF_DATE_TIME = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	private static final DateFormat DF_DATE = new SimpleDateFormat("yyyy-MM-dd");
 
 	private static final long MS_DAY = 3600 * 24 * 1000;
 	private static final long MS_WEEK = MS_DAY * 7;
@@ -58,7 +59,7 @@ public abstract class ZTasks {
 		}
 		// 处理后缀
 		if (null != d) {
-			String ds = ZTasks.D(d);
+			String ds = ZTasks.SDT(d);
 			text = text.replaceAll("[ \t]?//[ \t]*" + REG_D + "$", "") + " //" + ds;
 		}
 		return text;
@@ -72,7 +73,7 @@ public abstract class ZTasks {
 	 * @param unm
 	 *            用户，如果为 null，将不处理前缀
 	 * @return @return 包裹后的字符串
-	 * @see org.nutz.ztask.ZTasks#wrapComment(String, String, Date)
+	 * @see org.nutz.ztask.util.ZTasks#wrapComment(String, String, Date)
 	 */
 	public static String wrapComment(String text, String unm) {
 		return wrapComment(text, unm, now());
@@ -86,7 +87,7 @@ public abstract class ZTasks {
 	 * 
 	 * @return 时间范围(毫秒级别)
 	 * 
-	 * @see org.nutz.ztask.ZTasks#weeks(long, int, int)
+	 * @see org.nutz.ztask.util.ZTasks#weeks(long, int, int)
 	 */
 	public static Date[] week(int off) {
 		return week(System.currentTimeMillis(), off);
@@ -102,7 +103,7 @@ public abstract class ZTasks {
 	 * 
 	 * @return 时间范围(毫秒级别)
 	 * 
-	 * @see org.nutz.ztask.ZTasks#weeks(long, int, int)
+	 * @see org.nutz.ztask.util.ZTasks#weeks(long, int, int)
 	 */
 	public static Date[] week(long base, int off) {
 		return weeks(base, off, off);
@@ -118,7 +119,7 @@ public abstract class ZTasks {
 	 * 
 	 * @return 时间范围(毫秒级别)
 	 * 
-	 * @see org.nutz.ztask.ZTasks#weeks(long, int, int)
+	 * @see org.nutz.ztask.util.ZTasks#weeks(long, int, int)
 	 */
 	public static Date[] weeks(int offL, int offR) {
 		return weeks(System.currentTimeMillis(), offL, offR);
@@ -178,17 +179,81 @@ public abstract class ZTasks {
 	/**
 	 * 根据字符串得到时间
 	 * 
-	 * @param d
-	 *            时间字符串, 格式为 yyyy-MM-dd HH:mm:ss
+	 * <pre>
+	 * 如果你输入了格式为 "yyyy-MM-dd HH:mm:ss"
+	 *    那么会匹配到秒
+	 *    
+	 * 如果你输入格式为 "yyyy-MM-dd"
+	 *    相当于你输入了 "yyyy-MM-dd 00:00:00"
+	 * </pre>
+	 * 
+	 * @param ds
+	 *            时间字符串
 	 * @return 时间
 	 */
-	public static Date D(String d) {
+	public static Date D(String ds) {
 		try {
-			return date_format.parse(d);
+			if (ds.length() < 12)
+				return DF_DATE.parse(ds);
+			return DF_DATE_TIME.parse(ds);
 		}
 		catch (ParseException e) {
 			throw Lang.wrapThrow(e);
 		}
+	}
+
+	/**
+	 * 根据毫秒数得到时间
+	 * 
+	 * @param ms
+	 *            时间的毫秒数
+	 * @return 时间
+	 */
+	public static Date D(long ms) {
+		return new Date(ms);
+	}
+
+	/**
+	 * 根据字符串得到时间
+	 * 
+	 * <pre>
+	 * 如果你输入了格式为 "yyyy-MM-dd HH:mm:ss"
+	 *    那么会匹配到秒
+	 *    
+	 * 如果你输入格式为 "yyyy-MM-dd"
+	 *    相当于你输入了 "yyyy-MM-dd 00:00:00"
+	 * </pre>
+	 * 
+	 * @param ds
+	 *            时间字符串
+	 * @return 时间
+	 */
+	public static Calendar C(String ds) {
+		return C(D(ds));
+	}
+
+	/**
+	 * 根据日期对象得到时间
+	 * 
+	 * @param d
+	 *            时间对象
+	 * @return 时间
+	 */
+	public static Calendar C(Date d) {
+		return C(d.getTime());
+	}
+
+	/**
+	 * 根据毫秒数得到时间
+	 * 
+	 * @param ms
+	 *            时间的毫秒数
+	 * @return 时间
+	 */
+	public static Calendar C(long ms) {
+		Calendar c = Calendar.getInstance();
+		c.setTimeInMillis(ms);
+		return c;
 	}
 
 	/**
@@ -198,8 +263,19 @@ public abstract class ZTasks {
 	 *            日期时间对象
 	 * @return 时间字符串 , 格式为 yyyy-MM-dd HH:mm:ss
 	 */
-	public static String D(Date d) {
-		return date_format.format(d);
+	public static String SDT(Date d) {
+		return DF_DATE_TIME.format(d);
+	}
+
+	/**
+	 * 根据时间得到日期字符串
+	 * 
+	 * @param d
+	 *            日期时间对象
+	 * @return 时间字符串 , 格式为 yyyy-MM-dd
+	 */
+	public static String SD(Date d) {
+		return DF_DATE.format(d);
 	}
 
 	/**

@@ -1,6 +1,7 @@
 package org.nutz.ztask.web.module.core;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -17,9 +18,9 @@ import org.nutz.mvc.adaptor.JsonAdaptor;
 import org.nutz.mvc.annotation.*;
 import org.nutz.web.Webs;
 import org.nutz.web.ajax.AjaxCheckSession;
-import org.nutz.ztask.Err;
-import org.nutz.ztask.ZTasks;
 import org.nutz.ztask.api.*;
+import org.nutz.ztask.util.Err;
+import org.nutz.ztask.util.ZTasks;
 
 @Filters(@By(type = AjaxCheckSession.class, args = Webs.ME))
 @InjectName
@@ -40,6 +41,16 @@ public class AjaxModule {
 
 	@Inject("refer:labelService")
 	private LabelService labels;
+
+	@Inject("refer:reportor")
+	private TaskReportor reportor;
+
+	@At("/report/year")
+	public List<TaskReport> getReports(@Param("yy") String year) {
+		Calendar from = ZTasks.C(year + "-01-01 00:00:00");
+		Calendar to = ZTasks.C(year + "-12-31 23:59:59");
+		return reportor.getBy(from, to);
+	}
 
 	@At("/label/tops")
 	public List<Label> getTopLabels() {
@@ -238,8 +249,8 @@ public class AjaxModule {
 		return tasks.getTopStacks();
 	}
 
-	@At("/stack/mytops")
-	public List<TaskStack> getMyTopStacks(@Attr(scope = Scope.SESSION, value = Webs.ME) User me) {
+	@At("/stack/myfavos")
+	public List<TaskStack> getMyFavoStacks(@Attr(scope = Scope.SESSION, value = Webs.ME) User me) {
 		return tasks.getMyFavoStacks(me.getName());
 	}
 

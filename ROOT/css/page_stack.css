@@ -3,6 +3,10 @@
     width: 50%;
     padding-top: 50px;
     position: relative;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 #stacks {

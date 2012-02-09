@@ -16,7 +16,7 @@
 <script language="JavaScript" src="${rs}/js/page_stack.js"></script>
 
 </head>
-<body url-stack-top="${base}/ajax/stack/mytops">
+<body url-stack-top="${base}/ajax/stack/myfavos">
     <% /*==========================================顶部固定条=*/ %>
     <%@include file="/WEB-INF/jsp/include/_sky.jsp" %>
     <% /*==========================================左侧堆栈列表=*/ %>

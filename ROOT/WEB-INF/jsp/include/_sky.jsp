@@ -10,6 +10,8 @@ String url = request.getRequestURI();
             ${msg['ui.label']}
         </a><a href="${base}/page/task" <%=url.endsWith("/task.jsp")?"class=\"hlt\"":""%>>
             ${msg['ui.task']}
+        </a><a href="${base}/page/report" <%=url.endsWith("/report.jsp")?"class=\"hlt\"":""%>>
+            ${msg['ui.report']}
         </a><a href="${base}/page/sys" <%=url.endsWith("/sys.jsp")?"class=\"hlt\"":""%>>
             ${msg['ui.sys']}
         </a>

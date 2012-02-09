@@ -26,7 +26,7 @@ function myname() {
  */
 function stack_html(s) {
     var me = myname();
-    var favoIt = (s.owner == me || z.contains(s.watchers, me));
+    var favoIt = z.contains(s.watchers, me);
     var tip = favoIt ? z.msg("stack.unwatch.tip") : z.msg("stack.watch.tip");
     var html = '<div class="stack">';
     html += '<div class="stack_head">';

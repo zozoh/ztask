@@ -3,7 +3,7 @@ package org.nutz.ztask.api;
 import java.util.Date;
 
 import org.junit.Test;
-import org.nutz.ztask.ZTasks;
+import org.nutz.ztask.util.ZTasks;
 
 import static org.junit.Assert.*;
 import static org.nutz.ztask.api.TaskQuery.*;

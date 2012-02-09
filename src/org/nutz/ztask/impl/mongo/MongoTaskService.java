@@ -18,14 +18,14 @@ import org.nutz.mongo.MongoConnector;
 import org.nutz.mongo.util.MCur;
 import org.nutz.mongo.util.MKeys;
 import org.nutz.mongo.util.Moo;
-import org.nutz.ztask.Err;
-import org.nutz.ztask.ZTasks;
 import org.nutz.ztask.api.GInfo;
 import org.nutz.ztask.api.Task;
 import org.nutz.ztask.api.TaskQuery;
 import org.nutz.ztask.api.TaskService;
 import org.nutz.ztask.api.TaskStack;
 import org.nutz.ztask.api.TaskStatus;
+import org.nutz.ztask.util.Err;
+import org.nutz.ztask.util.ZTasks;
 
 public class MongoTaskService extends AbstractMongoService implements TaskService {
 
@@ -57,7 +57,9 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 
 	@Override
 	public Task setComment(String taskId, int index, String newText) {
-		dao.updateById(Task.class, taskId, Moo.SET("comments." + index, newText));
+		dao.updateById(	Task.class,
+						taskId,
+						Moo.SET("comments." + index, newText).set("lastModified", ZTasks.now()));
 		return getTask(taskId);
 	}
 
@@ -268,7 +270,9 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 	@Override
 	public Task setTaskOwner(String taskId, String ownerName) {
 		Task t = checkTask(taskId);
-		dao.updateById(Task.class, taskId, Moo.NEW().set("owner", ownerName));
+		dao.updateById(	Task.class,
+						taskId,
+						Moo.NEW().set("owner", ownerName).set("lastModified", ZTasks.now()));
 		t.setOwner(ownerName);
 		return t;
 	}
@@ -276,7 +280,9 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 	@Override
 	public Task setTaskText(String taskId, String newTitle) {
 		Task t = checkTask(taskId);
-		dao.updateById(Task.class, taskId, Moo.NEW().set("text", newTitle));
+		dao.updateById(	Task.class,
+						taskId,
+						Moo.NEW().set("text", newTitle).set("lastModified", ZTasks.now()));
 		t.setText(newTitle);
 		return t;
 	}
@@ -284,7 +290,9 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 	@Override
 	public Task setTaskLabels(String taskId, String[] labels) {
 		Task t = checkTask(taskId);
-		dao.updateById(Task.class, taskId, Moo.NEW().set("labels", labels));
+		dao.updateById(	Task.class,
+						taskId,
+						Moo.NEW().set("labels", labels).set("lastModified", ZTasks.now()));
 		t.setLabels(labels);
 		return t;
 	}
@@ -318,7 +326,9 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 		// 执行更新
 		for (Task t : ts)
 			t.setParentId(pid);
-		dao.update(Task.class, Moo.NEW().inArray("_id", ids), Moo.NEW().set("parentId", pid));
+		dao.update(	Task.class,
+					Moo.NEW().inArray("_id", ids),
+					Moo.NEW().set("parentId", pid).set("lastModified", ZTasks.now()));
 
 		// 归纳需要同步的节点
 		Map<String, Task> tops = new HashMap<String, Task>();
@@ -515,51 +525,53 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 	}
 
 	@Override
-	public Task pushToStack(Task task, TaskStack stack) {
+	public Task pushToStack(Task t, TaskStack stack) {
 		// 已经在栈里，就没必要再执行了
-		if (stack.getName().equals(task.getStack()))
-			return task;
+		if (stack.getName().equals(t.getStack()))
+			return t;
 
 		// 如果不是叶子任务，那么，插入其所有的叶子节点
-		if (!task.isLeaf()) {
-			List<Task> leafs = this.getLeafTasks(task);
+		if (!t.isLeaf()) {
+			List<Task> leafs = this.getLeafTasks(t);
 			for (Task leaf : leafs)
 				pushToStack(leaf, stack);
-			return task;
+			return t;
 		}
 
 		// 如果这个任务之前在别的栈里，先弹栈
-		if (task.isInStack())
-			_pop_from_stack(task, false, false);
+		if (t.isInStack())
+			_pop_from_stack(t, false, false);
 
 		// 更新 Java 对象 ...
-		task.setStack(stack.getName());
-		task.setStatus(TaskStatus.ING);
-		task.setPushAt(ZTasks.now());
-		task.setStartAt(task.getPushAt());
-		task.setPopAt(null);
-		task.setHungupAt(null);
-		task.setOwner(stack.getOwner());
+		t.setStack(stack.getName());
+		t.setStatus(TaskStatus.HUNGUP);
+		t.setPushAt(ZTasks.now());
+		t.setStartAt(null);
+		t.setPopAt(null);
+		t.setLastModified(t.getPushAt());
+		t.setHungupAt(t.getPushAt());
+		t.setOwner(stack.getOwner());
 
 		// 压入 ...
 		Moo o = Moo.NEW();
-		o.set("status", task.getStatus());
-		o.set("stack", task.getStack());
-		o.set("pushAt", task.getPushAt());
-		o.set("startAt", task.getStartAt());
-		o.set("popAt", task.getPopAt());
-		o.set("hungupAt", task.getHungupAt());
+		o.set("status", t.getStatus());
+		o.set("stack", t.getStack());
+		o.set("pushAt", t.getPushAt());
+		o.set("startAt", t.getStartAt());
+		o.set("popAt", t.getPopAt());
+		o.set("lastModified", t.getLastModified());
+		o.set("hungupAt", t.getHungupAt());
 		o.set("owner", stack.getOwner());
-		dao.updateById(Task.class, task.get_id(), o);
+		dao.updateById(Task.class, t.get_id(), o);
 
 		// 重新计算一下堆栈的数量
 		_recountStackTaskNumber(stack.getName());
 
 		// 重新计算一下自己所有的 parents 的 number
-		syncDescendants(checkTopTask(task.get_id()));
+		syncDescendants(checkTopTask(t.get_id()));
 
 		// 最后返回
-		return this.getTask(task.get_id());
+		return this.getTask(t.get_id());
 	}
 
 	@Override
@@ -583,6 +595,7 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 			Moo o = Moo.SET("status", t.getStatus());
 			o.set("startAt", null);
 			o.set("hungupAt", ZTasks.now());
+			o.set("lastModified", ZTasks.now());
 			dao.updateById(Task.class, t.get_id(), o);
 		}
 		return t;
@@ -595,6 +608,7 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 			t.setStatus(TaskStatus.ING);
 			Moo o = Moo.SET("status", t.getStatus());
 			o.set("startAt", ZTasks.now());
+			o.set("lastModified", ZTasks.now());
 			o.set("hungupAt", null);
 			dao.updateById(Task.class, t.get_id(), o);
 		}
@@ -610,6 +624,7 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 		t.setPushAt(null);
 		t.setStartAt(done ? t.getStartAt() : null);
 		t.setPopAt(ZTasks.now());
+		t.setLastModified(t.getPopAt());
 		t.setHungupAt(null);
 		if (!done)
 			t.setOwner(t.getCreater());
@@ -622,6 +637,7 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 		if (null == t.getStartAt())
 			o.set("startAt", t.getStartAt());
 		o.set("popAt", t.getPopAt());
+		o.set("lastModified", t.getLastModified());
 		o.set("hungupAt", t.getHungupAt());
 		o.set("owner", t.getOwner());
 		dao.updateById(Task.class, t.get_id(), o);
@@ -650,9 +666,8 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 
 	@Override
 	public List<TaskStack> getMyFavoStacks(String ownerName) {
-		return dao.find(TaskStack.class,
-						Moo.OR(Moo.NEW("owner", ownerName), Moo.NEW("watchers", ownerName)),
-						MCur.ASC("parentName").asc("name"));
+		return dao.find(TaskStack.class, Moo.NEW("watchers", ownerName), MCur.ASC("parentName")
+																				.asc("name"));
 	}
 
 	@Override
@@ -788,8 +803,8 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 		// 处理时间范围
 		if (null != tq.qTimeScope()) {
 			Date[] ds = tq.qTimeScope();
-			q.d_gte(tq.getSortBy(), ZTasks.D(ds[0]));
-			q.d_lte(tq.getSortBy(), ZTasks.D(ds[1]));
+			q.d_gte(tq.getSortBy(), ZTasks.SDT(ds[0]));
+			q.d_lte(tq.getSortBy(), ZTasks.SDT(ds[1]));
 
 		}
 

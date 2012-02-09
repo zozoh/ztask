@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.nutz.ioc.Ioc;
 import org.nutz.lang.Each;
 import org.nutz.lang.Strings;
 import org.nutz.lang.util.ObjFilter;
@@ -12,6 +13,7 @@ import org.nutz.log.Logs;
 import org.nutz.mongo.MongoDao;
 import org.nutz.ztask.api.GInfo;
 import org.nutz.ztask.api.Hook;
+import org.nutz.ztask.api.HookHandler;
 import org.nutz.ztask.api.HookService;
 import org.nutz.ztask.api.HookType;
 import org.nutz.ztask.api.Task;
@@ -20,6 +22,7 @@ import org.nutz.ztask.api.TaskService;
 import org.nutz.ztask.api.TaskStack;
 import org.nutz.ztask.api.TaskStatus;
 import org.nutz.ztask.impl.mongo.MongoHook;
+import org.nutz.ztask.util.Err;
 
 public class HookedTaskService implements TaskService {
 
@@ -28,6 +31,8 @@ public class HookedTaskService implements TaskService {
 	private TaskService tasks;
 
 	private HookService hooks;
+
+	private Ioc ioc;
 
 	public MongoDao dao() {
 		return tasks.dao();
@@ -265,6 +270,10 @@ public class HookedTaskService implements TaskService {
 				MongoHook h = new MongoHook();
 				h.setType(HookType.valueOf(Strings.trim(ss[0].toUpperCase())));
 				h.setHandler(Strings.trim(ss[1]));
+
+				// 检查一下 handler 是否有效
+				if (null == ioc.get(HookHandler.class, h.getHandler()))
+					throw Err.H.NO_HANDLER(h);
 
 				// 有这个钩子 ...
 				if (all.containsKey(h.getID())) {

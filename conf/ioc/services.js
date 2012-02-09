@@ -55,6 +55,7 @@ var ioc = {
 	hookedTaskService : {
 		type : 'org.nutz.ztask.impl.HookedTaskService',
 		fields : {
+			ioc : { refer : "$Ioc" },
 			tasks : { refer : 'taskService' },
 			hooks : { refer : 'hookService' } }
 	// ~ End bean

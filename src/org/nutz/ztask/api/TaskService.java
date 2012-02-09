@@ -76,7 +76,7 @@ public interface TaskService extends AbstractService {
 	 * @param taskId
 	 *            任务 ID
 	 * @return 任务对象
-	 * @throws org.nutz.ztask.Err.T
+	 * @throws org.nutz.ztask.util.Err.T
 	 *             #NO_EXISTS
 	 */
 	Task checkTopTask(String taskId);
@@ -89,7 +89,7 @@ public interface TaskService extends AbstractService {
 	 * @param taskId
 	 *            任务ID
 	 * @return 验证后的任务对象
-	 * @throws org.nutz.ztask.Err.T
+	 * @throws org.nutz.ztask.util.Err.T
 	 *             #NO_EXISTS
 	 */
 	Task checkTask(String taskId);
@@ -102,7 +102,7 @@ public interface TaskService extends AbstractService {
 	 * @param taskIds
 	 *            任务ID
 	 * @return 验证后的任务对象列表
-	 * @throws org.nutz.ztask.Err.T
+	 * @throws org.nutz.ztask.util.Err.T
 	 *             #NO_EXISTS
 	 */
 	Task[] checkTasks(String... taskIds);
@@ -327,7 +327,7 @@ public interface TaskService extends AbstractService {
 	 * @param stackName
 	 *            堆栈名
 	 * @return 修改后的任务对象，null 表示该任务不存在
-	 * @throws org.nutz.ztask.Err.S
+	 * @throws org.nutz.ztask.util.Err.S
 	 *             #NO_EXISTS
 	 */
 	Task pushToStack(String taskId, String stackName);
@@ -342,7 +342,7 @@ public interface TaskService extends AbstractService {
 	 * @param stack
 	 *            堆栈
 	 * @return 修改后的任务对象，null 表示该任务不存在
-	 * @throws org.nutz.ztask.Err.S
+	 * @throws org.nutz.ztask.util.Err.S
 	 *             #NO_EXISTS
 	 */
 	Task pushToStack(Task task, TaskStack stack);
@@ -450,7 +450,7 @@ public interface TaskService extends AbstractService {
 	 * @param stackName
 	 *            任务堆栈的名字
 	 * @return 堆栈对象
-	 * @throws org.nutz.ztask.Err.S
+	 * @throws org.nutz.ztask.util.Err.S
 	 *             #NO_EXISTS
 	 */
 	TaskStack checkStack(String stackName);
@@ -483,7 +483,7 @@ public interface TaskService extends AbstractService {
 	 * @param parentName
 	 *            父堆栈的名称
 	 * @return 堆栈对象
-	 * @throws org.nutz.ztask.Err.S
+	 * @throws org.nutz.ztask.util.Err.S
 	 *             #NO_EXISTS
 	 */
 	TaskStack setStackParent(String stackName, String parentName);
@@ -496,7 +496,7 @@ public interface TaskService extends AbstractService {
 	 * @param watcherName
 	 *            关注者名
 	 * @return 堆栈对象
-	 * @throws org.nutz.ztask.Err.S
+	 * @throws org.nutz.ztask.util.Err.S
 	 *             #NO_EXISTS
 	 */
 	TaskStack watchStack(String stackName, String watcherName);
@@ -509,7 +509,7 @@ public interface TaskService extends AbstractService {
 	 * @param watcherName
 	 *            关注者名
 	 * @return 堆栈对象
-	 * @throws org.nutz.ztask.Err.S
+	 * @throws org.nutz.ztask.util.Err.S
 	 *             #NO_EXISTS
 	 */
 	TaskStack unwatchStack(String stackName, String watcherName);

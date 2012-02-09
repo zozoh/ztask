@@ -5,6 +5,7 @@ import org.nutz.log.Log;
 import org.nutz.log.Logs;
 import org.nutz.mvc.NutConfig;
 import org.nutz.mvc.Setup;
+import org.nutz.ztask.ZTask;
 import org.nutz.ztask.api.InitService;
 
 /**
@@ -19,7 +20,7 @@ public class ZTaskSetup implements Setup {
 	@Override
 	public void init(NutConfig config) {
 		if (log.isInfoEnabled())
-			log.info("init zTask ...");
+			log.infof("init zTask (%s) ...", ZTask.version());
 		// 得到 Ioc 容器
 		final Ioc ioc = config.getIoc();
 

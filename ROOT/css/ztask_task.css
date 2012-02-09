@@ -102,10 +102,12 @@
     min-height: 42px;
     padding: 1px 6px 12px 6px;
     cursor: pointer;
+    border-radius: 4px;
 }
 
 .task_content:hover {
-    background-color: #F8F8F8;
+    background-color: #FFD;
+    color:#229;
 }
 
 .task_content_hlt, .task_content_hlt:hover {

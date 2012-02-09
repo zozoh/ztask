@@ -7,7 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.nutz.lang.Strings;
-import org.nutz.ztask.ZTasks;
+import org.nutz.ztask.util.ZTasks;
 
 /**
  * 封装了 Task 查询条件
@@ -266,6 +266,18 @@ public class TaskQuery {
 		TaskQuery tq = new TaskQuery();
 		tq.setKeyword(keyword);
 		return tq;
+	}
+
+	/**
+	 * 
+	 * @param format
+	 *            字符串格式模板
+	 * @param args
+	 *            模板参数
+	 * @return 任务查询条件，仅包括一个按时间从新到旧的排序，以及一个关键字
+	 */
+	public static TaskQuery NEWf(String format, Object... args) {
+		return NEW(String.format(format, args));
 	}
 
 	public TaskQuery() {

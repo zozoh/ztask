@@ -6,6 +6,7 @@ import static org.nutz.ztask.ZTaskCase.*;
 import java.util.Date;
 
 import org.junit.Test;
+import org.nutz.ztask.util.ZTasks;
 
 public class ZTasksTest {
 
@@ -33,7 +34,7 @@ public class ZTasksTest {
 	@Test
 	public void test_d() {
 		Date d = new Date(System.currentTimeMillis());
-		assertEquals(ZTasks.now().getTime() / 1000, ZTasks.D(ZTasks.D(d)).getTime() / 1000);
+		assertEquals(ZTasks.now().getTime() / 1000, ZTasks.D(ZTasks.SDT(d)).getTime() / 1000);
 	}
 
 	@Test
