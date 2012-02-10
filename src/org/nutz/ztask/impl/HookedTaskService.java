@@ -6,12 +6,16 @@ import java.util.Map;
 
 import org.nutz.ioc.Ioc;
 import org.nutz.lang.Each;
+import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
+import org.nutz.lang.util.Callback3;
 import org.nutz.lang.util.ObjFilter;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
 import org.nutz.mongo.MongoDao;
+import org.nutz.quartz.Quartz;
 import org.nutz.ztask.api.GInfo;
+import org.nutz.ztask.api.GlobalLock;
 import org.nutz.ztask.api.Hook;
 import org.nutz.ztask.api.HookHandler;
 import org.nutz.ztask.api.HookService;
@@ -22,11 +26,14 @@ import org.nutz.ztask.api.TaskService;
 import org.nutz.ztask.api.TaskStack;
 import org.nutz.ztask.api.TaskStatus;
 import org.nutz.ztask.impl.mongo.MongoHook;
+import org.nutz.ztask.thread.ScheduleUpdateAtom;
 import org.nutz.ztask.util.Err;
 
 public class HookedTaskService implements TaskService {
 
 	private final static Log log = Logs.get();
+
+	private GlobalLock glock;
 
 	private TaskService tasks;
 
@@ -47,7 +54,9 @@ public class HookedTaskService implements TaskService {
 	}
 
 	public Task addComment(String taskId, String comment) {
-		return tasks.addComment(taskId, comment);
+		Task t = tasks.addComment(taskId, comment);
+		hooks.doHook(HookType.COMMENT, t, -1);
+		return t;
 	}
 
 	public Task deleteComments(String taskId, int... indexes) {
@@ -55,7 +64,9 @@ public class HookedTaskService implements TaskService {
 	}
 
 	public Task setComment(String taskId, int index, String newText) {
-		return tasks.setComment(taskId, index, newText);
+		Task t = tasks.setComment(taskId, index, newText);
+		hooks.doHook(HookType.COMMENT, t, index);
+		return t;
 	}
 
 	public Task checkTopTask(String taskId) {
@@ -116,35 +127,42 @@ public class HookedTaskService implements TaskService {
 
 	public Task createTask(Task task) {
 		Task t = tasks.createTask(task);
-		hooks.doHook(HookType.CREATE, t);
+		hooks.doHook(HookType.CREATE, t, null);
 		return t;
 	}
 
 	public Task removeTask(String taskId, boolean recur) {
 		Task t = tasks.checkTask(taskId);
-		hooks.doHook(HookType.DROP, t);
+		hooks.doHook(HookType.DROP, t, null);
 		return tasks.removeTask(taskId, recur);
 	}
 
-	public Task setTaskOwner(String taskId, String ownerName) {
-		Task t = tasks.setTaskOwner(taskId, ownerName);
-		hooks.doHook(HookType.OWNER, t);
+	public Task setOwner(Task t, String ownerName) {
+		Object refer = t.getOwner();
+		t = tasks.setOwner(t, ownerName);
+		hooks.doHook(HookType.OWNER, t, refer);
 		return t;
 	}
 
-	public Task setTaskText(String taskId, String newTitle) {
-		Task t = tasks.setTaskText(taskId, newTitle);
-		hooks.doHook(HookType.UPDATE, t);
+	public Task setText(Task t, String newTitle) {
+		Object refer = t.getText();
+		t = tasks.setText(t, newTitle);
+		hooks.doHook(HookType.UPDATE, t, refer);
 		return t;
 	}
 
-	public List<Task> setTasksParent(String parentId, String... taskIds) {
-		return tasks.setTasksParent(parentId, taskIds);
+	public List<Task> setParent(String parentId, Task... ts) {
+		return this.setParentTask(checkTask(parentId), ts);
 	}
 
-	public Task setTaskLabels(String taskId, String[] labels) {
-		Task t = tasks.setTaskLabels(taskId, labels);
-		hooks.doHook(HookType.LABEL, t);
+	public List<Task> setParentTask(Task p, Task... ts) {
+		return tasks.setParentTask(p, ts);
+	}
+
+	public Task setLabels(Task t, String[] labels) {
+		Object refer = t.getLabels();
+		t = tasks.setLabels(t, labels);
+		hooks.doHook(HookType.LABEL, t, refer);
 		return t;
 	}
 
@@ -152,39 +170,37 @@ public class HookedTaskService implements TaskService {
 		return tasks.syncDescendants(task);
 	}
 
-	public Task pushToStack(String taskId, String stackName) {
-		Task t = tasks.pushToStack(taskId, stackName);
-		hooks.doHook(HookType.PUSH, t);
-		return t;
+	public Task pushToStack(Task t, String stackName) {
+		return this.pushToStack(t, this.checkStack(stackName));
 	}
 
-	public Task pushToStack(Task task, TaskStack stack) {
-		Task t = tasks.pushToStack(task, stack);
-		hooks.doHook(HookType.PUSH, t);
+	public Task pushToStack(Task t, TaskStack stack) {
+		Object refer = t.getStack();
+		t = tasks.pushToStack(t, stack);
+		hooks.doHook(HookType.PUSH, t, refer);
 		return t;
 	}
 
 	public Task popFromStack(String taskId, boolean done) {
-		Task t = tasks.popFromStack(taskId, done);
-		hooks.doHook(done ? HookType.DONE : HookType.REJECT, t);
+		return this.popFromStack(checkTask(taskId), done);
+	}
+
+	public Task popFromStack(Task t, boolean done) {
+		Object refer = t.getStack();
+		t = tasks.popFromStack(t, done);
+		hooks.doHook(done ? HookType.DONE : HookType.REJECT, t, refer);
 		return t;
 	}
 
-	public Task popFromStack(Task task, boolean done) {
-		Task t = tasks.popFromStack(task, done);
-		hooks.doHook(done ? HookType.DONE : HookType.REJECT, t);
+	public Task hungupTask(Task t) {
+		t = tasks.hungupTask(t);
+		hooks.doHook(HookType.HUNGUP, t, null);
 		return t;
 	}
 
-	public Task hungupTask(String taskId) {
-		Task t = tasks.hungupTask(taskId);
-		hooks.doHook(HookType.HUNGUP, t);
-		return t;
-	}
-
-	public Task restartTask(String taskId) {
-		Task t = tasks.restartTask(taskId);
-		hooks.doHook(HookType.RESTART, t);
+	public Task restartTask(Task t) {
+		t = tasks.restartTask(t);
+		hooks.doHook(HookType.RESTART, t, null);
 		return t;
 	}
 
@@ -224,16 +240,16 @@ public class HookedTaskService implements TaskService {
 		return tasks.createStackIfNoExistis(stackName, ownerName);
 	}
 
-	public TaskStack setStackParent(String stackName, String parentName) {
-		return tasks.setStackParent(stackName, parentName);
+	public TaskStack setStackParent(TaskStack s, String parentName) {
+		return tasks.setStackParent(s, parentName);
 	}
 
-	public TaskStack watchStack(String stackName, String watcherName) {
-		return tasks.watchStack(stackName, watcherName);
+	public TaskStack watchStack(TaskStack s, String watcherName) {
+		return tasks.watchStack(s, watcherName);
 	}
 
-	public TaskStack unwatchStack(String stackName, String watcherName) {
-		return tasks.unwatchStack(stackName, watcherName);
+	public TaskStack unwatchStack(TaskStack s, String watcherName) {
+		return tasks.unwatchStack(s, watcherName);
 	}
 
 	public TaskStack removeStack(String stackName) {
@@ -245,8 +261,59 @@ public class HookedTaskService implements TaskService {
 	}
 
 	public GInfo setGlobalInfo(GInfo info) {
+		// 先得到老的数据
+		GInfo oldInfo = tasks.getGlobalInfo();
+
 		info = tasks.setGlobalInfo(info);
 
+		// 同步钩子数据
+		syncHooks(info);
+
+		// 同步 timer 数据
+		syncTimer(info, oldInfo);
+
+		return info;
+	}
+
+	private void syncTimer(GInfo info, GInfo oldInfo) {
+		// 都没 Timer 无视
+		if (null == info.getTimers() && null == oldInfo.getTimers())
+			return;
+
+		// 如果 Timer 数据相等，也无视
+		if (Lang.equals(info.getTimers(), oldInfo.getTimers()))
+			return;
+
+		String[] timers = info.getTimers();
+		if (log.isDebugEnabled())
+			log.debugf("Found %d timers in sys", timers.length);
+
+		// 逐个检查，并打印 ...
+		info.eachTimer(ioc, new Callback3<Integer, Quartz, String[]>() {
+			public void invoke(Integer index, Quartz qz, String[] handlerNames) {
+				if (log.isDebugEnabled())
+					log.debugf(	"  @CHECK[%d]: %s :: (%d)'%s' ",
+								index,
+								qz,
+								handlerNames.length,
+								Lang.concat(", ", handlerNames));
+			}
+		});
+
+		// 最后通知更新线程
+		if (log.isInfoEnabled())
+			log.infof("notify thread %s ... " + ScheduleUpdateAtom.NAME);
+
+		synchronized (glock) {
+			glock.notifyAll();
+		}
+
+		if (log.isInfoEnabled())
+			log.infof("... done for notify" + ScheduleUpdateAtom.NAME);
+
+	}
+
+	private void syncHooks(GInfo info) {
 		// 清除所有的钩子
 		if (null == info.getHooks() || info.getHooks().length == 0) {
 			hooks.clearHooks();
@@ -303,8 +370,6 @@ public class HookedTaskService implements TaskService {
 				log.debugf("Done, for %d hooks", list.size());
 
 		}
-
-		return info;
 	}
 
 }

@@ -7,8 +7,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.nutz.lang.Lang;
+import org.nutz.lang.Times;
 import org.nutz.ztask.api.TaskReport;
-import org.nutz.ztask.util.ZTasks;
 
 /**
  * 根据一个文件对象（只能是文件）包裹成一个报告对象
@@ -42,9 +42,9 @@ public class FileTaskReport implements TaskReport {
 	 */
 	public FileTaskReport(Calendar c) {
 		date = c;
-		lastModified = ZTasks.now();
+		lastModified = Times.now();
 		shortName = "No tasks";
-		fullName = "No taks at " + ZTasks.SD(ZTasks.D(c.getTimeInMillis()));
+		fullName = "No taks at " + Times.sD(Times.D(c.getTimeInMillis()));
 	}
 
 	public FileTaskReport(File f) {
@@ -57,11 +57,11 @@ public class FileTaskReport implements TaskReport {
 		}
 
 		// 文件最后修改时间就是 report 的 lm
-		lastModified = ZTasks.D(f.lastModified());
+		lastModified = Times.D(f.lastModified());
 
 		// 根据文件名，得到日期
 		String ds = m.group(2) + "-" + m.group(6);
-		date = ZTasks.C(ds);
+		date = Times.C(ds);
 
 		// 根据文件名得到 ...
 		fullName = m.group(2) + "." + m.group(4) + "." + m.group(6);

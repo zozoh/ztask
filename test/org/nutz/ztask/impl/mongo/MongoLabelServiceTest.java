@@ -50,8 +50,8 @@ public class MongoLabelServiceTest extends ZTaskCase {
 		assertEquals("G:1", lbs.get(6).toString());
 
 		// 修改任务数据
-		tasks.setTaskLabels(t3.get_id(), Lang.array("A", "B", "F"));
-		tasks.setTaskLabels(t4.get_id(), Lang.array("B", "D", "H", "I"));
+		tasks.setLabels(t3, Lang.array("A", "B", "F"));
+		tasks.setLabels(t4, Lang.array("B", "D", "H", "I"));
 
 		// 同步一次
 		lbs = lbls.syncLables();

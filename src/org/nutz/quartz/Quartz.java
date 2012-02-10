@@ -1,14 +1,15 @@
 package org.nutz.quartz;
 
 import java.lang.reflect.Array;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
 import org.nutz.lang.Lang;
+import org.nutz.lang.Mirror;
 import org.nutz.lang.Strings;
+import org.nutz.lang.Times;
+import org.nutz.lang.born.Borning;
 
 /**
  * 封装 Quartz 表达式的解析，和解释
@@ -110,6 +111,7 @@ public class Quartz {
 	}
 
 	/*-------------------------------子表达式下标的含义----*/
+	private String str; // 原始信息
 	private QzItem iss;
 	private QzItem imm;
 	private QzItem iHH;
@@ -135,6 +137,7 @@ public class Quartz {
 	 * @return 自身以便链式使用
 	 */
 	public Quartz valueOf(String qzs) {
+		this.str = qzs;
 		// 拆
 		String[] ss = Strings.splitIgnoreBlank(qzs, "[ ]");
 		// 验证
@@ -179,7 +182,7 @@ public class Quartz {
 	 * @return 是否匹配
 	 */
 	public boolean matchDate(String ds) {
-		return matchDate(_C_(ds));
+		return matchDate(Times.C(ds));
 	}
 
 	/**
@@ -190,7 +193,7 @@ public class Quartz {
 	 * @return 是否匹配
 	 */
 	public boolean matchDate(Date d) {
-		return matchDate(_C_(d.getTime()));
+		return matchDate(Times.C(d.getTime()));
 	}
 
 	/**
@@ -232,17 +235,18 @@ public class Quartz {
 	}
 
 	/**
-	 * 本函数用来填充数组
+	 * 本函数用来迭代一个目标数组
 	 * <p>
-	 * 如果给定的日期，不能匹配，则跳过执行，即，本函数执行的是填充，如果匹配上了就填充，否则无视 <br>
-	 * 这样，你可以很容易叠加多个 Quartz 表达式的执行结果
+	 * 你的数组最多可以是 86400 的元素，对应一天中的每一秒，<br>
+	 * 根据你给定的日期，本函数来决定具体哪个一数组项目要被执行回调<br>
+	 * 当然，如果你给定日期不能匹配表达式，本函数会直接跳过执行
 	 * <p>
-	 * 这里涉及到一个时间的缩放问题，Quartz 实际上是声明了一天中的一系列启动点<br>
+	 * 关于数组的长度涉及到一个时间的缩放问题，Quartz 实际上是声明了一天中的一系列启动点<br>
 	 * 这些点，我们可以用秒来表示，从 0－86399 分别表示一天中的任何一秒。 <br>
-	 * <b style="color:red">这里，给定的数组的长度最好能把 86400 整除 否则一天中最后一段时间会被忽略掉</b>
+	 * <b style="color:red">因此，给定的数组的长度最好能把 86400 整除 否则一天中最后一段时间会被忽略掉</b>
 	 * <p>
 	 * 根据数组的长度，我就能知道，你所关心的 Quartz 表达式精细程度，<br>
-	 * 比如 如果长度为 24 则，你其实仅仅关心到一个小时，如果 1440 你仅仅关系到1分钟
+	 * 比如 如果长度为 24 则，你其实仅仅关心到一个小时，如果 1440 你仅仅关心到1分钟
 	 * <p>
 	 * 同时，你可以自由的定义，比如你给定一个 400 长度的数组，那么 86400/400=216。<br>
 	 * 因此，对你来说，时间的单位是 216 秒。
@@ -253,7 +257,150 @@ public class Quartz {
 	 * <li>然后，循环数组，根据下标，我们能得到一个秒数范围
 	 * <li>这个范围内，如果任意一秒能被匹配，就算匹配成功
 	 * </ol>
+	 * 
+	 * @param <T>
+	 * @param array
+	 *            要被填充的数组
+	 * @param c
+	 *            日期对象，时间部分无视
+	 * @param callback
+	 *            如果数组下标被匹配，则要执行的回调
+	 */
+	public <T> void each(T[] array, Calendar c, QzEach<T> callback) {
+		// 填充数组为空，每必要填充
+		if (null == array || array.length == 0)
+			return;
+
+		// 如果日期不匹配，无视
+		if (!matchDate(c))
+			return;
+
+		// 根据数组，获得一个数组元素表示多少秒
+		int unit = 86400 / array.length;
+
+		// 循环数组
+		try {
+			for (int i = 0; i < array.length; i++) {
+				int sec = i * unit;
+				int max = sec + unit;
+				// 循环每个数组元素
+				for (; sec < max; sec++) {
+					if (this.matchTime(sec)) {
+						callback.invoke(array, i);
+						break;
+					}
+				}
+			}
+		}
+		catch (Exception e) {
+			throw Lang.wrapThrow(e);
+		}
+	}
+
+	/**
+	 * 本函数用来叠加数组
 	 * <p>
+	 * 它将调用 each 函数，叠加数组中的匹配项。
+	 * <p>
+	 * 所谓叠加，就是数组每个元素都是一个 QzList，匹配的数组项，会 add 叠加对象。 <br>
+	 * 与之不同的，{@link #fill(Object[], Object, Calendar)} 是直接替换
+	 * 
+	 * @param <T>
+	 * @param array
+	 *            要被叠加的数组
+	 * @param obj
+	 *            叠加对象
+	 * @param c
+	 *            日期对象，时间部分无视
+	 * @return 数组本身以便链式赋值
+	 * @see #each(Object[], Calendar, QzEach)
+	 */
+	@SuppressWarnings("unchecked")
+	public <T extends QzOverlapor> T[] overlap(T[] array, final Object obj, Calendar c) {
+		if (null != array && array.length > 0) {
+			final Borning<T> borning = (Borning<T>) Mirror.me(array.getClass().getComponentType())
+															.getBorning();
+			final Object[] args = new Object[0];
+			each(array, c, new QzEach<T>() {
+				public void invoke(T[] array, int i) {
+					// 增加一个叠加器
+					if (null == array[i])
+						array[i] = borning.born(args);
+					// 加入叠加对象
+					array[i].add(obj);
+				}
+			});
+		}
+		return array;
+	}
+
+	/**
+	 * 根据当前时间的毫秒数叠加数组
+	 * 
+	 * @see #overlap(QzOverlapor[], Object, Calendar)
+	 */
+	public <T extends QzOverlapor> T[] overlapByToday(T[] array, T obj) {
+		return overlap(array, obj, Calendar.getInstance());
+	}
+
+	/**
+	 * 根据时间的毫秒数叠加数组
+	 * 
+	 * @param <T>
+	 * @param array
+	 *            要被叠加的数组
+	 * @param obj
+	 *            叠加的对象
+	 * @param ms
+	 *            毫秒数，但是仅仅其中的天这部分有意义
+	 * @return 数组本身以便链式赋值
+	 * @see #overlap(QzOverlapor[], Object, Calendar)
+	 */
+	public <T extends QzOverlapor> T[] overlapBy(T[] array, T obj, long ms) {
+		return overlap(array, obj, Times.C(ms));
+	}
+
+	/**
+	 * 根据时间的毫秒数叠加数组
+	 * 
+	 * @param <T>
+	 * @param array
+	 *            要被叠加的数组
+	 * @param obj
+	 *            叠加的对象
+	 * @param ds
+	 *            日期字符串，格式为 yyyy-MM-dd 的字符串
+	 * @return 数组本身以便链式赋值
+	 * @see #overlap(QzOverlapor[], Object, Calendar)
+	 */
+	public <T extends QzOverlapor> T[] overlapBy(T[] array, Object obj, String ds) {
+		return overlap(array, obj, Times.C(ds));
+	}
+
+	/**
+	 * 根据时间的毫秒数叠加数组
+	 * 
+	 * @param <T>
+	 * @param array
+	 *            要被叠加的数组
+	 * @param obj
+	 *            叠加的对象
+	 * @param d
+	 *            时间，但是仅仅其中的天这部分有意义
+	 * @return 数组本身以便链式赋值
+	 * @see #overlap(QzOverlapor[], Object, Calendar)
+	 */
+	public <T extends QzOverlapor> T[] overlapBy(T[] array, T obj, Date d) {
+		return overlap(array, obj, Times.C(d.getTime()));
+	}
+
+	/**
+	 * 本函数用来填充数组
+	 * <p>
+	 * 它将调用 each 函数，填充数组中的匹配项。
+	 * <p>
+	 * 所谓填充，就是数组每个元素都是一个 T，匹配的数组项，被设置成填充对象。 <br>
+	 * 与之不同的，{@link #overlap(QzOverlapor[], Object, Calendar)} 是叠加到一个 QzList
 	 * 
 	 * @param <T>
 	 * @param array
@@ -263,34 +410,21 @@ public class Quartz {
 	 * @param c
 	 *            日期对象，时间部分无视
 	 * @return 数组本身以便链式赋值
+	 * @see #each(Object[], Calendar, QzEach)
 	 */
-	public <T> T[] fill(T[] array, T obj, Calendar c) {
-		// 如果日期不匹配，无视
-		if (!matchDate(c))
-			return array;
-
-		// 根据数组，获得一个数组元素表示多少秒
-		int unit = 86400 / array.length;
-
-		// 循环数组
-		for (int i = 0; i < array.length; i++) {
-			int sec = i * unit;
-			int max = sec + unit;
-			// 循环每个数组元素
-			for (; sec < max; sec++) {
-				if (this.matchTime(sec)) {
-					array[i] = obj;
-					break;
-				}
+	public <T> T[] fill(T[] array, final T obj, Calendar c) {
+		each(array, c, new QzEach<T>() {
+			public void invoke(T[] array, int i) {
+				array[i] = obj;
 			}
-		}
-
-		// 返回
+		});
 		return array;
 	}
 
 	/**
-	 * @see org.nutz.quartz.Quartz#fillBy(Object[], Object, long)
+	 * 根据当前时间的毫秒数填充数组
+	 * 
+	 * @see #fill(Object[], Object, Calendar)
 	 */
 	public <T> T[] fillByToday(T[] array, T obj) {
 		return fill(array, obj, Calendar.getInstance());
@@ -307,10 +441,10 @@ public class Quartz {
 	 * @param ms
 	 *            毫秒数，但是仅仅其中的天这部分有意义
 	 * @return 数组本身以便链式赋值
-	 * @see org.nutz.quartz.Quartz#fill(Object[], Object, int, int, int)
+	 * @see #fill(Object[], Object, Calendar)
 	 */
 	public <T> T[] fillBy(T[] array, T obj, long ms) {
-		return fill(array, obj, _C_(ms));
+		return fill(array, obj, Times.C(ms));
 	}
 
 	/**
@@ -324,10 +458,10 @@ public class Quartz {
 	 * @param ds
 	 *            日期字符串，格式为 yyyy-MM-dd 的字符串
 	 * @return 数组本身以便链式赋值
-	 * @see org.nutz.quartz.Quartz#fillBy(Object[], Object, long)
+	 * @see #fill(Object[], Object, Calendar)
 	 */
 	public <T> T[] fillBy(T[] array, T obj, String ds) {
-		return fill(array, obj, _C_(ds));
+		return fill(array, obj, Times.C(ds));
 	}
 
 	/**
@@ -344,24 +478,11 @@ public class Quartz {
 	 * @see org.nutz.quartz.Quartz#fillBy(Object[], Object, long)
 	 */
 	public <T> T[] fillBy(T[] array, T obj, Date d) {
-		return fill(array, obj, _C_(d.getTime()));
+		return fill(array, obj, Times.C(d.getTime()));
 	}
 
-	private static Calendar _C_(String ds) {
-		try {
-			Date d = DF.parse(ds);
-			return _C_(d.getTime());
-		}
-		catch (ParseException e) {
-			throw Lang.wrapThrow(e);
-		}
+	public String toString() {
+		return str;
 	}
 
-	private static Calendar _C_(long ms) {
-		Calendar c = Calendar.getInstance();
-		c.setTimeInMillis(ms);
-		return c;
-	}
-
-	private static final SimpleDateFormat DF = new SimpleDateFormat("yyyy-MM-dd");
 }

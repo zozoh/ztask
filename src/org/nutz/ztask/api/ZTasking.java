@@ -4,6 +4,7 @@ import java.util.Date;
 
 import org.nutz.ioc.Ioc;
 import org.nutz.lang.util.SimpleContext;
+import org.nutz.mail.MailQueue;
 
 public class ZTasking extends SimpleContext {
 
@@ -38,6 +39,16 @@ public class ZTasking extends SimpleContext {
 	private TaskService tasks;
 
 	/**
+	 * Email队列操作接口
+	 */
+	private MailQueue mails;
+
+	/**
+	 * 报告接口
+	 */
+	private TaskReportor reportor;
+
+	/**
 	 * 一个帮助方法，快速获取 Ioc 容器接口
 	 * <p>
 	 * 当然，前提是你要设置了 Ioc 容器
@@ -50,6 +61,14 @@ public class ZTasking extends SimpleContext {
 
 	public void setIoc(Ioc ioc) {
 		this.set("$ioc", ioc);
+	}
+
+	public Object getRefer() {
+		return this.get("$refer");
+	}
+
+	public <T> T getReferAs(Class<T> referType) {
+		return this.getAs(referType, "$refer");
 	}
 
 	public Date startTime() {
@@ -74,6 +93,22 @@ public class ZTasking extends SimpleContext {
 
 	public TaskService tasks() {
 		return tasks;
+	}
+
+	public MailQueue mails() {
+		return mails;
+	}
+
+	public TaskReportor reportor() {
+		return reportor;
+	}
+
+	public void setReportor(TaskReportor reportor) {
+		this.reportor = reportor;
+	}
+
+	public void setMails(MailQueue mails) {
+		this.mails = mails;
 	}
 
 	public void setHooks(HookService hooks) {

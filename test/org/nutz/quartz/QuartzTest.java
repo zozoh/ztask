@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.util.List;
 
 import org.junit.Test;
+import org.nutz.lang.Lang;
 
 public class QuartzTest {
 
@@ -143,39 +144,52 @@ public class QuartzTest {
 	}
 
 	@Test
-	public void test_run_by_hour() {
-		Ahh("2012-02-08", "0 0 5-8 * * ?", "5:E", "6:E", "7:E", "8:E");
-		Ahh("2012-02-08", "0,3,4,5 0/1 4-8 * * ?", "4:E", "5:E", "6:E", "7:E", "8:E");
+	public void test_overlap_by_hour() {
+		OVERL(	24,
+				"2012-02-08",
+				Lang.array("0 0 5-7 * * ?", "0 0 5-6 * 2 ?", "0 0 5-8 * 3 ?"),
+				Lang.array("5:0.E,1.E", "6:0.E,1.E", "7:0.E"));
 
-		Ahh("2012-02-08", "0 0 5,8 * * ?", "5:E", "8:E");
-		Ahh("2012-02-08", "0,3,4,5 0/1 5,8 * * ?", "5:E", "8:E");
+		OVERL(	24,
+				"2012-03-08",
+				Lang.array("0 0 5-7 * * ?", "0 0 5-6 * 2 ?", "0 0 5-8 * 3 ?"),
+				Lang.array("5:0.E,2.E", "6:0.E,2.E", "7:0.E,2.E", "8:2.E"));
 	}
 
 	@Test
-	public void test_run_by_min() {
-		Amm("2012-02-08", "0 1,2 0,1 * * ?", "1:E", "2:E", "61:E", "62:E");
+	public void test_fill_by_hour() {
+		Fhh("2012-02-08", "0 0 5-8 * * ?", "5:E", "6:E", "7:E", "8:E");
+		Fhh("2012-02-08", "0,3,4,5 0/1 4-8 * * ?", "4:E", "5:E", "6:E", "7:E", "8:E");
+
+		Fhh("2012-02-08", "0 0 5,8 * * ?", "5:E", "8:E");
+		Fhh("2012-02-08", "0,3,4,5 0/1 5,8 * * ?", "5:E", "8:E");
 	}
 
 	@Test
-	public void test_run_by_sec() {
-		Ass("2012-02-08", "0,1 0 0,1 * * ?", "0:E", "1:E", "3600:E", "3601:E");
+	public void test_fill_by_min() {
+		Fmm("2012-02-08", "0 1,2 0,1 * * ?", "1:E", "2:E", "61:E", "62:E");
+	}
+
+	@Test
+	public void test_fill_by_sec() {
+		Fss("2012-02-08", "0,1 0 0,1 * * ?", "0:E", "1:E", "3600:E", "3601:E");
 	}
 
 	/*----------------------------------------------------------帮助函数们-------*/
 
-	private static void Ahh(String ds, String qzs, String... expect) {
-		A(hh(), ds, qzs, expect);
+	private static void Fhh(String ds, String qzs, String... expect) {
+		FILL(hh(), ds, qzs, expect);
 	}
 
-	private static void Amm(String ds, String qzs, String... expect) {
-		A(mm(), ds, qzs, expect);
+	private static void Fmm(String ds, String qzs, String... expect) {
+		FILL(mm(), ds, qzs, expect);
 	}
 
-	private static void Ass(String ds, String qzs, String... expect) {
-		A(ss(), ds, qzs, expect);
+	private static void Fss(String ds, String qzs, String... expect) {
+		FILL(ss(), ds, qzs, expect);
 	}
 
-	private static void A(String[] array, String ds, String qzs, String... expect) {
+	private static void FILL(String[] array, String ds, String qzs, String... expect) {
 		// 创建
 		Quartz qz = Quartz.NEW();
 
@@ -197,16 +211,47 @@ public class QuartzTest {
 
 		// 验证
 		if (ss.length != expect.length) {
-			fail(F("expect length %d, but is was %s !", expect.length, ss.length));
+			fail(FMT("expect length %d, but is was %s !", expect.length, ss.length));
 		}
 		for (int i1 = 0; i1 < ss.length; i1++) {
 			if (!ss[i1].equals(expect[i1])) {
-				fail(F("!expect '%s' but '%s'", expect[i1], ss[i1]));
+				fail(FMT("!expect '%s' but '%s'", expect[i1], ss[i1]));
 			}
 		}
 	}
 
-	private static String F(String fmt, Object... args) {
+	private static void OVERL(int scale, String ds, String[] qzss, String[] expect) {
+		QzOverlapor[] qos = new QzOverlapor[scale];
+		int i = 0;
+		for (String qzs : qzss) {
+			// 创建
+			Quartz qz = Quartz.NEW(qzs);
+			// 执行
+			qz.overlapBy(qos, (i++) + ".E", ds);
+		}
+
+		// 压缩结果
+		List<QzObj<QzOverlapor>> qzos = Quartz.compactAll(qos);
+		String[] ss = new String[qzos.size()];
+
+		// 结果可显示
+		i = 0;
+		for (QzObj<QzOverlapor> qzo : qzos) {
+			ss[i++] = qzo.toString();
+		}
+
+		// 验证
+		if (ss.length != expect.length) {
+			fail(FMT("expect length %d, but is was %s !", expect.length, ss.length));
+		}
+		for (int i1 = 0; i1 < ss.length; i1++) {
+			if (!ss[i1].equals(expect[i1])) {
+				fail(FMT("!expect '%s' but '%s'", expect[i1], ss[i1]));
+			}
+		}
+	}
+
+	private static String FMT(String fmt, Object... args) {
 		return String.format(fmt, args);
 	}
 

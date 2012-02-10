@@ -21,6 +21,14 @@ var ioc = {
 	// ~ End bean
 	},
 	/*
+	 * 邮件队列服务
+	 */
+	mailQueue : {
+		parent : 'mongoService',
+		type : 'org.nutz.ztask.impl.mongo.MongoMailQueue'
+	// ~ End bean
+	},
+	/*
 	 * 基础服务类
 	 */
 	taskService : {
@@ -44,6 +52,8 @@ var ioc = {
 		type : 'org.nutz.ztask.impl.mongo.MongoHookService',
 		fields : {
 			ioc : { refer : "$Ioc" },
+			mails : { refer : 'mailQueue' },
+			reportor : { refer : 'reportor' },
 			labels : { refer : 'labelService' },
 			users : { refer : 'userService' },
 			tasks : { refer : 'taskService' } }
@@ -55,6 +65,7 @@ var ioc = {
 	hookedTaskService : {
 		type : 'org.nutz.ztask.impl.HookedTaskService',
 		fields : {
+			glock : { refer : "schedule" },
 			ioc : { refer : "$Ioc" },
 			tasks : { refer : 'taskService' },
 			hooks : { refer : 'hookService' } }

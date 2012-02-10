@@ -16,6 +16,7 @@ import org.nutz.lang.Files;
 import org.nutz.lang.Lang;
 import org.nutz.lang.Streams;
 import org.nutz.lang.Strings;
+import org.nutz.lang.Times;
 import org.nutz.lang.util.Disks;
 import org.nutz.ztask.api.Task;
 import org.nutz.ztask.api.TaskQuery;
@@ -24,7 +25,6 @@ import org.nutz.ztask.api.TaskReportor;
 import org.nutz.ztask.api.TaskService;
 import org.nutz.ztask.util.KeyGetter;
 import org.nutz.ztask.util.ReportMap;
-import org.nutz.ztask.util.ZTasks;
 
 public class WeeklyReportor implements TaskReportor {
 
@@ -163,7 +163,7 @@ public class WeeklyReportor implements TaskReportor {
 		// 生成文档
 		ZDoc doc = new ZDoc();
 		doc.addAuthor("weekly-reportor");
-		doc.setTime(ZTasks.now());
+		doc.setTime(Times.now());
 
 		ZBlock p = ZD.p("Tasks Done or In Procesing:");
 		doneOrIng.joinTo(p);
@@ -257,7 +257,7 @@ public class WeeklyReportor implements TaskReportor {
 	 * @return 文件对象
 	 */
 	private File getFile(long ms) {
-		Calendar c = ZTasks.C(ms);
+		Calendar c = Times.C(ms);
 		// 转换成周五 (可配置)
 		c.set(Calendar.DAY_OF_WEEK, reportDay);
 		// 得到 "/yyyy/ww_MM-dd.txt"

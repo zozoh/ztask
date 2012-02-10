@@ -14,6 +14,7 @@ import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
+import org.nutz.lang.Times;
 import org.nutz.mvc.Scope;
 import org.nutz.mvc.adaptor.JsonAdaptor;
 import org.nutz.mvc.annotation.*;
@@ -48,8 +49,8 @@ public class AjaxModule {
 
 	@At("/report/year")
 	public List<TaskReport> getReports(@Param("yy") String year) {
-		Calendar from = ZTasks.C(year + "-01-01 00:00:00");
-		Calendar to = ZTasks.C(year + "-12-31 23:59:59");
+		Calendar from = Times.C(year + "-01-01 00:00:00");
+		Calendar to = Times.C(year + "-12-31 23:59:59");
 		return reportor.getBy(from, to);
 	}
 
@@ -70,7 +71,7 @@ public class AjaxModule {
 
 	@At("/do/push")
 	public Task doPush(@Param("tid") String taskId, @Param("s") String stackName) {
-		return tasks.pushToStack(taskId, stackName);
+		return tasks.pushToStack(tasks.checkTask(taskId), stackName);
 	}
 
 	@At("/do/pop")
@@ -80,12 +81,12 @@ public class AjaxModule {
 
 	@At("/do/hungup")
 	public Task doHungup(@Param("tid") String taskId) {
-		return tasks.hungupTask(taskId);
+		return tasks.hungupTask(tasks.checkTask(taskId));
 	}
 
 	@At("/do/restart")
 	public Task doRestart(@Param("tid") String taskId) {
-		return tasks.restartTask(taskId);
+		return tasks.restartTask(tasks.checkTask(taskId));
 	}
 
 	@At("/do/comment/add")
@@ -120,22 +121,22 @@ public class AjaxModule {
 
 	@At("/task/set/text")
 	public Task doSetTaskTitle(@Param("tid") String taskId, @Param("txt") String newText) {
-		return tasks.setTaskText(taskId, newText);
+		return tasks.setText(tasks.checkTask(taskId), newText);
 	}
 
 	@At("/task/set/labels")
 	public Task doSetTaskLabels(@Param("tid") String taskId, @Param("lbs") String[] lbs) {
-		return tasks.setTaskLabels(taskId, lbs);
+		return tasks.setLabels(tasks.checkTask(taskId), lbs);
 	}
 
 	@At("/task/set/owner")
 	public Task doSetTaskOwner(@Param("tid") String taskId, @Param("ow") String ownerName) {
-		return tasks.setTaskOwner(taskId, ownerName);
+		return tasks.setOwner(tasks.checkTask(taskId), ownerName);
 	}
 
 	@At("/task/set/parent")
 	public Task doSetTaskParent(@Param("tids") String[] taskIds, @Param("pid") String parentId) {
-		tasks.setTasksParent(parentId, taskIds);
+		tasks.setParentTask(tasks.checkTask(parentId), tasks.checkTasks(taskIds));
 		return tasks.getTask(parentId);
 	}
 
@@ -152,7 +153,7 @@ public class AjaxModule {
 		if (Strings.isBlank(t.getParentId()))
 			return t;
 		Task p = tasks.checkTask(t.getParentId());
-		tasks.setTasksParent(p.getParentId(), t.get_id());
+		tasks.setParentTask(p, t);
 		return t;
 	}
 
@@ -270,7 +271,7 @@ public class AjaxModule {
 	@At("/stack/do/watch")
 	public TaskStack doWatchStack(	@Param("s") String stackName,
 									@Attr(scope = Scope.SESSION, value = Webs.ME) User me) {
-		return tasks.watchStack(stackName, me.getName());
+		return tasks.watchStack(tasks.checkStack(stackName), me.getName());
 	}
 
 	/**
@@ -285,7 +286,7 @@ public class AjaxModule {
 	@At("/stack/do/unwatch")
 	public TaskStack doUnwatchStack(@Param("s") String stackName,
 									@Attr(scope = Scope.SESSION, value = Webs.ME) User me) {
-		return tasks.unwatchStack(stackName, me.getName());
+		return tasks.unwatchStack(tasks.checkStack(stackName), me.getName());
 	}
 
 	@AdaptBy(type = JsonAdaptor.class)

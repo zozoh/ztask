@@ -7,6 +7,8 @@ import org.nutz.mvc.NutConfig;
 import org.nutz.mvc.Setup;
 import org.nutz.ztask.ZTask;
 import org.nutz.ztask.api.InitService;
+import org.nutz.ztask.api.TimerSchedule;
+import org.nutz.ztask.thread.AbstractAtom;
 
 /**
  * 启动和关闭服务时的设定
@@ -27,14 +29,33 @@ public class ZTaskSetup implements Setup {
 		// 初始化数据
 		ioc.get(InitService.class).init();
 
+		// 启动后台进程
+		AbstractAtom[] atoms = new AbstractAtom[3];
+		atoms[0] = ioc.get(AbstractAtom.class, "schd_update");
+		atoms[1] = ioc.get(AbstractAtom.class, "timer_run");
+		atoms[2] = ioc.get(AbstractAtom.class, "send_mail");
+
+		for (int i = 0; i < atoms.length; i++) {
+			if (null != atoms[i]) {
+				Thread t = new Thread(atoms[i], atoms[i].name());
+				t.start();
+			}
+		}
+
+		// 初始化结束
 		if (log.isInfoEnabled())
 			log.info("... done for init zTask");
 	}
 
 	@Override
 	public void destroy(NutConfig config) {
+		// 关闭并通知
+		Ioc ioc = config.getIoc();
+		TimerSchedule glock = ioc.get(TimerSchedule.class, "schedule");
+		glock.stop();
+
 		if (log.isInfoEnabled())
-			log.info("destroy zTask");
+			log.info("zTask is down");
 	}
 
 }

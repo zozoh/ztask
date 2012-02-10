@@ -3,7 +3,7 @@ package org.nutz.ztask.api;
 import java.util.Date;
 
 import org.junit.Test;
-import org.nutz.ztask.util.ZTasks;
+import org.nutz.lang.Times;
 
 import static org.junit.Assert.*;
 import static org.nutz.ztask.api.TaskQuery.*;
@@ -30,7 +30,7 @@ public class TaskQueryTest {
 		ASTR(tq.qCreaters(), "abc");
 		ASTR(tq.qOwners(), "x", "y", "z");
 		ASTR(tq.qLabels(), "A", "B", "C");
-		AD(tq.qTimeScope(), ZTasks.week(0));
+		AD(tq.qTimeScope(), Times.week(0));
 		AS(tq.qStatus(), TaskStatus.DONE, TaskStatus.HUNGUP);
 
 	}
@@ -126,7 +126,7 @@ public class TaskQueryTest {
 		ASTR(tq.qCreaters());
 		ASTR(tq.qOwners());
 		ASTR(tq.qLabels());
-		AD(tq.qTimeScope(), ZTasks.weeks(-1, 4));
+		AD(tq.qTimeScope(), Times.weeks(-1, 4));
 		AS(tq.qStatus());
 
 		tq = NEW("&W(-1, 0)");
@@ -136,7 +136,7 @@ public class TaskQueryTest {
 		ASTR(tq.qCreaters());
 		ASTR(tq.qOwners());
 		ASTR(tq.qLabels());
-		AD(tq.qTimeScope(), ZTasks.weeks(-1, 0));
+		AD(tq.qTimeScope(), Times.weeks(-1, 0));
 		AS(tq.qStatus());
 
 		tq = NEW("&W(0)");
@@ -146,7 +146,7 @@ public class TaskQueryTest {
 		ASTR(tq.qCreaters());
 		ASTR(tq.qOwners());
 		ASTR(tq.qLabels());
-		AD(tq.qTimeScope(), ZTasks.week(0));
+		AD(tq.qTimeScope(), Times.week(0));
 		AS(tq.qStatus());
 
 		tq = NEW("abc");

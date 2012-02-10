@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.nutz.lang.Strings;
+import org.nutz.lang.Times;
 import org.nutz.mongo.annotation.Co;
 import org.nutz.mongo.annotation.CoField;
 import org.nutz.mongo.annotation.CoId;
@@ -362,7 +363,7 @@ public class Task {
 								prefix,
 								Strings.alignLeft(text, 48, ' '),
 								ZTasks.isBlankStack(stack) ? "" : " {" + stack + "} ",
-								ZTasks.SD(lastModified));
+								Times.sD(lastModified));
 	}
 
 	public String toString() {

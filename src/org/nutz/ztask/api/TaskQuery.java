@@ -7,6 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.nutz.lang.Strings;
+import org.nutz.lang.Times;
 import org.nutz.ztask.util.ZTasks;
 
 /**
@@ -201,9 +202,9 @@ public class TaskQuery {
 				if (null != re) {
 					String[] ss = Strings.splitIgnoreBlank(re[2], ",");
 					if (1 == ss.length)
-						timescope = ZTasks.week(Integer.parseInt(ss[0]));
+						timescope = Times.week(Integer.parseInt(ss[0]));
 					else
-						timescope = ZTasks.weeks(Integer.parseInt(ss[0]), Integer.parseInt(ss[1]));
+						timescope = Times.weeks(Integer.parseInt(ss[0]), Integer.parseInt(ss[1]));
 				}
 			}
 

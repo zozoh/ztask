@@ -4,8 +4,10 @@ import java.util.List;
 
 import org.nutz.ioc.Ioc;
 import org.nutz.lang.Lang;
+import org.nutz.lang.Times;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
+import org.nutz.mail.MailQueue;
 import org.nutz.mongo.MongoConnector;
 import org.nutz.mongo.util.MCur;
 import org.nutz.mongo.util.Moo;
@@ -16,10 +18,10 @@ import org.nutz.ztask.api.HookType;
 import org.nutz.ztask.api.Hooking;
 import org.nutz.ztask.api.LabelService;
 import org.nutz.ztask.api.Task;
+import org.nutz.ztask.api.TaskReportor;
 import org.nutz.ztask.api.TaskService;
 import org.nutz.ztask.api.UserService;
 import org.nutz.ztask.util.Err;
-import org.nutz.ztask.util.ZTasks;
 
 /**
  * 本实现将 Hook 的信息存放在 MongoDB 的一个名为 "hook" 的集合里
@@ -42,10 +44,14 @@ public class MongoHookService extends AbstractMongoService implements HookServic
 
 	private LabelService labels;
 
+	private MailQueue mails;
+	
+	private TaskReportor reportor;
+
 	private Ioc ioc;
 
 	@Override
-	public Hooking doHook(HookType htp, Task t) {
+	public Hooking doHook(HookType htp, Task t, Object refer) {
 		List<? extends Hook> list = this.getHooks(htp);
 		if (list.isEmpty())
 			return null;
@@ -56,12 +62,15 @@ public class MongoHookService extends AbstractMongoService implements HookServic
 		ing.setTasks(tasks);
 		ing.setLabels(labels);
 		ing.setUsers(users);
+		ing.setMails(mails);
+		ing.setReportor(reportor);
 		ing.setIoc(ioc);
 		ing.set("$dao", dao);
+		ing.set("$refer", refer);
 		ing.setList(list.toArray(new Hook[list.size()]));
 
 		// 循环调用
-		ing.setStartTime(ZTasks.now());
+		ing.setStartTime(Times.now());
 		if (log.isDebugEnabled())
 			log.debugf("Begin Hooking : %s", ing);
 
@@ -82,7 +91,7 @@ public class MongoHookService extends AbstractMongoService implements HookServic
 		}
 
 		// 结束
-		ing.setEndTime(ZTasks.now());
+		ing.setEndTime(Times.now());
 		if (log.isDebugEnabled())
 			log.debugf("End Hooking : %s", ing);
 

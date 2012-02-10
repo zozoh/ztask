@@ -245,47 +245,59 @@ public interface TaskService extends AbstractService {
 	/**
 	 * 修改一个任务对象的所有者
 	 * 
-	 * @param taskId
-	 *            任务的 ID
+	 * @param t
+	 *            任务
 	 * @param ownerName
 	 *            任务新的所有者
 	 * @return 修改后的任务对象，null 表示该任务不存在
 	 */
-	Task setTaskOwner(String taskId, String ownerName);
+	Task setOwner(Task t, String ownerName);
 
 	/**
 	 * 修改一个任务对象的标题，同时也会改变最后的修改时间
 	 * 
-	 * @param taskId
-	 *            任务的 ID
+	 * @param t
+	 *            任务
 	 * @param newTitle
 	 *            新标题
 	 * @return 修改后的任务对象，null 表示该任务不存在
 	 */
-	Task setTaskText(String taskId, String newTitle);
+	Task setText(Task t, String newTitle);
 
 	/**
 	 * 修改一组任务的父任务
 	 * 
 	 * @param parentId
 	 *            新的任务父ID
-	 * @param taskIds
-	 *            任务的 ID 列表
+	 * @param ts
+	 *            任务列表
 	 * 
 	 * @return 进行了修改后的任务对象
 	 */
-	List<Task> setTasksParent(String parentId, String... taskIds);
+	List<Task> setParent(String parentId, Task... ts);
+
+	/**
+	 * 修改一组任务的父任务
+	 * 
+	 * @param p
+	 *            新的任务父
+	 * @param ts
+	 *            任务列表
+	 * 
+	 * @return 进行了修改后的任务对象
+	 */
+	List<Task> setParentTask(Task p, Task... ts);
 
 	/**
 	 * 修改一个任务对象的标签，它会更新任务所有的标签
 	 * 
-	 * @param taskId
-	 *            任务的 ID
+	 * @param t
+	 *            任务
 	 * @param labels
 	 *            标签数组
 	 * @return 修改后的任务对象，null 表示该任务不存在
 	 */
-	Task setTaskLabels(String taskId, String[] labels);
+	Task setLabels(Task t, String[] labels);
 
 	/**
 	 * 根据自己所有的子孙节点，计算自己节点的数量和状态
@@ -322,15 +334,15 @@ public interface TaskService extends AbstractService {
 	 * <p>
 	 * 并且，它会设置本任务的状态为 ING, 并重新计算该栈的任务数量
 	 * 
-	 * @param taskId
-	 *            任务ID
+	 * @param t
+	 *            任务
 	 * @param stackName
 	 *            堆栈名
 	 * @return 修改后的任务对象，null 表示该任务不存在
 	 * @throws org.nutz.ztask.util.Err.S
 	 *             #NO_EXISTS
 	 */
-	Task pushToStack(String taskId, String stackName);
+	Task pushToStack(Task t, String stackName);
 
 	/**
 	 * 将一个任务压入某一个堆栈，即，记录这个任务所属的堆栈。
@@ -380,20 +392,20 @@ public interface TaskService extends AbstractService {
 	/**
 	 * 将一个任务置成挂起状态
 	 * 
-	 * @param taskId
-	 *            任务 ID
+	 * @param t
+	 *            任务
 	 * @return 任务对象
 	 */
-	Task hungupTask(String taskId);
+	Task hungupTask(Task t);
 
 	/**
 	 * 将一个任务置成非挂起状态
 	 * 
-	 * @param taskId
-	 *            任务 ID
+	 * @param t
+	 *            任务
 	 * @return 任务对象
 	 */
-	Task restartTask(String taskId);
+	Task restartTask(Task t);
 
 	/**
 	 * @return 系统中所有的堆栈对象
@@ -478,41 +490,41 @@ public interface TaskService extends AbstractService {
 	/**
 	 * 更新堆栈得父堆栈，如果不存在则抛错
 	 * 
-	 * @param stackName
-	 *            任务堆栈名称
+	 * @param s
+	 *            任务堆栈
 	 * @param parentName
 	 *            父堆栈的名称
 	 * @return 堆栈对象
 	 * @throws org.nutz.ztask.util.Err.S
 	 *             #NO_EXISTS
 	 */
-	TaskStack setStackParent(String stackName, String parentName);
+	TaskStack setStackParent(TaskStack s, String parentName);
 
 	/**
 	 * 将一个用户设置成本堆栈的关注者
 	 * 
-	 * @param stackName
-	 *            堆栈名
+	 * @param s
+	 *            堆栈
 	 * @param watcherName
 	 *            关注者名
 	 * @return 堆栈对象
 	 * @throws org.nutz.ztask.util.Err.S
 	 *             #NO_EXISTS
 	 */
-	TaskStack watchStack(String stackName, String watcherName);
+	TaskStack watchStack(TaskStack s, String watcherName);
 
 	/**
 	 * 取消一个用户对某个堆栈的关注
 	 * 
-	 * @param stackName
-	 *            堆栈名
+	 * @param s
+	 *            堆栈
 	 * @param watcherName
 	 *            关注者名
 	 * @return 堆栈对象
 	 * @throws org.nutz.ztask.util.Err.S
 	 *             #NO_EXISTS
 	 */
-	TaskStack unwatchStack(String stackName, String watcherName);
+	TaskStack unwatchStack(TaskStack s, String watcherName);
 
 	/**
 	 * 移除一个任务堆栈
@@ -524,6 +536,8 @@ public interface TaskService extends AbstractService {
 	TaskStack removeStack(String stackName);
 
 	/**
+	 * 取得整个数据库的全局配置参数，这个函数绝地不能返回 null，如果没有信息，也要 new 一个默认的回去
+	 * 
 	 * @return 整个数据库的全局配置参数
 	 */
 	GInfo getGlobalInfo();

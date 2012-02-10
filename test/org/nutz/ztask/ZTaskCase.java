@@ -9,11 +9,11 @@ import org.junit.Before;
 import org.nutz.ioc.Ioc;
 import org.nutz.ioc.impl.NutIoc;
 import org.nutz.ioc.loader.json.JsonLoader;
+import org.nutz.lang.Times;
 import org.nutz.mongo.MongoConnector;
 import org.nutz.mongo.MongoDao;
 import org.nutz.ztask.api.Task;
 import org.nutz.ztask.api.TaskStack;
-import org.nutz.ztask.util.ZTasks;
 import org.nutz.ztask.web.ZTaskConfig;
 
 public class ZTaskCase {
@@ -46,8 +46,8 @@ public class ZTaskCase {
 	}
 	
 	public static void AD(String b, String e, Date[] ds) {
-		assertEquals(b, ZTasks.SDT(ds[0]));
-		assertEquals(e, ZTasks.SDT(ds[1]));
+		assertEquals(b, Times.sDT(ds[0]));
+		assertEquals(e, Times.sDT(ds[1]));
 	}
 
 	protected long countStack() {

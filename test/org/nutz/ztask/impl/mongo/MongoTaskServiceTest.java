@@ -23,15 +23,15 @@ public class MongoTaskServiceTest extends ZTaskCase {
 		TaskStack s = tasks.createStackIfNoExistis("S", "zzh");
 		assertNull(s.getWatchers());
 
-		tasks.watchStack(s.getName(), "u0");
-		tasks.watchStack(s.getName(), "u1");
-		tasks.watchStack(s.getName(), "u2");
+		tasks.watchStack(s, "u0");
+		tasks.watchStack(s, "u1");
+		tasks.watchStack(s, "u2");
 		assertEquals(3, tasks.getStack(s.getName()).getWatchers().length);
 		assertEquals("u0", tasks.getStack(s.getName()).getWatchers()[0]);
 		assertEquals("u1", tasks.getStack(s.getName()).getWatchers()[1]);
 		assertEquals("u2", tasks.getStack(s.getName()).getWatchers()[2]);
 
-		tasks.unwatchStack(s.getName(), "u1");
+		tasks.unwatchStack(s, "u1");
 		assertEquals(2, tasks.getStack(s.getName()).getWatchers().length);
 		assertEquals("u0", tasks.getStack(s.getName()).getWatchers()[0]);
 		assertEquals("u2", tasks.getStack(s.getName()).getWatchers()[1]);
@@ -221,7 +221,7 @@ public class MongoTaskServiceTest extends ZTaskCase {
 		Task a = tasks.createTask(t_u("A", "zzh"));
 		Task b = tasks.createTask(t_u(a, "B", "zzh"));
 
-		tasks.setTasksParent(null, b.get_id());
+		tasks.setParentTask(null, b);
 		assertNull(tasks.getTask(b.get_id()).getParentId());
 	}
 
@@ -384,19 +384,19 @@ public class MongoTaskServiceTest extends ZTaskCase {
 		assertEquals("zzh", tasks.getTask(a.get_id()).getCreater());
 		assertEquals("zzh", tasks.getTask(a.get_id()).getOwner());
 
-		tasks.pushToStack(a.get_id(), s.getName());
+		tasks.pushToStack(a, s.getName());
 		assertEquals("zzh", tasks.getTask(a.get_id()).getCreater());
 		assertEquals("abc", tasks.getTask(a.get_id()).getOwner());
 
-		tasks.popFromStack(a.get_id(), false);
+		tasks.popFromStack(a, false);
 		assertEquals("zzh", tasks.getTask(a.get_id()).getCreater());
 		assertEquals("zzh", tasks.getTask(a.get_id()).getOwner());
 
-		tasks.pushToStack(a.get_id(), s.getName());
+		tasks.pushToStack(a, s.getName());
 		assertEquals("zzh", tasks.getTask(a.get_id()).getCreater());
 		assertEquals("abc", tasks.getTask(a.get_id()).getOwner());
 
-		tasks.popFromStack(a.get_id(), true);
+		tasks.popFromStack(a, true);
 		assertEquals("zzh", tasks.getTask(a.get_id()).getCreater());
 		assertEquals("abc", tasks.getTask(a.get_id()).getOwner());
 	}
@@ -410,7 +410,7 @@ public class MongoTaskServiceTest extends ZTaskCase {
 		assertNull(tasks.getTask(a.get_id()).getStartAt());
 		assertNull(tasks.getTask(a.get_id()).getHungupAt());
 
-		a = tasks.pushToStack(a.get_id(), s.getName());
+		a = tasks.pushToStack(a, s.getName());
 		assertNotNull(tasks.getTask(a.get_id()).getPushAt());
 		assertNull(tasks.getTask(a.get_id()).getPopAt());
 		assertNull(tasks.getTask(a.get_id()).getStartAt());
@@ -422,19 +422,19 @@ public class MongoTaskServiceTest extends ZTaskCase {
 		assertNull(tasks.getTask(a.get_id()).getStartAt());
 		assertNull(tasks.getTask(a.get_id()).getHungupAt());
 
-		a = tasks.pushToStack(a.get_id(), s.getName());
+		a = tasks.pushToStack(a, s.getName());
 		assertNotNull(tasks.getTask(a.get_id()).getPushAt());
 		assertNull(tasks.getTask(a.get_id()).getPopAt());
 		assertNull(tasks.getTask(a.get_id()).getStartAt());
 		assertNotNull(tasks.getTask(a.get_id()).getHungupAt());
 
-		a = tasks.hungupTask(a.get_id());
+		a = tasks.hungupTask(a);
 		assertNotNull(tasks.getTask(a.get_id()).getPushAt());
 		assertNull(tasks.getTask(a.get_id()).getPopAt());
 		assertNull(tasks.getTask(a.get_id()).getStartAt());
 		assertNotNull(tasks.getTask(a.get_id()).getHungupAt());
 
-		a = tasks.restartTask(a.get_id());
+		a = tasks.restartTask(a);
 		assertNotNull(tasks.getTask(a.get_id()).getPushAt());
 		assertNull(tasks.getTask(a.get_id()).getPopAt());
 		assertNotNull(tasks.getTask(a.get_id()).getStartAt());
@@ -452,7 +452,7 @@ public class MongoTaskServiceTest extends ZTaskCase {
 		TaskStack s = tasks.createStackIfNoExistis("XX", "zzh");
 		Task a = tasks.createTask(t("A"));
 
-		a = tasks.pushToStack(a.get_id(), s.getName());
+		a = tasks.pushToStack(a, s.getName());
 		assertEquals(TaskStatus.HUNGUP, a.getStatus());
 
 		a = tasks.popFromStack(a.get_id(), true);
@@ -520,7 +520,7 @@ public class MongoTaskServiceTest extends ZTaskCase {
 		Task c = tasks.createTask(t(a, "C"));
 		Task d = tasks.createTask(t("D"));
 
-		tasks.pushToStack(c.get_id(), stack.getName());
+		tasks.pushToStack(c, stack.getName());
 		assertEquals(TaskStatus.NEW, tasks.getTask(b.get_id()).getStatus());
 		assertEquals(2, tasks.getTask(a.get_id()).getNumberAll());
 		assertEquals(1, tasks.getTask(a.get_id()).getNumberProcessing());
@@ -560,7 +560,7 @@ public class MongoTaskServiceTest extends ZTaskCase {
 	public void test_set_self_parent() {
 		Task a = tasks.createTask(t("A"));
 		try {
-			tasks.setTasksParent(a.get_id(), a.get_id());
+			tasks.setParentTask(a, a);
 			fail();
 		}
 		catch (WebException e) {
@@ -574,9 +574,9 @@ public class MongoTaskServiceTest extends ZTaskCase {
 		Task b = tasks.createTask(t("I am B"));
 		Task c = tasks.createTask(t("Hello world!"));
 
-		tasks.setTaskOwner(a.get_id(), "zzh");
-		tasks.setTaskOwner(b.get_id(), "zzh");
-		tasks.setTaskOwner(c.get_id(), "wendal");
+		tasks.setOwner(a, "zzh");
+		tasks.setOwner(b, "zzh");
+		tasks.setOwner(c, "wendal");
 
 		// 判断一下 owner
 		List<Task> list = tasks.queryTasks(TaskQuery.NEW("@(zzh)").asc());
@@ -599,7 +599,7 @@ public class MongoTaskServiceTest extends ZTaskCase {
 		assertEquals(0, tasks.getStack("Y").getCount());
 
 		// 压入 X ...
-		tasks.pushToStack(t.get_id(), "X");
+		tasks.pushToStack(t, "X");
 
 		// 验证 ...
 		assertEquals(1, tasks.getTasksInStack("X").size());
@@ -609,7 +609,7 @@ public class MongoTaskServiceTest extends ZTaskCase {
 		assertEquals(TaskStatus.HUNGUP, tasks.getTask(t.get_id()).getStatus());
 
 		// 压入 Y ...
-		tasks.pushToStack(t.get_id(), "Y");
+		tasks.pushToStack(t, "Y");
 
 		// 验证 ...
 		assertEquals(0, tasks.getTasksInStack("X").size());
@@ -619,7 +619,7 @@ public class MongoTaskServiceTest extends ZTaskCase {
 		assertEquals(TaskStatus.HUNGUP, tasks.getTask(t.get_id()).getStatus());
 
 		// 弹出
-		tasks.popFromStack(t.get_id(), true);
+		tasks.popFromStack(t, true);
 
 		// 验证 ...
 		assertEquals(0, tasks.getTasksInStack("X").size());
@@ -629,8 +629,8 @@ public class MongoTaskServiceTest extends ZTaskCase {
 		assertEquals(TaskStatus.DONE, tasks.getTask(t.get_id()).getStatus());
 
 		// 压入，再弹出
-		tasks.pushToStack(t.get_id(), "X");
-		tasks.popFromStack(t.get_id(), false);
+		tasks.pushToStack(t, "X");
+		tasks.popFromStack(t, false);
 
 		// 验证 ...
 		assertEquals(0, tasks.getTasksInStack("X").size());
@@ -652,9 +652,9 @@ public class MongoTaskServiceTest extends ZTaskCase {
 		assertEquals(4, tops.size());
 
 		// 调整树结构
-		tasks.setTasksParent(t.get_id(), t1.get_id());
-		tasks.setTasksParent(t.get_id(), t2.get_id());
-		tasks.setTasksParent(t1.get_id(), t11.get_id());
+		tasks.setParent(t.get_id(), t1);
+		tasks.setParent(t.get_id(), t2);
+		tasks.setParent(t1.get_id(), t11);
 
 		// 判断树节点
 		tops = tasks.getTasks(null, null);

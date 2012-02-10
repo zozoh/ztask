@@ -113,7 +113,7 @@ public class MongoInitService extends AbstractMongoService implements InitServic
 			// 不存在，创建
 			if (null == s) {
 				s = tasks.createStackIfNoExistis(stackName, u.getName());
-				tasks.watchStack(s.getName(), u.getName());
+				tasks.watchStack(s, u.getName());
 				newID = s.get_id();
 			}
 			// 存在，移除索引
@@ -123,7 +123,7 @@ public class MongoInitService extends AbstractMongoService implements InitServic
 
 			// 如果堆栈以 "-" 开头
 			if (!isTop && null != prev) {
-				tasks.setStackParent(s.getName(), prev.getName());
+				tasks.setStackParent(s, prev.getName());
 			}
 			// 否则记录一下以便后续使用
 			else {
@@ -166,6 +166,7 @@ public class MongoInitService extends AbstractMongoService implements InitServic
 		dao.create(TaskStack.class, false);
 		dao.create(Label.class, false);
 		dao.create(GInfo.class, false);
+		dao.create(MongoMailObj.class, false);
 		if (log.isDebugEnabled())
 			log.debug("collections checked");
 	}

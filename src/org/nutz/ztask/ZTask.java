@@ -19,7 +19,7 @@ public class ZTask {
 	 * @return zTask 项目的版本号
 	 */
 	public static String version() {
-		return "1.a.2";
+		return "1.a.3";
 	}
 
 }

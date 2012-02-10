@@ -621,6 +621,19 @@ public class Moo extends MoChain {
 	}
 
 	/**
+	 * 创建链表，同时增加一个 inc 节点
+	 * 
+	 * @param field
+	 *            字段名
+	 * @param n
+	 *            自增值
+	 * @return 链表对象
+	 */
+	public static Moo INC(String field, int n) {
+		return NEW().inc(field, n);
+	}
+
+	/**
 	 * 创建链表的静态方法
 	 * 
 	 * @return 链表对象

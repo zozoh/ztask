@@ -11,6 +11,7 @@
    -  : liuhe     : 123456   : he.liu@danoonetworks.com          : LiuHe
    -  : livia     : 123456   : livia.zhang@danoonetworks.com     : Livia.Zhang
    -  : nwang     : 123456   : ning.wang@danoonetworks.com       : Ning.Wang
+   -  : strato    : 123456   : strato@danoonetworks.com          : Project Strato
    -  : superman  : 123456   : manchao.wang@danoonetworks.com    : ManChao.Wang
    S  : wendal    : 123456   : zhencheng.chen@danoonetworks.com  : Wendal.Chen
    -  : wangq     : 123456   : qi.wang@danoonetworks.com         : Qi.Wang
