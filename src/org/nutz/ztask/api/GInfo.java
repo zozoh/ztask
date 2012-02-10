@@ -41,7 +41,7 @@ public class GInfo {
 	 * SMTP 服务的信息
 	 */
 	@CoField
-	private Gsmtp smtp;
+	private SmtpInfo smtp;
 
 	/**
 	 * 时间戳
@@ -132,11 +132,11 @@ public class GInfo {
 		this.formats = formats;
 	}
 
-	public Gsmtp getSmtp() {
+	public SmtpInfo getSmtp() {
 		return smtp;
 	}
 
-	public void setSmtp(Gsmtp smtp) {
+	public void setSmtp(SmtpInfo smtp) {
 		this.smtp = smtp;
 	}
 

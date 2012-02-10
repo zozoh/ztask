@@ -7,7 +7,7 @@ import org.apache.commons.mail.SimpleEmail;
 import org.nutz.lang.Strings;
 import org.nutz.lang.Times;
 import org.nutz.mail.MailObj;
-import org.nutz.ztask.api.Gsmtp;
+import org.nutz.ztask.api.SmtpInfo;
 import org.nutz.ztask.api.User;
 import org.nutz.ztask.impl.mongo.MongoMailObj;
 
@@ -56,7 +56,7 @@ public abstract class ZTasks {
 	 *            收信人
 	 * @return 发送结果，null 表失败
 	 */
-	public static String sendTextMail(Gsmtp smtp, String subject, String text, List<User> usrs) {
+	public static String sendTextMail(SmtpInfo smtp, String subject, String text, List<User> usrs) {
 
 		if (!smtp.isAvaliable())
 			return null;

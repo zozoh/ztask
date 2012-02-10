@@ -8,7 +8,7 @@ import org.nutz.log.Logs;
 import org.nutz.mail.AfterEach;
 import org.nutz.mail.EachMail;
 import org.nutz.mail.MailObj;
-import org.nutz.ztask.api.Gsmtp;
+import org.nutz.ztask.api.SmtpInfo;
 import org.nutz.ztask.api.User;
 import org.nutz.ztask.util.ZTasks;
 
@@ -33,7 +33,7 @@ public class SendMailAtom extends AbstractAtom {
 			return inter();
 		}
 
-		final Gsmtp smtp = tasks.getGlobalInfo().getSmtp();
+		final SmtpInfo smtp = tasks.getGlobalInfo().getSmtp();
 		if (smtp == null || !smtp.isAvaliable()) {
 			if (log.isWarnEnabled())
 				log.warn("SMTP not avaliable!");
