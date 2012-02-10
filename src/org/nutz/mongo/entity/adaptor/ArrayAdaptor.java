@@ -5,14 +5,22 @@ import java.lang.reflect.Array;
 import org.nutz.castor.Castors;
 import org.nutz.lang.Lang;
 import org.nutz.lang.Mirror;
+import org.nutz.log.Log;
+import org.nutz.log.Logs;
 import org.nutz.mongo.Mongos;
 import org.nutz.mongo.entity.FieldAdaptor;
+import org.nutz.mongo.entity.MongoEntity;
+import org.nutz.mongo.entity.StaticMongoEntity;
 
 import com.mongodb.BasicDBList;
+import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import com.mongodb.DBRef;
 
 public class ArrayAdaptor extends FieldAdaptor {
 
+	private static final Log log = Logs.get();
+	
 	@Override
 	public Object adaptForGet(Object val, boolean check) {
 		// 容忍 null
@@ -32,8 +40,25 @@ public class ArrayAdaptor extends FieldAdaptor {
 		for (int i = 0; i < array.length; i++) {
 			Object ele = Array.get(val, i);
 			// 如果是POJO或者容器
-			if (Mirror.me(ele.getClass()).isObj())
-				array[i] = Mongos.obj2dbo(ele);
+			if (Mirror.me(ele.getClass()).isObj()) {
+				if (field.isRef()) {
+					MongoEntity en = Mongos.entity(val.getClass().getComponentType());
+					DBObject dbo = en.toDBObject(ele);
+					if (dbo.containsField("_id")) {
+						array[i] = new DBRef(null, en.getCollectionName(null), dbo.get("_id"));
+						continue;
+					} else {
+						if (log.isWarnEnabled())
+							log.warn("!!obj without _id but using as ref field value!! fallback to embed doc!!");
+					}
+				} else {
+					MongoEntity en = Mongos.entity(val.getClass().getComponentType());
+					if (en instanceof StaticMongoEntity)
+						array[i] = en.toDBObject(ele);
+					else
+						array[i] = Mongos.obj2dbo(ele);
+				}
+			}
 			// 否则直接设置
 			else {
 				array[i] = ele;
@@ -68,11 +93,20 @@ public class ArrayAdaptor extends FieldAdaptor {
 			if (null != v) {
 				// 如果是 DBObject
 				if (v instanceof DBObject) {
-					o = Lang.map2Object(((DBObject) v).toMap(), eleType);
+					MongoEntity en = Mongos.entity(eleType);
+					if (en instanceof StaticMongoEntity) {
+						o = en.toObject(new BasicDBObject(((DBObject)v).toMap()));
+					}
+					else
+						o = Lang.map2Object(((DBObject) v).toMap(), eleType);
 				}
 				// 否则就强制转换一下
 				else {
-					o = Castors.me().castTo(v, eleType);
+					//TODO
+					if (v instanceof DBRef && field.isRef()) {
+						o = unpackRef((DBRef)v, eleType);
+					} else
+						o = Castors.me().castTo(v, eleType);
 				}
 			}
 			Array.set(array, i, o);

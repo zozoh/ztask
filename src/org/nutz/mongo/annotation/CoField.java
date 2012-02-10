@@ -19,4 +19,8 @@ public @interface CoField {
 
 	String value() default "";
 
+	/*ref doc or embem doc*/
+	boolean ref() default false;
+	
+	boolean lazy() default false;
 }

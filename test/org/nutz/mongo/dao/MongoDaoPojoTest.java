@@ -12,6 +12,7 @@ import org.nutz.lang.util.Callback;
 import org.nutz.mongo.MongoCase;
 import org.nutz.mongo.dao.pojo.CappedPet;
 import org.nutz.mongo.dao.pojo.Pet;
+import org.nutz.mongo.dao.pojo.Pet2;
 import org.nutz.mongo.dao.pojo.PetType;
 import org.nutz.mongo.dao.pojo.SInner;
 import org.nutz.mongo.dao.pojo.SObj;
@@ -593,5 +594,45 @@ public class MongoDaoPojoTest extends MongoCase {
 		long size = dao.count(CappedPet.class, null);
 		System.out.println("CappedPet size=" + size);
 		assertTrue(100 >= size);
+	}
+	
+	@Test
+	public void test_ref() {
+		Pet embed = Pet.AGE("embed", 10, 1000);
+		Pet lazy = Pet.AGE("LAZY", 20, 2000);
+		Pet ref = Pet.AGE("REF", 30, 3000);
+		dao.create(Pet.class, true);
+//		dao.save(embed);
+		dao.save(lazy);
+		dao.save(ref);
+		assertEquals(2, dao.count(Pet.class, null));
+		
+		dao.create(Pet2.class, true);
+		Pet2 pet2 = new Pet2();
+		pet2.setName("XXX");
+		pet2.setId((int)System.currentTimeMillis());
+		pet2.setEmbedPet(embed);
+		pet2.setLazyPet(lazy);
+		pet2.setRefPet(ref);
+		pet2.setPets(new Pet[]{embed,embed});
+		pet2.setRefPets(new Pet[]{ref, lazy});
+		dao.save(pet2);
+		assertTrue(dao.count(Pet2.class, null) == 1);
+		Pet2 p = dao.findOne(Pet2.class, null);
+		assertNotNull(p);
+//		assertEquals(embed.getId(), p.getEmbedPet().getId());
+		assertEquals(lazy.getId(), p.getLazyPet().getId());
+		assertEquals(ref.getId(), p.getRefPet().getId());
+		assertEquals("embed", p.getEmbedPet().getName());
+		assertEquals(null, p.getLazyPet().getName());
+		assertEquals("REF", p.getRefPet().getName());
+
+		assertEquals(2, p.getPets().length);
+		assertEquals("embed", p.getPets()[0].getName());
+		assertEquals("embed", p.getPets()[1].getName());
+		
+		assertEquals(2, p.getRefPets().length);
+		assertEquals("REF", p.getRefPets()[0].getName());
+		assertEquals("LAZY", p.getRefPets()[1].getName());
 	}
 }

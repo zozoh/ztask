@@ -14,6 +14,9 @@ import org.nutz.lang.inject.Injecting;
 import org.nutz.mongo.Mongos;
 import org.nutz.mongo.annotation.CoIdType;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBRef;
+
 /**
  * 将字段与 DBObject 中的字段进行适配
  * 
@@ -145,5 +148,18 @@ public class FieldAdaptor {
 
 	public String toString() {
 		return String.format("%s:%s", this.getClass().getName(), field);
+	}
+	
+//	public DBRef packRef(Object val) {
+//		
+//	}
+	
+	public Object unpackRef(DBRef ref, Class<?> eleType) {
+		MongoEntity en = Mongos.entity(eleType);
+		if (field.isLazy()) {
+			return en.toObject(new BasicDBObject("_id", ref.getId()));
+		} else {
+			return en.toObject(ref.fetch());
+		}
 	}
 }
