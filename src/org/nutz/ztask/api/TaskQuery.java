@@ -184,7 +184,7 @@ public class TaskQuery {
 			if (text.length() > 0) {
 				re = find("(#[(])([^)]+)([)])");
 				if (null != re) {
-					labels = Strings.splitIgnoreBlank(re[2], ZTasks.REG_NOWORD);
+					labels = Strings.splitIgnoreBlank(re[2], "[ \t\n\r,:]");
 				}
 			}
 

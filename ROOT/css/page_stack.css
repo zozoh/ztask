@@ -8,3 +8,7 @@
 #stacks {
     background-color: #EEE;
 }
+
+#stacks .hierachy_block{
+    overflow-y: scroll;
+}

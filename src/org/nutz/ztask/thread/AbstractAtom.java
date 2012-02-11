@@ -5,17 +5,17 @@ import org.nutz.lang.Lang;
 import org.nutz.lang.Times;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
-import org.nutz.mail.MailQueue;
 import org.nutz.trans.Atom;
-import org.nutz.ztask.api.TaskService;
 import org.nutz.ztask.api.TimerSchedule;
-import org.nutz.ztask.api.UserService;
+import org.nutz.ztask.api.ZTaskFactory;
 
 public abstract class AbstractAtom implements Atom {
 
 	@Override
 	public void run() {
-		while (!schedule.isStop()) {
+		TimerSchedule schd = factory.schedule();
+		
+		while (!schd.isStop()) {
 			// 唤醒 ...
 			if (log.isInfoEnabled())
 				log.infof("up @ %s", Times.sDTms(Times.now()));
@@ -39,14 +39,14 @@ public abstract class AbstractAtom implements Atom {
 			if (log.isInfoEnabled())
 				log.infof("sleep %d ms...", interval);
 
-			synchronized (schedule) {
+			synchronized (schd) {
 				try {
 					// 等待一个固定的秒数
 					if (interval > 0)
-						schedule.wait(interval);
+						schd.wait(interval);
 					// 无限等待
 					else
-						schedule.wait();
+						schd.wait();
 				}
 				catch (InterruptedException e) {
 					throw Lang.wrapThrow(e);
@@ -65,31 +65,16 @@ public abstract class AbstractAtom implements Atom {
 	 * @return 要等待的时间(秒)，小于等于0 表示无限等待
 	 */
 	protected abstract long exec();
-
+	
 	/**
-	 * 注入:全局锁，存放在 Ioc 容器中的单例
-	 */
-	protected TimerSchedule schedule;
-
-	/**
-	 * 注入:任务访问接口
-	 */
-	protected TaskService tasks;
-
-	/**
-	 * 注入:用户服务访问接口
-	 */
-	protected UserService users;
-
-	/**
-	 * 注入: 访问邮件服务
-	 */
-	protected MailQueue mails;
-
-	/**
-	 * 注入: Ioc 容器本身
+	 * Ioc 容器接口
 	 */
 	protected Ioc ioc;
+
+	/**
+	 * 注入: 服务工厂接口
+	 */
+	protected ZTaskFactory factory;
 
 	/**
 	 * 构造函数: 日志接口

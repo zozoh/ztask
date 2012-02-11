@@ -33,14 +33,14 @@ public class SendMailAtom extends AbstractAtom {
 			return inter();
 		}
 
-		final SmtpInfo smtp = tasks.getGlobalInfo().getSmtp();
+		final SmtpInfo smtp = factory.htasks().getGlobalInfo().getSmtp();
 		if (smtp == null || !smtp.isAvaliable()) {
 			if (log.isWarnEnabled())
 				log.warn("SMTP not avaliable!");
 			return inter();
 		}
 
-		mails.each(new EachMail() {
+		factory.mails().each(new EachMail() {
 			public AfterEach doMail(MailObj mo) {
 				// 超过最大重试次数，删除
 				if (mo.getRetryCount() > 3)
@@ -49,7 +49,7 @@ public class SendMailAtom extends AbstractAtom {
 				List<User> usrs = new LinkedList<User>();
 				// 用户必须存在
 				for (String to : mo.getTos()) {
-					User u = users.get(to);
+					User u = factory.users().get(to);
 					if (null == u) {
 						if (log.isWarnEnabled())
 							log.warnf("Fail to find user '%s'", to);

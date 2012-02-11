@@ -19,7 +19,7 @@ function task_newer_appendTo(ele, opt) {
     html += '</div>';
     // Add to DOM
     var jNewer = $(html).appendTo(ele);
-    jNewer.find("textarea").toggleInput(z.msg("stack.new.tip"));
+    jNewer.find("textarea").toggleInput($.trim(z.msg("stack.new.tip")).replace(/[\n]/g," "));
 
     var opt = opt || {};
     task_newer_opt(jNewer, opt);
@@ -102,10 +102,10 @@ function task_newer_do() {
 }
 
 /**
- * 事件处理: 处理 newer 中的 textarea 事件，以便支持 shift + enter 快捷键
+ * 事件处理: 处理 newer 中的 textarea 事件，以便支持 Ctrl + enter 快捷键
  */
 function task_newer_on_keydown(e) {
-    if(e.which == 13 && window.keyboard.shift) {
+    if(e.which == 13 && window.keyboard.ctrl) {
         task_newer_do.apply(this);
         return false;
     }

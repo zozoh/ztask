@@ -15,18 +15,18 @@ public class ScheduleUpdateAtom extends AbstractAtom {
 	@Override
 	protected long exec() {
 		// 得到信息
-		GInfo info = tasks.getGlobalInfo();
+		GInfo info = factory.htasks().getGlobalInfo();
 
 		if (log.isDebugEnabled())
 			log.debug("Reset schedule ...");
-		schedule.reset();
+		factory.schedule().reset();
 
 		// 开始更新
 		info.eachTimer(ioc, new Callback3<Integer, Quartz, String[]>() {
 			public void invoke(Integer index, Quartz qz, String[] handlerNames) {
 				// 迭代所有的表达式
 				for (String handlerName : handlerNames)
-					schedule.overlap(qz, handlerName);
+					factory.schedule().overlap(qz, handlerName);
 				// 打印日志
 				if (log.isDebugEnabled())
 					log.debugf(	"  @SET[%d]: %s :: (%d)'%s' ",
@@ -40,11 +40,11 @@ public class ScheduleUpdateAtom extends AbstractAtom {
 		// 成功
 		if (log.isDebugEnabled())
 			log.debug("... done");
-		schedule.ready();
+		factory.schedule().ready();
 
 		// 最后通知一下运行进程
-		synchronized (schedule) {
-			schedule.notifyAll();
+		synchronized (factory.schedule()) {
+			factory.schedule().notifyAll();
 		}
 
 		// 然后无限等待

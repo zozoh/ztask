@@ -12,6 +12,7 @@ pre{
     padding: 10px 20px;
     border:1px dashed #CCC;
     background-color:#EEE;
+    font-family: Courier;
 }
 </style>
 </head>

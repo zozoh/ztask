@@ -17,6 +17,6 @@ import org.nutz.ztask.web.ZTaskSetup;
 @IocBy(args = {	"*org.nutz.ioc.loader.json.JsonLoader",
 				"ioc",
 				"*org.nutz.ioc.loader.annotation.AnnotationIocLoader",
-				"org.nutz.ztask.web.module"}, type = ComboIocProvider.class)
+				"org.nutz.ztask"}, type = ComboIocProvider.class)
 @Views({AjaxViewMaker.class})
 public class ZTaskMainModule {}

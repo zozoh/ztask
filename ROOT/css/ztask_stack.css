@@ -23,18 +23,82 @@
     border-radius: 4px;
 }
 
-.stack_head a {
+.stack_head:after, .stack_menu:after {
+    content: ".";
+    display: block;
+    clear: both;
+    visibility: hidden;
+    line-height: 0;
+    height: 0;
+}
+
+.stack_view, .stack_reload {
+    list-style: none;
+    padding: 0;
+    margin: 3px 2px 0 0;
     float: right;
+    height: 24px;
+    line-height: 24px;
+    cursor: pointer;
+}
+
+.stack_reload{
+    margin-right:6px;
+}
+
+.stack_reload:hover{
+    color:#444;
+}
+
+.stack_reload img{
+    visibility: hidden;
+    width:16px;
+    height:16px;
+    margin-top:3px;
+    vertical-align: top;
+}
+
+.stack_view_item {
+    float: left;
+    width: 24px;
+    height: 24px;
+    background: url(pics/icons.png) no-repeat;
+    background-position-x: 0;
+}
+
+.stack_view_item:hover{
+    background-color:rgba(255,255,0,0.2);
+}
+
+.stack_view_item_hlt {
+    background-position-x: -24px;
+    background-color:#EEC;
+}
+
+.stack_view_hide {
+    background-position-y: -119px;
+}
+
+.stack_view_brief {
+    background-position-y: -145px;
+}
+
+.stack_view_full {
+    background-position-y: -169px;
+}
+
+.stack_head a {
+    float: left;
     margin: 0 4px;
 }
 
 .stack_name {
     font-size: 16px;
+    float: left;
     color: #FFF;
     font-weight: bolder;
     text-shadow: 1px 1px 1px #666;
     cursor: pointer;
-    min-width: 200px;
 }
 
 .stack_name:hover {
@@ -49,11 +113,11 @@
     height: 16px;
     background: url(pics/icons.png) no-repeat -16px -80px;
     cursor: pointer;
-    margin:6px 8px 6px 4px; 
+    margin: 6px 8px 6px 4px;
 }
 
-.stack_favo_on{
-    background-position:0 -80px;
+.stack_favo_on {
+    background-position: 0 -80px;
 }
 
 .stack_count {

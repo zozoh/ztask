@@ -22,7 +22,26 @@ var ioc = {
 	 * 抽象的服务
 	 */
 	mongoService : { // 仅仅提供构造函数
-	args : [ { refer : 'connector' }, { java : '$conf.getDB("db-name")' } ]
+		args : [ { refer : 'connector' }, { java : '$conf.getDB("db-name")' } ],
+		fields : {
+			ioc : { refer : '$Ioc' },
+			factory : { refer : 'serviceFactory' } }
+	// ~ End bean
+	},
+	/*
+	 * 服务类工厂接口
+	 */
+	serviceFactory : {
+		type : 'org.nutz.ztask.impl.StaticZTaskFactory',
+		fields : {
+			hooks : { refer : 'hookService' },
+			labels : { refer : 'labelService' },
+			users : { refer : 'userService' },
+			tasks : { refer : 'taskService' },
+			htasks : { refer : 'hookedTaskService' },
+			mails : { refer : 'mailQueue' },
+			reportor : { refer : 'reportor' },
+			schedule : { refer : 'schedule' } }
 	// ~ End bean
 	},
 	/*
@@ -39,10 +58,7 @@ var ioc = {
 	 */
 	atom : { fields : {
 		ioc : { refer : '$Ioc' },
-		mails : { refer : 'mailQueue' },
-		users : { refer : 'userService' },
-		schedule : { refer : 'schedule' },
-		tasks : { refer : 'taskService' } } }
+		factory : { refer : 'serviceFactory' } } }
 
 // ~ End Ioc
 }

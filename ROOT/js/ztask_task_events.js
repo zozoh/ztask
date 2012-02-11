@@ -33,7 +33,7 @@ function task_events_bind(selection, opt) {
     selection.delegate(".task_pause", "click", task_events_on_restart);
     selection.delegate(".task_done", "click", task_events_on_renew);
     selection.delegate(".task_ing", "click", task_events_on_done);
-    selection.delegate(".task_label", "click", task_events_on_label);
+    selection.delegate(".task_labels *", "click", task_events_on_label);
     selection.delegate(".task_content", "click", task_events_on_showDetail);
 
     // 标签事件
@@ -73,13 +73,19 @@ function task_events_on_label(e) {
 
     // 获取标签数值
     var lbs = [];
-    jLbs.children().each(function() {
-        lbs.push($(this).text());
+    jLbs.children(".task_labels_item").each(function() {
+        lbs.push($(this).attr("val"));
     });
     // 建立一个 html，插入到标签容器中
-    var jq = $(task_html_lbe()).insertBefore(jLbs).attr("old-value", lbs.join(","));
-    jq.width(jLbs.innerWidth());
-
+    var jq = $(task_html_lbe()).prependTo($(".task_labels_gasket",ee.jTask)).attr("old-value", lbs.join(","));
+    jq.css({
+        width: ee.jTask.innerWidth() - 30,
+        top: jLbs.outerHeight(),
+    });
+    // 设立 body 取消事件
+    $(document.body).one("click", function() {
+        $(".task_lbe").remove();
+    });
     // 聚焦
     $("input", jq).val(lbs.join(",")).select();
 }
@@ -101,35 +107,36 @@ function _task_lbe_on_change_(e) {
 
 function _task_lbe_on_esc_(e) {
     if(27 == e.which) {
-        _task_lbe_do_cancel_.apply();
+        _task_lbe_do_cancel_();
     }
 }
 
 function _task_lbe_do_cancel_() {
-    var jLbs = $(".task_labels");
-    var ee = _task_obj(jLbs);
-    _task_lbe_redraw_labels_.apply(jLbs, [ee.jTask.find(".task_lbe").attr("old-value")]);
-    $(".task_lbe").remove();
+    var jq = $(".task_lbe");
+    if(jq.size() == 0)
+        return;
+    var ee = _task_obj(jq);
+    _task_lbe_redraw_labels_.apply(jq, [jq.attr("old-value")]);
+    jq.remove();
 }
 
 function _task_lbe_on_keyup_(e) {
     _task_lbe_redraw_labels_.apply(this, [$(this).val()]);
 }
 
-// 这是一个绘制函数，用来绘制 task_labels, this 为 jLbs
+// 这是一个绘制函数，用来绘制 task_labels, this 为 可以找到 jTask 的元素
 function _task_lbe_redraw_labels_(s) {
-    var ss = s.split(/[, ]/);
+    s = $.trim(s);
+    var ss = s ? s.split(/[, ]+/) : [];
     var ee = _task_obj(this);
+    var jLbs = $(".task_labels", ee.jTask);
     var t = ee.t;
     t.labels = ss;
     // 移除旧的
-    var jLbs = $(".task_labels", ee.jTask);
+    var jLbs = $(".task_labels", ee.jTask).empty();
     jLbs.find(".task_labels_item").remove();
     // 添加新的
-    for(var i = 0; i < ss.length; i++) {
-        if($.trim(ss[i]))
-            $('<li class="task_labels_item">'+$.trim(ss[i])+'</li>').appendTo(jLbs);
-    }
+    jLbs.html(task_html_labels(t.labels));
 }
 
 /**
@@ -308,6 +315,7 @@ function task_events_on_edit() {
         multi: true,
         after: function(newval, oldval) {
             if(newval && newval != oldval) {
+                newval = $.trim(newval.replace(/[\n]{1,}/g, " ")).replace(/[ ][ ]/, " ");
                 if(newval.length < 5) {
                     alert(z.msg("e.t.short_task"));
                     return;

@@ -17,7 +17,7 @@ public class SyncLabel implements HookHandler {
 
 	@Override
 	public void doHandle(HookType htp, String name, Hooking ing) {
-		ing.labels().syncLables();
+		ing.factory().labels().syncLables();
 	}
 
 }

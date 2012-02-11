@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.nutz.lang.Each;
 import org.nutz.lang.Lang;
@@ -51,7 +53,7 @@ public class MongoLabelService extends AbstractMongoService implements LabelServ
 		dao.each(new Each<Label>() {
 			public void invoke(int index, Label lb, int length) {
 				Integer c = map.get(lb.getName());
-				// 存在在最新同步出来的标签表中的话，常识更新
+				// 存在在最新同步出来的标签表中的话，尝试更新
 				if (null != c) {
 					// 不等，就更新
 					if (lb.getCount() != c) {
@@ -95,6 +97,11 @@ public class MongoLabelService extends AbstractMongoService implements LabelServ
 	}
 
 	@Override
+	public List<Label> getByText(String labelText) {
+		return dao.find(Label.class, Moo.NEW("text", labelText), null);
+	}
+
+	@Override
 	public Label remove(String labelName) {
 		// TODO 无需先查询,直接执行remove即可
 		Label l = get(labelName);
@@ -118,28 +125,29 @@ public class MongoLabelService extends AbstractMongoService implements LabelServ
 		return dao.find(Label.class, Moo.NEW("parent", labelName), MCur.NEW().asc("name"));
 	}
 
+	private static final Pattern _LB_ = Pattern.compile("^([^#:]*)(#[0-9A-F]{3})?(:[0-9]+)?$");
+
 	@Override
 	public List<Label> save(String... lbs) {
 		// TODO 使用findAndModify
 		ArrayList<Label> list = new ArrayList<Label>(lbs.length);
 		for (String lb : lbs) {
-			String[] ss = Strings.splitIgnoreBlank(lb, ":");
+			Matcher m = _LB_.matcher(lb);
+			if (!m.find())
+				throw Lang.makeThrow("Error label string '%s'", lb);
 
-			String lbnm = ss[0];
-			int count = ss.length > 1 ? Integer.valueOf(ss[1]) : 0;
+			Label l = new Label();
+			l.setText(m.group(1));
+			l.setColor(m.group(2));
+			l.setCount(null == m.group(3) ? 0 : Integer.parseInt(m.group(3).substring(1)));
+			l.setName(l.getText() + Strings.sBlank(l.getColor(), ""));
 
-			Label l = get(lbnm);
-			// 不存在创建
-			if (null == l) {
-				l = new Label();
-				l.setName(lbnm);
-				l.setCount(count);
-				dao.save(l);
+			Label dbL = get(l.getName());
+
+			if (null != dbL) {
+				l.set_id(dbL.get_id());
 			}
-			// 否则更新
-			else {
-				dao.updateById(Label.class, l.get_id(), Moo.NEW().set("count", count));
-			}
+			dao.save(l);
 
 			list.add(l);
 		}

@@ -29,7 +29,7 @@
                 <span class="srch_sort_txt">${msg['srch.sort.txttail']}</span>
             </div>
         </div>
-        <div id="tasks" class="B hierachy_right"></div>
+        <div id="tasks" class="B scro hierachy_right"></div>
     </div></div>
     <% /*===============================================右侧=*/ %>
     <div id="R"><div class="WP">

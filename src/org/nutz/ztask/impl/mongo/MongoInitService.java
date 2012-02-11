@@ -16,24 +16,16 @@ import org.nutz.ztask.api.GInfo;
 import org.nutz.ztask.api.InitService;
 import org.nutz.ztask.api.Label;
 import org.nutz.ztask.api.Task;
-import org.nutz.ztask.api.TaskService;
 import org.nutz.ztask.api.TaskStack;
 import org.nutz.ztask.api.User;
-import org.nutz.ztask.api.UserService;
 
 public class MongoInitService extends AbstractMongoService implements InitService {
 
+	public MongoInitService(MongoConnector conn, String dbname) {
+		super(conn, dbname);
+	}
+
 	private static final Log log = Logs.get();
-
-	/**
-	 * 用户数据访问接口
-	 */
-	private UserService users;
-
-	/**
-	 * Task 数据访问接口
-	 */
-	private TaskService tasks;
 
 	/**
 	 * 是否强制保证数据库中的 stack 与配置中的相同
@@ -45,10 +37,6 @@ public class MongoInitService extends AbstractMongoService implements InitServic
 	 */
 	private String stacksPath;
 
-	public MongoInitService(MongoConnector conn, String dbname) {
-		super(conn, dbname);
-	}
-
 	@Override
 	public void init() {
 		/*
@@ -57,7 +45,7 @@ public class MongoInitService extends AbstractMongoService implements InitServic
 		_init_collections();
 
 		// 看看是否需要初始化
-		if (null == users || Strings.isBlank(stacksPath)) {
+		if (null == factory.users() || Strings.isBlank(stacksPath)) {
 			if (log.isWarnEnabled())
 				log.warn("!!! No stack for init...");
 			return;
@@ -65,7 +53,7 @@ public class MongoInitService extends AbstractMongoService implements InitServic
 
 		// 得到系统中所有的 TaskStack，并做成散列，以便得到需要删除的堆栈信息
 		final Map<String, TaskStack> alls = new HashMap<String, TaskStack>();
-		tasks.eachStack(new Each<TaskStack>() {
+		factory.htasks().eachStack(new Each<TaskStack>() {
 			public void invoke(int index, TaskStack s, int length) {
 				alls.put(s.getName(), s);
 			}
@@ -90,7 +78,7 @@ public class MongoInitService extends AbstractMongoService implements InitServic
 				continue;
 			// 堆栈名和用户名
 			String[] ss = Strings.splitIgnoreBlank(line, "@");
-			User u = users.get(ss[1]);
+			User u = factory.users().get(ss[1]);
 			// 保证是合法的用户名
 			if (null == u) {
 				throw Lang.makeThrow("User not exists line %d : %s", i, line);
@@ -112,8 +100,8 @@ public class MongoInitService extends AbstractMongoService implements InitServic
 			String newID = "";
 			// 不存在，创建
 			if (null == s) {
-				s = tasks.createStackIfNoExistis(stackName, u.getName());
-				tasks.watchStack(s, u.getName());
+				s = factory.htasks().createStackIfNoExistis(stackName, u.getName());
+				factory.htasks().watchStack(s, u.getName());
 				newID = s.get_id();
 			}
 			// 存在，移除索引
@@ -123,7 +111,7 @@ public class MongoInitService extends AbstractMongoService implements InitServic
 
 			// 如果堆栈以 "-" 开头
 			if (!isTop && null != prev) {
-				tasks.setStackParent(s, prev.getName());
+				factory.htasks().setStackParent(s, prev.getName());
 			}
 			// 否则记录一下以便后续使用
 			else {
@@ -147,13 +135,13 @@ public class MongoInitService extends AbstractMongoService implements InitServic
 		for (TaskStack s : alls.values()) {
 			if (log.isDebugEnabled())
 				log.debugf("  -- : %s", s);
-			List<Task> ts = tasks.getTasksInStack(s.getName());
+			List<Task> ts = factory.htasks().getTasksInStack(s.getName());
 			for (Task t : ts) {
-				tasks.popFromStack(t, false);
+				factory.htasks().popFromStack(t, false);
 				if (log.isDebugEnabled())
 					log.debugf("     << Pop: %s", t);
 			}
-			tasks.removeStack(s.getName());
+			factory.htasks().removeStack(s.getName());
 			if (log.isDebugEnabled())
 				log.debugf("  -- Done", s.get_id());
 		}

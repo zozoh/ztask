@@ -12,7 +12,7 @@ var ioc = {
 	reportor : {
 		type : 'org.nutz.ztask.impl.WeeklyReportor',
 		fields : {
-			tasks : { refer : 'taskService' },
+			factory : { refer : 'serviceFactory' },
 			render : { refer : 'reportRender' },
 			dbName : { java : '$conf.getDB("db-name")' },
 			home : { java : '$conf.get("sys-report-home")' },

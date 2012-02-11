@@ -1,25 +1,27 @@
 .label {
-    margin: 4px;
-    padding: 0 10px;
-    line-height: 32px;
-    height: 32px;
-    float: left;
-    font-size: 16px;
-    background-color: #FF8;
-    border-radius: 6px;
+    display:inline-block;
+    margin: 0 8px;
+    color:#08F;
     cursor: pointer;
-    border: 1px solid #FFF;
 }
 
 .label:hover {
-    background-color: #EE6;
+    background-color: #FF0;
+    text-decoration: underline;
 }
 
 .label em {
+    display:inline-block;
+    height:14px;
+    line-height:14px;
+    padding:0 4px;
+    border-radius:8px;
     font-style: normal;
-    color: #F0F;
-    margin-left: 6px;
-    font-size: 9px;
+    margin-left: 2px;
+    font-size: 10px;
+    color:#FFF;
+    background-color:#08F;
+    text-decoration: none;
 }
 
 /*-------------------------------------------------布局相关--------------*/
@@ -36,6 +38,10 @@
 
 #L .WP {
     padding-top: 20px;
+}
+
+#R .WP{
+    padding:20px;
 }
 
 #R {

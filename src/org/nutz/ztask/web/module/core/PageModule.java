@@ -21,8 +21,7 @@ import org.nutz.mvc.annotation.Param;
 import org.nutz.mvc.filter.CheckSession;
 import org.nutz.web.Webs;
 import org.nutz.ztask.api.TaskReport;
-import org.nutz.ztask.api.TaskReportor;
-import org.nutz.ztask.api.TimerSchedule;
+import org.nutz.ztask.api.ZTaskFactory;
 import org.nutz.ztask.api.User;
 
 @Filters(@By(type = CheckSession.class, args = {Webs.ME, "/page/login"}))
@@ -47,11 +46,8 @@ public class PageModule {
 	@Inject("java:$conf.get('sys-report-day',2)")
 	private int reportDay;
 
-	@Inject("refer:reportor")
-	private TaskReportor reportor;
-
-	@Inject("refer:schedule")
-	private TimerSchedule schedule;
+	@Inject("refer:serviceFactory")
+	private ZTaskFactory factory;
 
 	/**
 	 * 自动决定，重定向到哪个视图
@@ -88,7 +84,7 @@ public class PageModule {
 	@At("/monitor/schedule")
 	@Ok("jsp:jsp.monitor.schedule")
 	public String showMonitorSchedule() {
-		return schedule.toString();
+		return factory.schedule().toString();
 	}
 
 	/**
@@ -106,9 +102,9 @@ public class PageModule {
 	@Ok("jsp:jsp.report_display")
 	public String doMakeReports(String ds, @Param("force") boolean force, ServletRequest req) {
 		Calendar c = Times.C(ds);
-		TaskReport rpt = force ? reportor.make(c) : reportor.makeIfNoExists(c);
+		TaskReport rpt = force ? factory.reportor().make(c) : factory.reportor().makeIfNoExists(c);
 		StringBuilder sb = new StringBuilder();
-		reportor.writeAndClose(rpt, Lang.ops(sb));
+		factory.reportor().writeAndClose(rpt, Lang.ops(sb));
 		req.setAttribute("rpt", rpt);
 		return sb.toString();
 	}
@@ -145,7 +141,7 @@ public class PageModule {
 				String ds = yy + "-" + MM + "-" + Strings.alignRight(1 + w * 7, 2, '0');
 				c = Times.C(ds);
 				c.set(Calendar.DAY_OF_WEEK, this.reportDay);
-				boolean hasReport = reportor.get(c) != null;
+				boolean hasReport = factory.reportor().get(c) != null;
 				boolean isCurrentWeek = thisWeek.equals(Times.sD(c.getTime()));
 				int weekOfYear = c.get(Calendar.WEEK_OF_YEAR);
 

@@ -10,7 +10,7 @@ import org.nutz.mvc.annotation.Ok;
 import org.nutz.mvc.annotation.Param;
 import org.nutz.web.Webs;
 import org.nutz.ztask.api.User;
-import org.nutz.ztask.api.UserService;
+import org.nutz.ztask.api.ZTaskFactory;
 import org.nutz.ztask.util.Err;
 
 @InjectName
@@ -18,14 +18,14 @@ import org.nutz.ztask.util.Err;
 @At("/do")
 public class LoginModule {
 
-	@Inject("refer:userService")
-	private UserService usrs;
+	@Inject("refer:serviceFactory")
+	private ZTaskFactory factory;
 
 	@At("/login")
 	@Ok(">>:/page/mystack")
 	public void doLogin(@Param("nm") String name, @Param("pwd") String password, HttpSession sess) {
 		// 验证
-		User u = usrs.verify(name, password);
+		User u = factory.users().verify(name, password);
 		if (null == u)
 			throw Err.U.INVALID_LOGIN();
 		// 通过 ...

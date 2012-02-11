@@ -113,11 +113,11 @@ function task_detail_cmt_on_del() {
 }
 
 /**
- * 事件: 处理输入时的 Shift + Enter
+ * 事件: 处理输入时的 Ctrl + Enter
  */
 function task_detail_cmt_on_keydown(e) {
-    // Shift + Enter 那么就提交
-    if(e.which == 13 && window.keyboard.shift) {
+    // Ctrl + Enter 那么就提交
+    if(e.which == 13 && window.keyboard.ctrl) {
         $(this).parents(".task_cmt_newer").find(".task_cmt_add").click();
     }
 }

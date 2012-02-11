@@ -21,12 +21,12 @@ import org.nutz.lang.util.Disks;
 import org.nutz.ztask.api.Task;
 import org.nutz.ztask.api.TaskQuery;
 import org.nutz.ztask.api.TaskReport;
-import org.nutz.ztask.api.TaskReportor;
-import org.nutz.ztask.api.TaskService;
+import org.nutz.ztask.api.ZTaskReportor;
+import org.nutz.ztask.api.ZTaskFactory;
 import org.nutz.ztask.util.KeyGetter;
 import org.nutz.ztask.util.ReportMap;
 
-public class WeeklyReportor implements TaskReportor {
+public class WeeklyReportor implements ZTaskReportor {
 
 	/**
 	 * 注入: 根据它来得到数据库名称
@@ -34,9 +34,9 @@ public class WeeklyReportor implements TaskReportor {
 	private String dbName;
 
 	/**
-	 * 注入: 任务访问接口
+	 * 注入: 服务工厂接口
 	 */
-	private TaskService tasks;
+	private ZTaskFactory factory;
 
 	/**
 	 * 注入: 用周几那一天，表示一周
@@ -126,19 +126,20 @@ public class WeeklyReportor implements TaskReportor {
 		int wwOffset = (int) ((rptYear * wwOfYear + rptWeek) - (toYear * wwOfYear + toWeek));
 
 		// 完成的任务
-		List<Task> dones = tasks.queryTasks(TaskQuery.NEWf("&W(%s) %%(DONE)", wwOffset)
-														.asc()
-														.sortBy("popAt"));
+		List<Task> dones = factory.htasks().queryTasks(TaskQuery.NEWf("&W(%s) %%(DONE)", wwOffset)
+																.asc()
+																.sortBy("popAt"));
 
 		// 开始分配的任务
-		List<Task> pushs = tasks.queryTasks(TaskQuery.NEWf("&W(%s) %%(ING,HUNGUP)", wwOffset)
-														.asc()
-														.sortBy("pushAt"));
+		List<Task> pushs = factory.htasks().queryTasks(TaskQuery.NEWf(	"&W(%s) %%(ING,HUNGUP)",
+																		wwOffset)
+																.asc()
+																.sortBy("pushAt"));
 
 		// 新创建的任务
-		List<Task> news = tasks.queryTasks(TaskQuery.NEWf("&W(%s) %%(NEW)", wwOffset)
-													.asc()
-													.sortBy("createTime"));
+		List<Task> news = factory.htasks().queryTasks(TaskQuery.NEWf("&W(%s) %%(NEW)", wwOffset)
+																.asc()
+																.sortBy("createTime"));
 
 		KeyGetter<Task> keyg = new KeyGetter<Task>() {
 			public String getKey(Task task) {
@@ -147,15 +148,17 @@ public class WeeklyReportor implements TaskReportor {
 		};
 
 		// 汇总统计
-		ReportMap doneOrIng = new ReportMap();
-		doneOrIng.add(dones, keyg);
-		doneOrIng.add(pushs, keyg);
+		ReportMap ok = new ReportMap();
+		ok.add(dones, keyg);
+
+		ReportMap ingOrHungup = new ReportMap();
+		ingOrHungup.add(pushs, keyg);
 
 		ReportMap newOrReject = new ReportMap();
 		newOrReject.add(news, keyg);
 
 		// 没有任务
-		if ((doneOrIng.isEmpty() && newOrReject.isEmpty())) {
+		if ((ok.isEmpty() && ingOrHungup.isEmpty() && newOrReject.isEmpty())) {
 			Files.deleteFile(f);
 			return new FileTaskReport(c);
 		}
@@ -165,11 +168,18 @@ public class WeeklyReportor implements TaskReportor {
 		doc.addAuthor("weekly-reportor");
 		doc.setTime(Times.now());
 
-		ZBlock p = ZD.p("Tasks Done or In Procesing:");
-		doneOrIng.joinTo(p);
+		doc.root().add(ZD.hr());
+		ZBlock p = ZD.p("This week, we finished:");
+		ok.joinTo(p);
 		doc.root().add(p);
 
-		p = ZD.p("New Tasks This Week:");
+		doc.root().add(ZD.hr());
+		p = ZD.p("Next week, we will do:");
+		ingOrHungup.joinTo(p);
+		doc.root().add(p);
+
+		doc.root().add(ZD.hr());
+		p = ZD.p("Some new tasks been created at this week also:");
 		newOrReject.joinTo(p);
 		doc.root().add(p);
 

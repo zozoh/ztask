@@ -11,6 +11,22 @@ import static org.nutz.ztask.api.TaskQuery.*;
 public class TaskQueryTest {
 
 	@Test
+	public void test_label_with_color() {
+		TaskQuery tq;
+
+		tq = NEW("#( abc#FF0, xyz#CCC  )");
+		assertNull(tq.qText());
+		assertNull(tq.qRegex());
+		assertNull(tq.qID());
+		ASTR(tq.qCreaters());
+		ASTR(tq.qOwners());
+		ASTR(tq.qLabels(), "abc#FF0", "xyz#CCC");
+		AD(tq.qTimeScope());
+		AS(tq.qStatus());
+
+	}
+
+	@Test
 	public void test_simple_mixmode() {
 		TaskQuery tq;
 
@@ -22,6 +38,7 @@ public class TaskQueryTest {
 		ASTR(tq.qOwners());
 		ASTR(tq.qLabels());
 		AD(tq.qTimeScope());
+		AS(tq.qStatus());
 
 		tq = NEW(" haha @(x,  y  ,z )  %(DONE,hungUP) ok @C( abc  )  #(A,B,C) &W(0) %REG%:.*");
 		assertEquals("haha ok", tq.qText());

@@ -34,6 +34,15 @@ function stack_html(s) {
     html += '    <span class="stack_count">' + s.count + '</span>';
     html += '    <span class="stack_name">' + s.name + '</span>';
     html += '    <a class="lnkb stack_owner" href="/page/user#' + s.owner + '" >@' + s.owner + '</a>';
+    html += '    <div class="stack_reload">';
+    html += '        <img src="' + $("#sky").attr("rs") + '/img/loading_16.gif">';
+    html += '        <b>' + z.msg("ui.reload") + '</b>';
+    html += '    </div>';
+    html += '    <ul class="stack_view">';
+    html += '        <li val="hide"  class="stack_view_item stack_view_hide"></li>';
+    html += '        <li val="brief" class="stack_view_item stack_view_brief"></li>';
+    html += '        <li val="full"  class="stack_view_item stack_view_full"></li>';
+    html += '    </ul>';
     html += '</div>';
     html += '<div class="stack_body">';
     html += '</div>';
@@ -145,11 +154,11 @@ function task_format_title(t) {
  * 任务的菜单项默认配置 －－ 根据 stask.status
  */
 var _TASK_MENU_ = {
-    "task_push": "edit,join,del,gout,check,label",
-    "task_ing": "label,edit,reject,hungup",
-    "task_pause": "label,edit,reject",
-    "task_done": "label,del,edit,join,check",
-    "task_wait": "label,edit"
+    "task_push": "edit,join,del,gout,check",
+    "task_ing": "edit,reject,hungup",
+    "task_pause": "edit,reject",
+    "task_done": "del,edit,join,check",
+    "task_wait": "edit"
 };
 
 /**
@@ -162,11 +171,15 @@ var _TASK_MENU_ = {
  *                                       # 则默认根据评估过的状态来显示菜单项
  *                                       # 可能的状态有，task_push, task_done, task_ing
  *     goin : true | false | String,     # 是否显示 goin 的按钮，如果为字符串，则为给定样式
- *     mode : "html|replace|prepend|append"   # 几种不同得操作模式，默认为 append
+ *     mode : "html|replace|prepend|append",  # 几种不同得操作模式，默认为 append
  *                                            #   html - 仅仅返回 html 片段
  *                                            #   replace - 替换掉 this 指向的 DOM
  *                                            #   prepend - prependTo this 指向的 DOM
  *                                            #   append - appendTo this 指向的 DOM
+ *     viewType : "hide|brief|full"      # 几种不同的显示模式
+ *                                       #  - hide 不显示
+ *                                       #  - brief 显示简要
+ *                                       #  - full 显示完整
  * }
  * </pre>
  *
@@ -177,20 +190,6 @@ var _TASK_MENU_ = {
  */
 function task_html(t, opt) {
     opt = opt || {};
-    var html = '<div class="task id_' + t._id + '" task-id="' + t._id + '">';
-    /*
-     * 标签
-     */
-    html += '<ul class="task_labels">';
-    if($.isArray(t.labels) && t.labels.length > 0)
-        for(var i = 0; i < t.labels.length; i++) {
-            html += '<li class="task_labels_item">' + t.labels[i] + '</li>';
-        }
-    html += '</ul>';
-    /*
-     * 内容
-     */
-    html += '<div class="task_content">' + task_format_text(t.text) + '</div>';
     /*
      * 判断状态
      */
@@ -215,55 +214,88 @@ function task_html(t, opt) {
     } else {
         throw "Uknow task status '" + t.status + "'";
     }
+    var viewType = opt.viewType || "full";
+    // 开始准备 HTML
+    var html = '<div class="task task_view_' + viewType + '" id_' + t._id + '" task-id="' + t._id + '">';
     /*
-     * 编辑菜单
+     * 简要模式
      */
-    var menu = opt.menu || _TASK_MENU_[statusClass];
-    if(menu) {
-        menu = menu.split(",");
-        html += '<div class="menu task_menu">';
-        for(var i = 0; i < menu.length; i++) {
-            html += '<a class="task_' + menu[i] + '">' + z.msg("task.menu." + menu[i]) + '</a>';
+    if("brief" == viewType) {
+        /*
+         * 主动作按钮
+         */
+        html += '<div class="task_btn ' + statusClass + '">';
+        html += '    <div class="task_status">' + statusText + '</div>';
+        html += '</div>';
+        /*
+         * 内容
+         */
+        html += '<div class="task_content">' + task_format_text(t.text) + '</div>';
+    }
+    /*
+     * 完整模式
+     */
+    else {
+        /*
+         * 标签
+         */
+        html += '<ul class="task_labels">' + task_html_labels(t.labels) + '</ul>';
+        /*
+         * 编辑菜单
+         */
+        var menu = opt.menu || _TASK_MENU_[statusClass];
+        if(menu) {
+            menu = menu.split(",");
+            html += '<div class="menu task_menu">';
+            for(var i = 0; i < menu.length; i++) {
+                html += '<a class="task_' + menu[i] + '">' + z.msg("task.menu." + menu[i]) + '</a>';
+            }
+            html += '</div>';
         }
+        html += '<div class="task_labels_gasket"></div>';
+        /*
+         * 内容
+         */
+        html += '<br class="clr">';
+        html += '<div class="task_content">' + task_format_text(t.text) + '</div>';
+        /*
+         * 主动作按钮
+         */
+        html += '<div class="task_btn ' + statusClass + '">';
+        html += '    <div class="task_status">' + statusText + '</div>';
         html += '</div>';
-    }
-    /*
-     * 主动作按钮
-     */
-    html += '<div class="task_btn ' + statusClass + '">';
-    html += '    <div class="task_status">' + statusText + '</div>';
-    html += '</div>';
-    /*
-     * 节点任务的统计数据
-     */
-    if(t.number && t.number[0] > 0) {
-        html += '<div class="task_nums">';
-        html += '<div class="task_num_ing">' + t.number[2] + '</div>';
-        html += '<div class="task_num_done">' + t.number[1] + '</div>';
-        html += '<div class="task_num_all">' + t.number[0] + '</div>';
-        html += '</div>';
-    }
-    /*
-     * 拆分按钮(没有子节点) 或者 查看子节点
-     */
-    if(false != opt.goin) {
-        var s = typeof opt.goin == "string" ? opt.goin : "detail";
-        html += '<a class="task_goin task_' + s + '">' + z.msg("task.goin." + s) + '</a>';
-    }
+        /*
+         * 节点任务的统计数据
+         */
+        if(t.number && t.number[0] > 0) {
+            html += '<div class="task_nums">';
+            html += '<div class="task_num_ing">' + t.number[2] + '</div>';
+            html += '<div class="task_num_done">' + t.number[1] + '</div>';
+            html += '<div class="task_num_all">' + t.number[0] + '</div>';
+            html += '</div>';
+        }
+        /*
+         * 拆分按钮(没有子节点) 或者 查看子节点
+         */
+        if(false != opt.goin) {
+            var s = typeof opt.goin == "string" ? opt.goin : "detail";
+            html += '<a class="task_goin task_' + s + '">' + z.msg("task.goin." + s) + '</a>';
+        }
 
-    /*
-     * 任务信息
-     */
-    html += '<div class="task_uinfo">';
-    if(t.stack && "--" != t.stack)
-        html += '<span class="task_stack">' + z.msg("ui.stack") + ' : <b>' + t.stack + '</b></span>';
-    if(t.parentId) {
-        html += '    <span class="task_ID">' + z.msg("task.parent") + ":" + task_format_id(t.parentId) + '</span>';
-    }
-    html += '    <span class="task_ID">ID:' + task_format_id(t._id) + '</span>';
-    html += '    <span><a class="lnk" href="/page/user#' + t.owner + '">@' + t.owner + '</a>';
-    html += '    ' + t.lastModified + '</span>';
-    html += '</div>';
+        /*
+         * 任务信息
+         */
+        html += '<div class="task_uinfo">';
+        if(t.stack && "--" != t.stack)
+            html += '<span class="task_stack">' + z.msg("ui.stack") + ' : <b>' + t.stack + '</b></span>';
+        if(t.parentId) {
+            html += '    <span class="task_ID">' + z.msg("task.parent") + ":" + task_format_id(t.parentId) + '</span>';
+        }
+        html += '    <span class="task_ID">ID:' + task_format_id(t._id) + '</span>';
+        html += '    <span><a class="lnk" href="/page/user#' + t.owner + '">@' + t.owner + '</a>';
+        html += '    ' + t.lastModified + '</span>';
+        html += '</div>';
+    } // ~ 完整模式结束
     html += '</div>';
 
     // 根据 mode 返回
@@ -294,6 +326,46 @@ function task_html(t, opt) {
 }
 
 /**
+ * 根据给定 lbs 返回一组 labels 的 HTML
+ *
+ * @param lbs : 字符串数组
+ *
+ * @return lbs 的 HTML 片段
+ */
+function task_html_labels(lbs) {
+    var html = "";
+    if($.isArray(lbs) && lbs.length > 0) {
+        for(var i = 0; i < lbs.length; i++) {
+            var lbo = task_lable_obj(lbs[i]);
+            if(!lbo)
+                continue;
+            html += '<li val="' + lbo.name + '" class="task_labels_item" style="' + lbo.style + '">';
+            html += lbo.text + '</li>';
+        }
+    } else {
+        html += '<i>' + z.msg("task.label.empty") + '</i>';
+    }
+    return html;
+}
+
+var _LB_COLOR = /^([^#]*)(#[0-9A-F]{3})$/;
+function task_lable_obj(lb) {
+    if(!lb)
+        return null;
+    var ms = _LB_COLOR.exec(lb);
+    return ms ? {
+        name: lb,
+        color: ms[2],
+        style: 'background-color:' + ms[2] + ';color:#FFF;',
+        text: ms[1]
+    } : {
+        name: lb,
+        style: "",
+        text: lb
+    };
+}
+
+/**
  * 根据给定的 jTask , 重新绘制自身
  *
  * @param this : jTask
@@ -317,10 +389,6 @@ function task_html_lbe() {
     var html = '<div class="task_lbe">';
     html += '<div class="task_lbe_tip">' + z.msg("task.label.edit.tip") + '</div>';
     html += '<input>';
-    //html += '<div class="task_lbe_btns">';
-    //html += '<a class="task_lbe_cancel">' + z.msg("ui.cancel") + '</a>';
-    //html += '<a class="task_lbe_ok"">' + z.msg("ui.ok") + '</a>';
-    //html += '</div>';
     html += '</div>';
     return html;
 }

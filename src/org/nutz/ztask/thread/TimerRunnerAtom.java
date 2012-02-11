@@ -19,22 +19,22 @@ public class TimerRunnerAtom extends AbstractAtom {
 	@Override
 	protected long exec() {
 		// 首先以间隔 1000 ms 的时间，自选等待 schedule 的准备完成
-		while (!schedule.isReady() && !schedule.isStop()) {
-			
+		while (!factory.schedule().isReady() && !factory.schedule().isStop()) {
+
 			if (log.isDebugEnabled())
 				log.debug("check schedule ...");
-			
-			synchronized (schedule) {
+
+			synchronized (factory.schedule()) {
 				try {
-					schedule.wait(1000);
+					factory.schedule().wait(1000);
 				}
 				catch (InterruptedException e) {
 					throw Lang.wrapThrow(e);
 				}
 			}
 		}
-		
-		return schedule.runSlot(Calendar.getInstance(), log);
+
+		return factory.schedule().runSlot(Calendar.getInstance(), log);
 	}
 
 	public static final String NAME = "SCHD.run";

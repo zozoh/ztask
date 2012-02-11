@@ -27,7 +27,7 @@
             </li>
         </ul>
     </h1>
-    <div id="weeks">
+    <div id="weeks" class="scro">
         <%
         Map<String,String> msgs = (Map<String,String>)request.getAttribute("msg");
         NutMap[][] cells = (NutMap[][])request.getAttribute("cells");

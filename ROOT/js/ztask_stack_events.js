@@ -14,9 +14,12 @@
 function stack_events_bind(selection, opt) {
     var selection = stack_opt($(selection), opt || {});
     //---------------------------------------------------------
-    selection.delegate(".stack_head", "click", stack_events_on_reload);
+    selection.delegate(".stack", "click", stack_events_on_active);
+    selection.delegate(".stack_reload", "click", stack_events_on_reload);
+    selection.delegate(".stack_view_item", "click", stack_events_on_change_view_type);
     selection.delegate(".stack_name", "click", stack_events_on_goin);
     selection.delegate(".stack_favo", "click", stack_events_on_watchOrNot);
+
 }
 
 /**
@@ -68,6 +71,25 @@ function stack_events_on_goin(e) {
 }
 
 /**
+ * 事件处理: 高亮当前堆栈，如果内容为空，重新加载
+ */
+function stack_events_on_active() {
+    var ee = _stack_obj(this);
+    if(!ee.jStack.hasClass("stack_hlt")) {
+        $(".stack_hlt", ee.selection).removeClass("stack_hlt");
+        ee.jStack.addClass("stack_hlt");
+        // 没有设置显示类型 ...
+        if($(".stack_view_item_hlt", ee.jStack).size() == 0) {
+            $(".stack_view_full",ee.jStack).addClass("stack_view_item_hlt");
+        }
+        // 没有内容，重新加载
+        if($(".task",ee.jStack).size() == 0) {
+            $(".stack_reload", ee.jStack).click();
+        }
+    }
+}
+
+/**
  * 事件处理: 重新加载当前堆栈任务
  */
 function stack_events_on_reload() {
@@ -82,20 +104,64 @@ function stack_events_on_reload() {
 }
 
 /**
+ * 事件处理: 改变当前堆栈类型的显示方式
+ */
+function stack_events_on_change_view_type() {
+    if(!$(this).hasClass("stack_view_item_hlt")) {
+        $(this).parent().find(".stack_view_item_hlt").removeClass("stack_view_item_hlt");
+        $(this).addClass("stack_view_item_hlt");
+    }
+    stack_redraw_mytasks.apply(this);
+}
+
+/**
  * 重新绘制当前 stack 的数据
  *
  * @param this - 一个 DOM 对象，它可以是 .stack 或者其内任意一个元素
- * @param ts - Task 的数据对象列表
+ * @param ts - Task 的数据对象列表，如果没有，从 DOM 中取得数据
+ * @param animate - 是否动画显示重绘过程
  */
-function stack_redraw_mytasks(ts) {
+function stack_redraw_mytasks(ts, animate) {
     // 找到 body
-    var jBody = $(".stack_body", this).empty();
+    var jStack = stack_jstack(this);
+    var viewType = $(".stack_view_item_hlt", jStack).attr("val");
+    var jBody = $(".stack_body", jStack);
+    // 检查数据
+    if(!ts) {
+        ts = [];
+        $(".task",jStack).each(function() {
+            ts.push($(this).data("task"));
+        });
+    }
     // 循环添加
     if(ts) {
-        for(var i = 0; i < ts.length; i++) {
-            task_html.apply(jBody, [ts[i], {
-                goin: false
-            }]);
+        jBody.empty();
+        var opt = {
+            goin: false,
+            mode: "append",
+            viewType: viewType
+        };
+        var i = 0;
+        // 快速显示
+        if(!animate) {
+            for(; i < ts.length; i++) {
+                var jTask = task_html.apply(jBody, [ts[i], opt]);
+                z.blinkIt(jTask);
+            }
+        }
+        // 动画显示
+        else {
+            var func = function() {
+                if(i >= ts.length)
+                    return;
+                var jTask = task_html.apply(jBody, [ts[i++], opt]);
+                jTask[0].scrollIntoView(false);
+                z.blinkIt(jTask, {
+                    speed: 80,
+                    after: func
+                });
+            };
+            func();
         }
     }
 }
@@ -108,6 +174,10 @@ function stack_redraw_mytasks(ts) {
 function stack_do_reload() {
     var jStack = stack_jstack(this);
     var snm = $(".stack_name", jStack).text();
+    var viewType = $(".stack_view_item_hlt", jStack).attr("val");
+    var jReload = $(".stack_reload", jStack);
+    jReload.find("img").css("visibility", "visible");
+    jReload.find("b").css("visibility", "hidden");
     ajax.get("/ajax/stack/detail", {
         s: snm
     }, function(re) {
@@ -115,6 +185,7 @@ function stack_do_reload() {
         var isHlt = jStack.hasClass("stack_hlt");
         var newJStack = $(stack_html(re.data.stack)).replaceAll(jStack);
         newJStack.data("stack", re.data.stack);
+        $(".stack_view_item[val="+viewType+"]",newJStack).addClass("stack_view_item_hlt");
         if(isHlt)
             newJStack.addClass("stack_hlt");
         // 重新排序，将 HUNGUP 的放在底部
@@ -128,7 +199,7 @@ function stack_do_reload() {
                 list.push(re.data.tasks[i]);
         }
         // 重绘堆栈内的 Tasks
-        stack_redraw_mytasks.apply(newJStack, [list]);
+        stack_redraw_mytasks.apply(newJStack, [list, true]);
     });
 }
 

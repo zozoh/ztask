@@ -16,9 +16,9 @@
     <% /*==========================================顶部固定条=*/ %>
     <%@include file="/WEB-INF/jsp/include/_sky.jsp" %>
     <% /*===============================================左侧=*/ %>
-    <div id="L"><div class="WP hierachy_right"><div id="tasks"></div></div></div>
+    <div id="L"><div class="WP scro hierachy_right"><div id="tasks"></div></div></div>
     <% /*===============================================右侧=*/ %>
-    <div id="R"><div class="WP"><div id="labels"></div></div></div>
+    <div id="R"><div class="WP scro"><div id="labels"></div></div></div>
     <% /*========================================Task Detail DOM=*/ %>
     <%@include file="/WEB-INF/jsp/include/_task_comment.jsp" %>
     <% /*==========================================本地化字符串支持=*/ %>   

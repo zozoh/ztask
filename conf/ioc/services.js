@@ -13,11 +13,7 @@ var ioc = {
 	initService : {
 		parent : 'mongoService',
 		type : 'org.nutz.ztask.impl.mongo.MongoInitService',
-		fields : {
-			users : { refer : "userService" },
-			tasks : { refer : 'taskService' },
-			stacksPath : 'stacks.txt',
-			autosync : true }
+		fields : { stacksPath : 'stacks.txt', autosync : true }
 	// ~ End bean
 	},
 	/*
@@ -52,11 +48,7 @@ var ioc = {
 		type : 'org.nutz.ztask.impl.mongo.MongoHookService',
 		fields : {
 			ioc : { refer : "$Ioc" },
-			mails : { refer : 'mailQueue' },
-			reportor : { refer : 'reportor' },
-			labels : { refer : 'labelService' },
-			users : { refer : 'userService' },
-			tasks : { refer : 'taskService' } }
+			factory : { refer : 'serviceFactory' } }
 	// ~ End bean
 	},
 	/*

@@ -11,8 +11,8 @@ import org.nutz.castor.Castors;
  */
 public class Hooking extends ZTasking {
 
-	public Hooking() {
-		super();
+	public Hooking(ZTaskFactory factory) {
+		super(factory);
 		this.hookIndex = -1;
 	}
 
@@ -64,7 +64,7 @@ public class Hooking extends ZTasking {
 	public User u() {
 		if (null == user)
 			return null;
-		return users().get(user);
+		return factory().users().get(user);
 	}
 
 	/**

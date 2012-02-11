@@ -26,6 +26,15 @@ public interface LabelService extends AbstractService {
 	Label get(String labelName);
 
 	/**
+	 * 根据显示文字获取一组标签
+	 * 
+	 * @param labelText
+	 *            显示文字
+	 * @return 标签列表
+	 */
+	List<Label> getByText(String labelText);
+
+	/**
 	 * @return 所有顶级标签列表
 	 */
 	List<Label> getTopLabels();
@@ -45,9 +54,9 @@ public interface LabelService extends AbstractService {
 	 * 支持特殊格式的字符串
 	 * 
 	 * <pre>
-	 *    标签名[:计数]
+	 *    标签名[#颜色][:计数]
 	 * 比如:
-	 *    save(&quot;A&quot;, &quot;B:3&quot;, &quot;D:45&quot;);
+	 *    save("A", "B:3","C#FF0" "D#F80:45");
 	 * </pre>
 	 * 
 	 * @param lbs

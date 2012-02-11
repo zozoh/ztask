@@ -2,12 +2,10 @@ package org.nutz.ztask.impl.mongo;
 
 import java.util.List;
 
-import org.nutz.ioc.Ioc;
 import org.nutz.lang.Lang;
 import org.nutz.lang.Times;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
-import org.nutz.mail.MailQueue;
 import org.nutz.mongo.MongoConnector;
 import org.nutz.mongo.util.MCur;
 import org.nutz.mongo.util.Moo;
@@ -16,11 +14,7 @@ import org.nutz.ztask.api.HookHandler;
 import org.nutz.ztask.api.HookService;
 import org.nutz.ztask.api.HookType;
 import org.nutz.ztask.api.Hooking;
-import org.nutz.ztask.api.LabelService;
 import org.nutz.ztask.api.Task;
-import org.nutz.ztask.api.TaskReportor;
-import org.nutz.ztask.api.TaskService;
-import org.nutz.ztask.api.UserService;
 import org.nutz.ztask.util.Err;
 
 /**
@@ -38,18 +32,6 @@ public class MongoHookService extends AbstractMongoService implements HookServic
 
 	private final static Class<MongoHook> HT = MongoHook.class;
 
-	private TaskService tasks;
-
-	private UserService users;
-
-	private LabelService labels;
-
-	private MailQueue mails;
-	
-	private TaskReportor reportor;
-
-	private Ioc ioc;
-
 	@Override
 	public Hooking doHook(HookType htp, Task t, Object refer) {
 		List<? extends Hook> list = this.getHooks(htp);
@@ -57,16 +39,12 @@ public class MongoHookService extends AbstractMongoService implements HookServic
 			return null;
 
 		// 构建进行时
-		Hooking ing = new Hooking();
+		Hooking ing = new Hooking(factory);
 		ing.setT(t);
-		ing.setTasks(tasks);
-		ing.setLabels(labels);
-		ing.setUsers(users);
-		ing.setMails(mails);
-		ing.setReportor(reportor);
 		ing.setIoc(ioc);
 		ing.set("$dao", dao);
 		ing.set("$refer", refer);
+
 		ing.setList(list.toArray(new Hook[list.size()]));
 
 		// 循环调用

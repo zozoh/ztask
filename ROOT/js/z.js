@@ -549,8 +549,8 @@ window.z = {
             if(27 == e.which) {
                 $(this).val($(this).attr("old-val")).blur();
             }
-            // Shift + Enter
-            else if(e.which == 13 && window.keyboard.shift) {
+            // Ctrl + Enter
+            else if(e.which == 13 && window.keyboard.ctrl) {
                 $(this).blur();
             }
         };

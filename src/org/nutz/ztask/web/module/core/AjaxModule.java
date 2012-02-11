@@ -38,55 +38,49 @@ public class AjaxModule {
 	@Inject("java:$conf.getInt('sys-task-len-max')")
 	private int taskTitleMaxLength;
 
-	@Inject("refer:hookedTaskService")
-	private TaskService tasks;
-
-	@Inject("refer:labelService")
-	private LabelService labels;
-
-	@Inject("refer:reportor")
-	private TaskReportor reportor;
+	@Inject("refer:serviceFactory")
+	private ZTaskFactory factory;
 
 	@At("/report/year")
 	public List<TaskReport> getReports(@Param("yy") String year) {
 		Calendar from = Times.C(year + "-01-01 00:00:00");
 		Calendar to = Times.C(year + "-12-31 23:59:59");
-		return reportor.getBy(from, to);
+		return factory.reportor().getBy(from, to);
 	}
 
 	@At("/label/tops")
 	public List<Label> getTopLabels() {
-		return labels.getTopLabels();
+		return factory.labels().getTopLabels();
 	}
 
 	@At("/label/children")
 	public List<Label> getChildrenLabels(@Param("lbnm") String labelName) {
-		return labels.getChildren(labelName);
+		return factory.labels().getChildren(labelName);
 	}
 
 	@At("/do/sync/labels")
 	public List<Label> doSyncLabels() {
-		return labels.syncLables();
+		return factory.labels().syncLables();
 	}
 
 	@At("/do/push")
 	public Task doPush(@Param("tid") String taskId, @Param("s") String stackName) {
-		return tasks.pushToStack(tasks.checkTask(taskId), stackName);
+		return factory.htasks().pushToStack(factory.htasks().checkTask(taskId), stackName);
 	}
 
 	@At("/do/pop")
 	public Task doPop(@Param("tid") String taskId, @Param("done") boolean done) {
-		return tasks.popFromStack(taskId, done);
+		return factory.htasks().popFromStack(taskId, done);
 	}
 
 	@At("/do/hungup")
 	public Task doHungup(@Param("tid") String taskId) {
-		return tasks.hungupTask(tasks.checkTask(taskId));
+		return factory.htasks().hungupTask(factory.htasks().checkTask(taskId));
 	}
 
 	@At("/do/restart")
 	public Task doRestart(@Param("tid") String taskId) {
-		return tasks.restartTask(tasks.checkTask(taskId));
+		return factory.htasks().restartTask(factory.htasks().checkTask(taskId));
 	}
 
 	@At("/do/comment/add")
@@ -94,13 +88,13 @@ public class AjaxModule {
 								@Param("txt") String text,
 								@Attr(scope = Scope.SESSION, value = Webs.ME) User me) {
 		text = ZTasks.wrapComment(text, me.getName());
-		tasks.addComment(taskId, text);
+		factory.htasks().addComment(taskId, text);
 		return text;
 	}
 
 	@At("/do/comment/del")
 	public Task doDeleteComment(@Param("tid") String taskId, @Param("i") int index) {
-		return tasks.deleteComments(taskId, index);
+		return factory.htasks().deleteComments(taskId, index);
 	}
 
 	@At("/do/comment/set")
@@ -109,35 +103,36 @@ public class AjaxModule {
 								@Param("txt") String text,
 								@Attr(scope = Scope.SESSION, value = Webs.ME) User me) {
 		text = ZTasks.wrapComment(text, me.getName());
-		tasks.setComment(taskId, index, ZTasks.wrapComment(text, me.getName()));
+		factory.htasks().setComment(taskId, index, ZTasks.wrapComment(text, me.getName()));
 		return text;
 	}
 
 	@AdaptBy(type = JsonAdaptor.class)
 	@At("/task/query")
 	public List<Task> queryTask(TaskQuery tq) {
-		return tasks.queryTasks(tq);
+		return factory.htasks().queryTasks(tq);
 	}
 
 	@At("/task/set/text")
 	public Task doSetTaskTitle(@Param("tid") String taskId, @Param("txt") String newText) {
-		return tasks.setText(tasks.checkTask(taskId), newText);
+		return factory.htasks().setText(factory.htasks().checkTask(taskId), newText);
 	}
 
 	@At("/task/set/labels")
 	public Task doSetTaskLabels(@Param("tid") String taskId, @Param("lbs") String[] lbs) {
-		return tasks.setLabels(tasks.checkTask(taskId), lbs);
+		return factory.htasks().setLabels(factory.htasks().checkTask(taskId), lbs);
 	}
 
 	@At("/task/set/owner")
 	public Task doSetTaskOwner(@Param("tid") String taskId, @Param("ow") String ownerName) {
-		return tasks.setOwner(tasks.checkTask(taskId), ownerName);
+		return factory.htasks().setOwner(factory.htasks().checkTask(taskId), ownerName);
 	}
 
 	@At("/task/set/parent")
 	public Task doSetTaskParent(@Param("tids") String[] taskIds, @Param("pid") String parentId) {
-		tasks.setParentTask(tasks.checkTask(parentId), tasks.checkTasks(taskIds));
-		return tasks.getTask(parentId);
+		factory.htasks().setParentTask(	factory.htasks().checkTask(parentId),
+										factory.htasks().checkTasks(taskIds));
+		return factory.htasks().getTask(parentId);
 	}
 
 	/**
@@ -149,22 +144,22 @@ public class AjaxModule {
 	 */
 	@At("/task/gout")
 	public Task doGoutTask(@Param("tid") String taskId) {
-		Task t = tasks.checkTask(taskId);
+		Task t = factory.htasks().checkTask(taskId);
 		if (Strings.isBlank(t.getParentId()))
 			return t;
-		Task p = tasks.checkTask(t.getParentId());
-		tasks.setParentTask(p, t);
+		Task p = factory.htasks().checkTask(t.getParentId());
+		factory.htasks().setParentTask(p, t);
 		return t;
 	}
 
 	@At("/task/topnews")
 	public List<Task> getTopNewTasks() {
-		return tasks.getTopNewTasks();
+		return factory.htasks().getTopNewTasks();
 	}
 
 	@At("/task/children")
 	public List<Task> getChildrenTasks(@Param("tid") String taskId, HttpServletRequest req) {
-		return tasks.getChildTasks(taskId);
+		return factory.htasks().getChildTasks(taskId);
 	}
 
 	@At("/task/get")
@@ -174,18 +169,18 @@ public class AjaxModule {
 		}
 		List<Task> list = new ArrayList<Task>(taskIds.length);
 		for (String taskId : taskIds)
-			list.add(tasks.getTask(taskId));
+			list.add(factory.htasks().getTask(taskId));
 		return list;
 	}
 
 	@At("/task/self")
 	public Task getTaskSelfAndChildren(@Param("tid") String taskId) {
-		return tasks.loadTaskChildren(tasks.checkTask(taskId));
+		return factory.htasks().loadTaskChildren(factory.htasks().checkTask(taskId));
 	}
 
 	@At("/task/del")
 	public Task removeTask(@Param("tid") String taskId, @Param("r") boolean recur) {
-		return tasks.removeTask(taskId, recur);
+		return factory.htasks().removeTask(taskId, recur);
 	}
 
 	@At("/task/save")
@@ -205,7 +200,7 @@ public class AjaxModule {
 		// 检查: 父任务是否存在
 		Task parent = null;
 		if (!Strings.isBlank(parentId)) {
-			parent = tasks.checkTask(parentId);
+			parent = factory.htasks().checkTask(parentId);
 		}
 
 		// 合适，那么我们来创建它
@@ -217,7 +212,7 @@ public class AjaxModule {
 		t.setParentId(null == parent ? null : parent.get_id());
 
 		// 创建
-		return tasks.createTask(t);
+		return factory.htasks().createTask(t);
 	}
 
 	/**
@@ -236,26 +231,26 @@ public class AjaxModule {
 	 */
 	@At("/stack/detail")
 	public Map<String, Object> getStackDetail(@Param("s") String stackName) {
-		TaskStack s = tasks.checkStack(stackName);
-		List<Task> ts = tasks.getTasksInStack(s, null);
+		TaskStack s = factory.htasks().checkStack(stackName);
+		List<Task> ts = factory.htasks().getTasksInStack(s, null);
 		return Chain.make("stack", s).add("tasks", ts).toMap();
 	}
 
 	@At("/stack/children")
 	public List<TaskStack> getChildrenStacks(@Param("s") String stackName) {
-		return tasks.getChildStacks(stackName);
+		return factory.htasks().getChildStacks(stackName);
 	}
 
 	@At("/stack/tops")
 	public List<TaskStack> getTopStacks() {
-		return tasks.getTopStacks();
+		return factory.htasks().getTopStacks();
 	}
 
 	@At("/stack/myfavos")
 	public List<TaskStack> getMyFavoStacks(@Attr(scope = Scope.SESSION, value = Webs.ME) User me) {
-		List<TaskStack> re = tasks.getMyFavoStacks(me.getName());
+		List<TaskStack> re = factory.htasks().getMyFavoStacks(me.getName());
 		if (re.isEmpty())
-			re = Lang.list(tasks.getStack(me.getName()));
+			re = Lang.list(factory.htasks().getStack(me.getName()));
 		return re;
 	}
 
@@ -271,7 +266,7 @@ public class AjaxModule {
 	@At("/stack/do/watch")
 	public TaskStack doWatchStack(	@Param("s") String stackName,
 									@Attr(scope = Scope.SESSION, value = Webs.ME) User me) {
-		return tasks.watchStack(tasks.checkStack(stackName), me.getName());
+		return factory.htasks().watchStack(factory.htasks().checkStack(stackName), me.getName());
 	}
 
 	/**
@@ -286,7 +281,7 @@ public class AjaxModule {
 	@At("/stack/do/unwatch")
 	public TaskStack doUnwatchStack(@Param("s") String stackName,
 									@Attr(scope = Scope.SESSION, value = Webs.ME) User me) {
-		return tasks.unwatchStack(tasks.checkStack(stackName), me.getName());
+		return factory.htasks().unwatchStack(factory.htasks().checkStack(stackName), me.getName());
 	}
 
 	@AdaptBy(type = JsonAdaptor.class)
@@ -295,15 +290,15 @@ public class AjaxModule {
 		if (null == info)
 			info = new GInfo();
 		if (!Strings.isBlank(info.get_id())) {
-			GInfo info2 = tasks.dao().findOne(GInfo.class, null);
+			GInfo info2 = factory.htasks().dao().findOne(GInfo.class, null);
 			info.set_id(info2.get_id());
 		}
-		return tasks.setGlobalInfo(info);
+		return factory.htasks().setGlobalInfo(info);
 	}
 
 	@At("/g/get")
 	public GInfo getGlobalInfo(@Param("smtp") boolean showSmtp) {
-		GInfo info = tasks.getGlobalInfo();
+		GInfo info = factory.htasks().getGlobalInfo();
 		if (null == info)
 			info = new GInfo();
 		if (!showSmtp)

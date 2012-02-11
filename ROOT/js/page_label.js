@@ -9,13 +9,27 @@ function main() {
 function redrawLables(lbs) {
     var jLbs = $("#labels").empty();
     if(lbs && lbs.length > 0) {
+        // 算最大/小值
+        var max = 0;
+        var min = -1;
+        for(var i = 0; i < lbs.length; i++) {
+            var c = lbs[i].count;
+            max = Math.max(max, c);
+            min = min < 0 ? c : Math.min(c, min);
+        }
+        jLbs.attr("lb-count-max", max).attr("lb-count-min", min);
+        var de = max - min;
+        // 输出
         for(var i = 0; i < lbs.length; i++) {
             var lb = lbs[i];
-            var html = '<div class="label" lb-id="' + lb._id + '">';
+            var fz = Math.max(14, 60 * (lb.count - min) / de);
+            var fontSize = "font-size:" + fz + "px;";
+            var style = lb.color ? ' color:' + lb.color + ';' : "";
+            var html = '<span class="label" lb-id="' + lb._id + '"  lb-count="' + lb.count + '"';
+            html += ' style="' + style + fontSize + '">';
             html += '<b class="lb_name">' + lb.name + '</b>';
-            if(lb.count)
-                html += '<em>' + lb.count + '</em>';
-            html += '</div>';
+            html += '<em ' + (lb.color ? 'style="background-color:' + lb.color + ';"' : "") + '>' + lb.count + '</em>';
+            html += '</span>';
             $(html).appendTo(jLbs);
         }
     }
@@ -42,7 +56,7 @@ function onClickLabel() {
         var jTasks = $("#tasks").empty();
         for(var i = 0; i < ts.length; i++) {
             task_html.apply(jTasks, [ts[i], {
-                menu: "edit,del,label",
+                menu: "edit,del",
                 goin: false
             }]);
         }
