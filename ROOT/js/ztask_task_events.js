@@ -326,11 +326,11 @@ function task_events_on_edit() {
                 ajax.post("/ajax/task/set/text", {
                     tid: ee.t._id,
                     txt: newval
-                }, function() {
+                }, function(re) {
                     // 找到所有对应的 TASK，进行数据修改
                     $(".id_"+ee.t._id).each(function() {
-                        var jq = $(".task_content", this).html(task_format_text(newval));
-                        ee.t.text = newval;
+                        var jq = $(".task_content", ee.jTask).html(task_format_text(re.data.text));
+                        ee.t.text = re.data.text;
                         z.blinkIt(this);
                     });
                 });

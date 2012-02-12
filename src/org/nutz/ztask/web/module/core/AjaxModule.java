@@ -114,7 +114,7 @@ public class AjaxModule {
 	}
 
 	@At("/task/set/text")
-	public Task doSetTaskTitle(@Param("tid") String taskId, @Param("txt") String newText) {
+	public Task doSetTaskText(@Param("tid") String taskId, @Param("txt") String newText) {
 		return factory.htasks().setText(factory.htasks().checkTask(taskId), newText);
 	}
 

@@ -63,7 +63,6 @@
     width: 24px;
     height: 24px;
     background: url(pics/icons.png) no-repeat;
-    background-position-x: 0;
 }
 
 .stack_view_item:hover{
@@ -71,20 +70,19 @@
 }
 
 .stack_view_item_hlt {
-    background-position-x: -24px;
     background-color:#EEC;
 }
 
 .stack_view_hide {
-    background-position-y: -119px;
+    background-position:0 -119px;
 }
 
 .stack_view_brief {
-    background-position-y: -145px;
+    background-position:0 -145px;
 }
 
 .stack_view_full {
-    background-position-y: -169px;
+    background-position:0 -169px;
 }
 
 .stack_head a {

@@ -146,7 +146,8 @@ function stack_redraw_mytasks(ts, animate) {
         if(!animate) {
             for(; i < ts.length; i++) {
                 var jTask = task_html.apply(jBody, [ts[i], opt]);
-                z.blinkIt(jTask);
+                if("hide" != viewType)
+                    z.blinkIt(jTask);
             }
         }
         // 动画显示
@@ -155,11 +156,15 @@ function stack_redraw_mytasks(ts, animate) {
                 if(i >= ts.length)
                     return;
                 var jTask = task_html.apply(jBody, [ts[i++], opt]);
-                jTask[0].scrollIntoView(false);
-                z.blinkIt(jTask, {
-                    speed: 80,
-                    after: func
-                });
+                if("hide" != viewType) {
+                    jTask[0].scrollIntoView(false);
+                    z.blinkIt(jTask, {
+                        speed: 80,
+                        after: func
+                    });
+                } else {
+                    func();
+                }
             };
             func();
         }

@@ -258,11 +258,11 @@ public interface TaskService extends AbstractService {
 	 * 
 	 * @param t
 	 *            任务
-	 * @param newTitle
-	 *            新标题
+	 * @param newText
+	 *            新文本
 	 * @return 修改后的任务对象，null 表示该任务不存在
 	 */
-	Task setText(Task t, String newTitle);
+	Task setText(Task t, String newText);
 
 	/**
 	 * 修改一组任务的父任务

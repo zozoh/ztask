@@ -2,7 +2,9 @@ function main() {
     doReloadLabels();
     $("#labels").delegate(".label", "click", onClickLabel);
     task_events_bind($("#tasks"), {
-
+        reject: task_replace,
+        renew: task_replace,
+        done: task_replace
     });
 }
 

@@ -278,11 +278,11 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 	}
 
 	@Override
-	public Task setText(Task t, String newTitle) {
+	public Task setText(Task t, String newText) {
 		dao.updateById(	Task.class,
 						t.get_id(),
-						Moo.NEW().set("text", newTitle).set("lastModified", Times.now()));
-		t.setText(newTitle);
+						Moo.NEW().set("text", newText).set("lastModified", Times.now()));
+		t.setText(newText);
 		return t;
 	}
 

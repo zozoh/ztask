@@ -216,7 +216,7 @@ function task_html(t, opt) {
     }
     var viewType = opt.viewType || "full";
     // 开始准备 HTML
-    var html = '<div class="task task_view_' + viewType + '" id_' + t._id + '" task-id="' + t._id + '">';
+    var html = '<div class="task task_view_' + viewType + ' id_' + t._id + '" task-id="' + t._id + '">';
     /*
      * 简要模式
      */
@@ -224,9 +224,11 @@ function task_html(t, opt) {
         /*
          * 主动作按钮
          */
-        html += '<div class="task_btn ' + statusClass + '">';
-        html += '    <div class="task_status">' + statusText + '</div>';
-        html += '</div>';
+        if(t.owner == myname()) {
+            html += '<div class="task_btn ' + statusClass + '">';
+            html += '    <div class="task_status">' + statusText + '</div>';
+            html += '</div>';
+        }
         /*
          * 内容
          */
@@ -261,9 +263,11 @@ function task_html(t, opt) {
         /*
          * 主动作按钮
          */
-        html += '<div class="task_btn ' + statusClass + '">';
-        html += '    <div class="task_status">' + statusText + '</div>';
-        html += '</div>';
+        if(t.owner == myname()) {
+            html += '<div class="task_btn ' + statusClass + '">';
+            html += '    <div class="task_status">' + statusText + '</div>';
+            html += '</div>';
+        }
         /*
          * 节点任务的统计数据
          */

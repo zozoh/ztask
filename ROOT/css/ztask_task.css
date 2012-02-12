@@ -5,8 +5,8 @@
     position: relative;
 }
 
-.task_view_brief{
-    padding:4px 8px;
+.task_view_brief {
+    padding: 4px 8px;
 }
 
 .task_view_hide {
@@ -193,12 +193,12 @@
     -khtml-user-select: none;
     -webkit-user-select: none;
     user-select: none;
-    overflow:hidden;
+    overflow: hidden;
 }
 
 .task_view_brief .task_btn {
-    margin:1px 8px;
-    padding:2px 4px;
+    margin: 1px 8px;
+    padding: 2px 4px;
 }
 
 .task_view_full .task_btn {
@@ -333,7 +333,7 @@
     right: 10px;
 }
 
-.hierachy_left .task_view_brief .task_btn{
+.hierachy_left .task_view_brief .task_btn {
     float: right;
 }
 
@@ -344,6 +344,7 @@
 
 .hierachy_left .task_menu {
     float: left;
+    padding-left: 4px;
 }
 
 .hierachy_left .task_menu a {
@@ -385,7 +386,7 @@
     left: 10px;
 }
 
-.hierachy_right .task_view_brief .task_btn{
+.hierachy_right .task_view_brief .task_btn {
     float: left;
 }
 
@@ -396,6 +397,7 @@
 
 .hierachy_right .task_menu {
     float: right;
+    padding-right: 4px;
 }
 
 .hierachy_right .task_menu a {
