@@ -3,6 +3,7 @@ package org.nutz.ztask.hook;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
 import org.nutz.lang.segment.Segment;
@@ -28,6 +29,7 @@ import org.nutz.ztask.util.ZTasks;
  * 
  * @author zozoh(zozohtnt@gmail.com)
  */
+@IocBean(name = "h_notify")
 public class AddNotify implements HookHandler {
 
 	private static final Log log = Logs.get();

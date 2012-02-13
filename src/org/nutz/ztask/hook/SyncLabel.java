@@ -1,5 +1,6 @@
 package org.nutz.ztask.hook;
 
+import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.ztask.api.HookHandler;
 import org.nutz.ztask.api.HookType;
 import org.nutz.ztask.api.Hooking;
@@ -13,6 +14,7 @@ import org.nutz.ztask.api.Hooking;
  * 
  * @author zozoh(zozohtnt@gmail.com)
  */
+@IocBean(name="h_sync_label")
 public class SyncLabel implements HookHandler {
 
 	@Override

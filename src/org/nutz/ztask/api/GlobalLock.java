@@ -13,8 +13,19 @@ public class GlobalLock {
 		return stop;
 	}
 
-	public void setStop(boolean stop) {
-		this.stop = stop;
+	/**
+	 * 关闭所有同步在自己身上的线程，子类可以重载，进行更多的操作
+	 */
+	synchronized public void stop() {
+
+		// 设置标志
+		stop = true;
+
+		// 通知所有同步在自己上的线程，停止
+		synchronized (this) {
+			this.notifyAll();
+		}
+
 	}
 
 }

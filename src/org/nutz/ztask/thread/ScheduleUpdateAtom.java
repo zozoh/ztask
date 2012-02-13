@@ -54,6 +54,14 @@ public class ScheduleUpdateAtom extends AbstractAtom {
 	public static final String NAME = "SCHD.update";
 
 	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder(super.toString());
+		sb.append("\n").append(factory.schedule().toString());
+		sb.append("\n------------------ The End ----------------------\n");
+		return sb.toString();
+	}
+
+	@Override
 	public String name() {
 		return NAME;
 	}

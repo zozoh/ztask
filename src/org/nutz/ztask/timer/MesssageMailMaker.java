@@ -105,6 +105,6 @@ public class MesssageMailMaker implements TimerHandler {
 		}
 
 		// 返回成功
-		return null;
+		return "OK:" + map.size() + " users";
 	}
 }

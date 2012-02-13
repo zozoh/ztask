@@ -55,6 +55,10 @@ var ioc = {
 			sec_each_slot : { java : '$conf.get("sys-timer-slot", 3600)' },
 			thread_pool_size : { java : '$conf.get("sys-timer-thread-pool-size", 10)' } } },
 	/*
+	 * 邮件发送线程专用同步锁
+	 */
+	mailLock : { type : "org.nutz.ztask.api.GlobalLock" },
+	/*
 	 * 抽象原子
 	 */
 	atom : { fields : {

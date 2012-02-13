@@ -353,6 +353,7 @@
 
 .hierachy_left .task_view_brief .task_btn {
     float: right;
+    margin-right:26px;
 }
 
 .hierachy_left .task_uinfo {
@@ -410,6 +411,7 @@
 
 .hierachy_right .task_view_brief .task_btn {
     float: left;
+    margin-left:26px;
 }
 
 .hierachy_right .task_uinfo {

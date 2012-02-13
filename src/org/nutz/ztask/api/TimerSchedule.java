@@ -132,11 +132,6 @@ public class TimerSchedule extends GlobalLock {
 						Times.sDTms(time),
 						System.currentTimeMillis() - time.getTime());
 
-		// 更详细的调试信息
-		if (log.isDebugEnabled()) {
-			log.debug(this.toString());
-		}
-
 		// 标志完成
 		_done_ = true;
 
@@ -175,12 +170,14 @@ public class TimerSchedule extends GlobalLock {
 	 * 关闭线程池，以及通知所有的后台线程停止
 	 */
 	synchronized public void stop() {
+		// 关闭线程池
 		threads.shutdown();
+
+		// 设置标志
 		_done_ = true;
-		this.setStop(true);
-		synchronized (this) {
-			this.notifyAll();
-		}
+
+		// 通知所有同步在自己上的线程，停止
+		super.stop();
 	}
 
 	/**

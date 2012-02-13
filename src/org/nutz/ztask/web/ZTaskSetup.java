@@ -6,6 +6,7 @@ import org.nutz.log.Logs;
 import org.nutz.mvc.NutConfig;
 import org.nutz.mvc.Setup;
 import org.nutz.ztask.ZTask;
+import org.nutz.ztask.api.GlobalLock;
 import org.nutz.ztask.api.InitService;
 import org.nutz.ztask.api.TimerSchedule;
 import org.nutz.ztask.thread.AbstractAtom;
@@ -42,6 +43,9 @@ public class ZTaskSetup implements Setup {
 			}
 		}
 
+		// 最后将 atoms 数组存入应用上下文环境，以便界面的JSP端读取其状态
+		config.setAttribute("$atoms", atoms);
+
 		// 初始化结束
 		if (log.isInfoEnabled())
 			log.info("... done for init zTask");
@@ -49,10 +53,17 @@ public class ZTaskSetup implements Setup {
 
 	@Override
 	public void destroy(NutConfig config) {
-		// 关闭并通知
 		Ioc ioc = config.getIoc();
-		TimerSchedule glock = ioc.get(TimerSchedule.class, "schedule");
-		glock.stop();
+
+		// 关闭同步在 schedule 上的线程
+		ioc.get(TimerSchedule.class, "schedule").stop();
+		if (log.isDebugEnabled())
+			log.debug("stop schedule ...");
+
+		// 关闭同步在 mailLock 上的线程
+		ioc.get(GlobalLock.class, "mailLock").stop();
+		if (log.isDebugEnabled())
+			log.debug("stop mailing ...");
 
 		if (log.isInfoEnabled())
 			log.info("zTask is down");

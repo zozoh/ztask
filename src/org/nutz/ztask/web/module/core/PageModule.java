@@ -12,7 +12,9 @@ import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
 import org.nutz.lang.Times;
 import org.nutz.lang.util.NutMap;
+import org.nutz.mvc.Scope;
 import org.nutz.mvc.annotation.At;
+import org.nutz.mvc.annotation.Attr;
 import org.nutz.mvc.annotation.By;
 import org.nutz.mvc.annotation.Fail;
 import org.nutz.mvc.annotation.Filters;
@@ -23,6 +25,7 @@ import org.nutz.web.Webs;
 import org.nutz.ztask.api.TaskReport;
 import org.nutz.ztask.api.ZTaskFactory;
 import org.nutz.ztask.api.User;
+import org.nutz.ztask.thread.AbstractAtom;
 
 @Filters(@By(type = CheckSession.class, args = {Webs.ME, "/page/login"}))
 @InjectName
@@ -77,14 +80,34 @@ public class PageModule {
 	public void showLoginPage() {}
 
 	/**
-	 * 一个查看后台 schedule 状态的隐蔽 URL
+	 * 一个查看后台 schedule 状态的界面
 	 * 
 	 * @return 后台 schedule 的内容
 	 */
 	@At("/monitor/schedule")
-	@Ok("jsp:jsp.monitor.schedule")
-	public String showMonitorSchedule() {
+	@Ok("jsp:jsp.monitor.brief")
+	public String showMonitorSchedule(ServletRequest req) {
+		req.setAttribute("title", "zTask schedule dump");
 		return factory.schedule().toString();
+	}
+
+	/**
+	 * 一个查看后台进程状态的隐蔽界面
+	 * 
+	 * @return 后台 schedule 的内容
+	 */
+	@At("/monitor/threads")
+	@Ok("jsp:jsp.monitor.brief")
+	public String showMonitorThreads(	ServletRequest req,
+										@Attr(scope = Scope.APP, value = "$atoms") AbstractAtom[] atoms) {
+		req.setAttribute("title", "zTask threads");
+
+		StringBuilder sb = new StringBuilder();
+		for (AbstractAtom atom : atoms) {
+			sb.append(" - ").append(atom.getRuntimeInfo()).append("\n\n");
+		}
+
+		return sb.toString();
 	}
 
 	/**

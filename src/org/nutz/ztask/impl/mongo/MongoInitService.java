@@ -99,13 +99,13 @@ public class MongoInitService extends AbstractMongoService implements InitServic
 			// 如果堆栈不存在，则创建它，否则从 alls 移除，这样就能知道应该删掉哪些堆栈了
 			TaskStack s = alls.get(stackName);
 			String newID = "";
-			// 不存在，创建
+			// 不存在，在数据库中创建
 			if (null == s) {
 				s = factory.htasks().createStackIfNoExistis(stackName, u.getName());
 				factory.htasks().watchStack(s, u.getName());
 				newID = s.get_id();
 			}
-			// 存在，移除索引
+			// 存在，从 map 中移除
 			else {
 				alls.remove(s.getName());
 			}
@@ -145,6 +145,18 @@ public class MongoInitService extends AbstractMongoService implements InitServic
 			factory.htasks().removeStack(s.getName());
 			if (log.isDebugEnabled())
 				log.debugf("  -- Done", s.get_id());
+		}
+
+		// 最后检查一下，如果一个用户没有 watch 任何堆栈，那么让他 watch 自己
+		for (User u : factory.users().all()) {
+			if (factory.tasks().getMyFavoStacks(u.getName()).isEmpty()) {
+				TaskStack s = factory.tasks().getStack(u.getName());
+				if (null != s) {
+					if (log.isDebugEnabled())
+						log.debug("  - rewatch : " + u.getName());
+					factory.tasks().watchStack(s, u.getName());
+				}
+			}
 		}
 
 	}

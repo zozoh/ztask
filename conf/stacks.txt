@@ -1,10 +1,10 @@
 # 这里存放系统中所有的堆栈
 #
-RD_服务器 @zozoh
+服务器 @zozoh
  - ${name} @pangwu
  - ${name} @wendal
  - ${name} @zozoh
-RD_客户端 @zft
+客户端 @zft
  - ${name} @dxni
  - ${name} @sjie
  - ${name} @xlei
@@ -21,3 +21,9 @@ RD_客户端 @zft
  - ${name} @nwang
  - ${name} @stone
  - ${name} @wangq
+公司级经验积累    @amber
+ - 服务器搭建    @wendal
+ - 用户体验      @pangwu
+ - 播放器调试    @yyang
+ - 系统剪裁      @sjie
+ - 设备测试与安装 @liuhe

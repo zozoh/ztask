@@ -9,28 +9,35 @@ import org.nutz.log.Logs;
 import org.nutz.mail.AfterEach;
 import org.nutz.mail.EachMail;
 import org.nutz.mail.MailObj;
+import org.nutz.ztask.api.GlobalLock;
 import org.nutz.ztask.api.SmtpInfo;
 import org.nutz.ztask.api.User;
 import org.nutz.ztask.util.ZTasks;
 
+/**
+ * 本原子负责消费邮件队列中的邮件
+ * 
+ * @author zozoh(zozohtnt@gmail.com)
+ */
 public class SendMailAtom extends AbstractAtom {
 
 	private final static Log log = Logs.get();
 
+	/**
+	 * 注入: 邮件线程，特殊的启动间隔时间
+	 */
 	private int interval;
 
-	private boolean firstUp;
-
-	public SendMailAtom() {
-		firstUp = true;
-	}
+	/**
+	 * 注入: 邮件线程，特殊的同步锁。 以便 schedule 被 notify 的时候，它不会启动
+	 */
+	private GlobalLock lock;
 
 	@Override
 	protected long exec() {
-		if (firstUp) {
+		if (isFirstUp()) {
 			if (log.isInfoEnabled())
 				log.info("skip first up");
-			firstUp = false;
 			return inter();
 		}
 
@@ -96,6 +103,11 @@ public class SendMailAtom extends AbstractAtom {
 
 	private int inter() {
 		return interval <= 0 ? 30000 : interval * 1000;
+	}
+
+	@Override
+	public GlobalLock getMyLock() {
+		return lock;
 	}
 
 	public static final String NAME = "SEND.MAIL";

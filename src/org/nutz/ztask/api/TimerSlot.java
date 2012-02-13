@@ -77,16 +77,23 @@ public class TimerSlot {
 
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < rows.length; i++) {
+			// 增加分隔符
 			if (i > 0)
 				sb.append(", ");
+
+			// 每个槽行 [ 名字 ｜ 状态 or TimerHandler ]...
 			Object[] row = rows[i];
 			sb.append('"').append(row[0]).append(':');
 			Object o = row[1];
+			// 运行完毕了
 			if (o == null || o instanceof CharSequence) {
+				sb.append(Strings.dup('-', 10));
 				sb.append(Strings.alignLeft(Times.sDTms(doneAt.getTime()), 21, ' '));
 				if (null != o)
 					sb.append(" [").append(o).append("]");
-			} else {
+			}
+			// 还未运行
+			else {
 				sb.append("..").append(o.getClass().getSimpleName());
 			}
 		}
