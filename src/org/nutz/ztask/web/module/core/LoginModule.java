@@ -12,11 +12,15 @@ import org.nutz.web.Webs;
 import org.nutz.ztask.api.User;
 import org.nutz.ztask.api.ZTaskFactory;
 import org.nutz.ztask.util.Err;
+import org.nutz.ztask.web.ZTaskConfig;
 
 @InjectName
 @IocBean
 @At("/do")
 public class LoginModule {
+
+	@Inject("refer:conf")
+	private ZTaskConfig conf;
 
 	@Inject("refer:serviceFactory")
 	private ZTaskFactory factory;
@@ -30,6 +34,10 @@ public class LoginModule {
 			throw Err.U.INVALID_LOGIN();
 		// 通过 ...
 		sess.setAttribute(Webs.ME, u);
+
+		// 记录一些配置数据
+		sess.setAttribute("msg_inter", conf.getInt("sys-msg-update-interval", 200) * 1000);
+		sess.setAttribute("rs", conf.get("app-rs", ""));
 	}
 
 	@At("/logout")

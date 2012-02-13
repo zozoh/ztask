@@ -8,6 +8,7 @@ import java.util.List;
 import org.junit.Test;
 import org.nutz.castor.Castors;
 import org.nutz.lang.Lang;
+import org.nutz.lang.Times;
 import org.nutz.lang.util.Callback;
 import org.nutz.mongo.MongoCase;
 import org.nutz.mongo.dao.pojo.CappedPet;
@@ -24,6 +25,51 @@ import com.mongodb.DB;
 import com.mongodb.WriteResult;
 
 public class MongoDaoPojoTest extends MongoCase {
+
+	@Test
+	public void test_find_by_date_null() {
+		dao.create(Pet.class, true);
+		dao.save(Pet.NEW("A"));
+		dao.save(Pet.BIRTHDAY("B", "2009-09-21 00:00:11"));
+		dao.save(Pet.NEW("C"));
+
+		List<Pet> pets;
+
+		pets = dao.find(Pet.class, Moo.NEW("birthday", null), null);
+		assertEquals(2, pets.size());
+		assertEquals("A", pets.get(0).getName());
+		assertEquals("C", pets.get(1).getName());
+
+		pets = dao.find(Pet.class, Moo.NEW().ne("birthday", null), null);
+		assertEquals(1, pets.size());
+		assertEquals("B", pets.get(0).getName());
+	}
+
+	@Test
+	public void test_find_and_modify_remove() {
+		dao.create(Pet.class, true);
+		dao.save(Pet.NEW("A"));
+		Pet b = dao.save(Pet.NEW("B"));
+		dao.save(Pet.NEW("C"));
+
+		Pet pet = dao.findAndModify(Pet.class, Moo.NEW("name", "B"), Moo.SET("age", 800));
+		assertEquals(b.getAge(), pet.getAge());
+
+		pet = dao.findAndRemove(Pet.class, Moo.NEW("name", "B"));
+		assertEquals(800, pet.getAge());
+
+		List<Pet> pets = dao.find(Pet.class, null, null);
+		assertEquals(2, pets.size());
+		assertEquals("A", pets.get(0).getName());
+		assertEquals("C", pets.get(1).getName());
+
+		pet = dao.findAndModify(Pet.class, Moo.NEW("name", "B"), Moo.SET("age", 900));
+		assertNull(pet);
+
+		pet = dao.findAndRemove(Pet.class, Moo.NEW("name", "B"));
+		assertNull(pet);
+
+	}
 
 	@Test
 	public void test_two_asc() {
@@ -137,7 +183,7 @@ public class MongoDaoPojoTest extends MongoCase {
 		MCur mcur = MCur.ASC("name");
 		List<Pet> pets;
 
-		pets = dao.find(Pet.class, Moo.D_EQUALS("birthday", "1991-12-30 12:23:48"), mcur);
+		pets = dao.find(Pet.class, Moo.D_EQUALS("birthday", Times.D("1991-12-30 12:23:48")), mcur);
 		assertEquals(1, pets.size());
 		assertEquals("C", pets.get(0).getName());
 
@@ -151,8 +197,8 @@ public class MongoDaoPojoTest extends MongoCase {
 		assertEquals("C", pets.get(1).getName());
 
 		pets = dao.find(Pet.class,
-						Moo.D_GT("birthday", "1980-01-01 00:00:00").d_lt(	"birthday",
-																			"2010-01-01 00:00:00"),
+						Moo.D_GT("birthday", Times.D("1980-01-01 00:00:00"))
+							.d_lt("birthday", Times.D("2010-01-01 00:00:00")),
 						mcur);
 		assertEquals(3, pets.size());
 		assertEquals("B", pets.get(0).getName());
@@ -595,32 +641,32 @@ public class MongoDaoPojoTest extends MongoCase {
 		System.out.println("CappedPet size=" + size);
 		assertTrue(100 >= size);
 	}
-	
+
 	@Test
 	public void test_ref() {
 		Pet embed = Pet.AGE("embed", 10, 1000);
 		Pet lazy = Pet.AGE("LAZY", 20, 2000);
 		Pet ref = Pet.AGE("REF", 30, 3000);
 		dao.create(Pet.class, true);
-//		dao.save(embed);
+		// dao.save(embed);
 		dao.save(lazy);
 		dao.save(ref);
 		assertEquals(2, dao.count(Pet.class, null));
-		
+
 		dao.create(Pet2.class, true);
 		Pet2 pet2 = new Pet2();
 		pet2.setName("XXX");
-		pet2.setId((int)System.currentTimeMillis());
+		pet2.setId((int) System.currentTimeMillis());
 		pet2.setEmbedPet(embed);
 		pet2.setLazyPet(lazy);
 		pet2.setRefPet(ref);
-		pet2.setPets(new Pet[]{embed,embed});
+		pet2.setPets(new Pet[]{embed, embed});
 		pet2.setRefPets(new Pet[]{ref, lazy});
 		dao.save(pet2);
 		assertTrue(dao.count(Pet2.class, null) == 1);
 		Pet2 p = dao.findOne(Pet2.class, null);
 		assertNotNull(p);
-//		assertEquals(embed.getId(), p.getEmbedPet().getId());
+		// assertEquals(embed.getId(), p.getEmbedPet().getId());
 		assertEquals(lazy.getId(), p.getLazyPet().getId());
 		assertEquals(ref.getId(), p.getRefPet().getId());
 		assertEquals("embed", p.getEmbedPet().getName());
@@ -630,7 +676,7 @@ public class MongoDaoPojoTest extends MongoCase {
 		assertEquals(2, p.getPets().length);
 		assertEquals("embed", p.getPets()[0].getName());
 		assertEquals("embed", p.getPets()[1].getName());
-		
+
 		assertEquals(2, p.getRefPets().length);
 		assertEquals("REF", p.getRefPets()[0].getName());
 		assertEquals("LAZY", p.getRefPets()[1].getName());

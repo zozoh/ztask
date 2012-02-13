@@ -11,6 +11,7 @@ import org.nutz.ztask.web.ZTaskSetup;
  * @author zozoh(zozohtnt@gmail.com)
  */
 @Modules(scanPackage = true)
+@ChainBy(args = "ajax.chain.js")
 @Localization("msg")
 @Fail("jsp:jsp.error")
 @SetupBy(ZTaskSetup.class)

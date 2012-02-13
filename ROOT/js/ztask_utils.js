@@ -189,6 +189,11 @@ var _TASK_MENU_ = {
  * @return HTML 字符串表示一个 Task 对象
  */
 function task_html(t, opt) {
+    if( typeof opt == "string") {
+        var mode = opt;
+        opt = $(this).data("task-html-opt") || {};
+        opt.mode = mode;
+    }
     opt = opt || {};
     /*
      * 判断状态
@@ -215,8 +220,16 @@ function task_html(t, opt) {
         throw "Uknow task status '" + t.status + "'";
     }
     var viewType = opt.viewType || "full";
+
     // 开始准备 HTML
     var html = '<div class="task task_view_' + viewType + ' id_' + t._id + '" task-id="' + t._id + '">';
+    /*
+     *显示收藏按钮
+     */
+    var favoIt = z.contains(t.watchers, myname());
+    var tip = favoIt ? z.msg("task.unwatch.tip") : z.msg("task.watch.tip");
+    html += '<span class="task_favo' + ( favoIt ? " task_favo_on" : "") + '" title="' + tip + '"></span>'
+
     /*
      * 简要模式
      */
@@ -224,11 +237,9 @@ function task_html(t, opt) {
         /*
          * 主动作按钮
          */
-        if(t.owner == myname()) {
-            html += '<div class="task_btn ' + statusClass + '">';
-            html += '    <div class="task_status">' + statusText + '</div>';
-            html += '</div>';
-        }
+        html += '<div class="task_btn ' + statusClass + '">';
+        html += '    <div class="task_status">' + statusText + '</div>';
+        html += '</div>';
         /*
          * 内容
          */
@@ -263,11 +274,9 @@ function task_html(t, opt) {
         /*
          * 主动作按钮
          */
-        if(t.owner == myname()) {
-            html += '<div class="task_btn ' + statusClass + '">';
-            html += '    <div class="task_status">' + statusText + '</div>';
-            html += '</div>';
-        }
+        html += '<div class="task_btn ' + statusClass + '">';
+        html += '    <div class="task_status">' + statusText + '</div>';
+        html += '</div>';
         /*
          * 节点任务的统计数据
          */
@@ -326,7 +335,7 @@ function task_html(t, opt) {
         throw "Uknown mode '" + opt.mode + "'";
     }
 
-    return jq.data("task", t);
+    return jq.data("task", t).data("task-html-opt", opt);
 }
 
 /**

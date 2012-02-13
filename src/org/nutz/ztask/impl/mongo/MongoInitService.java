@@ -15,6 +15,7 @@ import org.nutz.mongo.MongoConnector;
 import org.nutz.ztask.api.GInfo;
 import org.nutz.ztask.api.InitService;
 import org.nutz.ztask.api.Label;
+import org.nutz.ztask.api.Message;
 import org.nutz.ztask.api.Task;
 import org.nutz.ztask.api.TaskStack;
 import org.nutz.ztask.api.User;
@@ -155,6 +156,7 @@ public class MongoInitService extends AbstractMongoService implements InitServic
 		dao.create(Label.class, false);
 		dao.create(GInfo.class, false);
 		dao.create(MongoMailObj.class, false);
+		dao.create(Message.class, false);
 		if (log.isDebugEnabled())
 			log.debug("collections checked");
 	}

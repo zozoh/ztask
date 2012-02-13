@@ -4,9 +4,11 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.mail.SimpleEmail;
+import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
 import org.nutz.lang.Times;
 import org.nutz.mail.MailObj;
+import org.nutz.mvc.impl.NutMessageMap;
 import org.nutz.ztask.api.SmtpInfo;
 import org.nutz.ztask.api.User;
 import org.nutz.ztask.impl.mongo.MongoMailObj;
@@ -17,6 +19,82 @@ import org.nutz.ztask.impl.mongo.MongoMailObj;
  * @author zozoh(zozohtnt@gmail.com)
  */
 public abstract class ZTasks {
+
+	/**
+	 * 保存当前线程的多国语言设定
+	 */
+	private static ThreadLocal<NutMessageMap> _msgs_ = new ThreadLocal<NutMessageMap>();
+
+	/**
+	 * 设置当前线程的多国语言设定
+	 * 
+	 * @param msgs
+	 *            多国语言设定
+	 */
+	public static void setMsgs(NutMessageMap msgs) {
+		_msgs_.set(msgs);
+	}
+
+	/**
+	 * 获取当前线程的多国语言设定
+	 * 
+	 * @return 当前线程的多国语言设定
+	 */
+	public static NutMessageMap getMsgs() {
+		return _msgs_.get();
+	}
+
+	/**
+	 * 清除当前线程的多国语言设定
+	 */
+	public static void clearMsgs() {
+		_msgs_.set(null);
+	}
+
+	/**
+	 * 保存当前线程的操作用户
+	 */
+	private static ThreadLocal<User> _me_ = new ThreadLocal<User>();
+
+	/**
+	 * 设置当前线程操作的用户
+	 * 
+	 * @param me
+	 *            当前操作的用户
+	 */
+	public static void setME(User me) {
+		_me_.set(me);
+	}
+
+	/**
+	 * 获取当前线程操作的用户
+	 * 
+	 * @return 当前操作的用户
+	 */
+	public static User getME() {
+		return _me_.get();
+	}
+
+	/**
+	 * 获取当前线程操作的用户名
+	 * 
+	 * @return 当前操作的用户名
+	 */
+	public static String getMyName() {
+		User me = _me_.get();
+		if (null == me)
+			return null;
+		return me.getName();
+	}
+
+	/**
+	 * 清除当前线程操作的用户
+	 */
+	public static void clearME() {
+		_me_.set(null);
+	}
+
+	/*-----------------------------------------------------其他帮助函数----*/
 
 	public static final String REG_NOWORD = "[ \t\r\b\n~!@#$%^&*()+=`:{}|\\[\\]\\\\:\"';<>?,./-]";
 
@@ -37,9 +115,26 @@ public abstract class ZTasks {
 	 * @return 邮件对象
 	 */
 	public static MailObj textMail(String subject, String text) {
+		return textMail(subject, text, null);
+	}
+
+	/**
+	 * 生成一个邮件对象
+	 * 
+	 * @param subject
+	 *            邮件标题
+	 * @param text
+	 *            邮件正文
+	 * @param to
+	 *            接受用户
+	 * @return 邮件对象
+	 */
+	public static MailObj textMail(String subject, String text, String to) {
 		MongoMailObj mo = new MongoMailObj();
 		mo.setSubject(subject);
 		mo.setMailBody(text);
+		if (!Strings.isBlank(to))
+			mo.setTos(Lang.array(to));
 		return mo;
 	}
 
@@ -124,17 +219,31 @@ public abstract class ZTasks {
 	 */
 	public static String wrapComment(String text, String unm, Date d) {
 		// 处理空串
-		text = Strings.sNull(Strings.trim(text), "");
+		text = unwrapComment(text);
 		// 处理前缀
 		if (!Strings.isBlank(unm)) {
-			text = "@" + unm + ": " + text.replaceAll("^@[^ :,]+: ", "");
+			text = "@" + unm + ": " + text;
 		}
 		// 处理后缀
 		if (null != d) {
 			String ds = Times.sDT(d);
-			text = text.replaceAll("[ \t]?//[ \t]*" + REG_D + "$", "") + " //" + ds;
+			text += " //" + ds;
 		}
 		return text;
+	}
+
+	/**
+	 * 将注释文本解包
+	 * 
+	 * @param text
+	 *            注释文本
+	 * @return 解包后的注释文本
+	 */
+	public static String unwrapComment(String text) {
+		// 处理空串
+		text = Strings.sNull(Strings.trim(text), "");
+		// 替换
+		return text.replaceAll("(^@[^ :,]+: )|[ \t]?//[ \t]*" + REG_D + "$", "");
 	}
 
 	/**

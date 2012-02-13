@@ -1,10 +1,10 @@
 package org.nutz.mongo.util;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import org.nutz.castor.Castors;
 import org.nutz.lang.Lang;
 import org.nutz.mongo.Mongos;
 
@@ -44,11 +44,11 @@ public class Moo extends MoChain {
 	 * @param field
 	 *            字段
 	 * @param d
-	 *            日期，格式为 yyyy-MM-dd HH:mm:ss
+	 *            日期
 	 * @return 新节点
 	 */
-	public Moo d_ne(String field, String d) {
-		return append(field, Mongos.dbo("$ne", Castors.me().castTo(d, java.util.Date.class)));
+	public Moo d_ne(String field, Date d) {
+		return append(field, Mongos.dbo("$ne", d));
 	}
 
 	/**
@@ -57,11 +57,11 @@ public class Moo extends MoChain {
 	 * @param field
 	 *            字段
 	 * @param d
-	 *            日期，格式为 yyyy-MM-dd HH:mm:ss
+	 *            日期
 	 * @return 新节点
 	 */
-	public Moo d_gte(String field, String d) {
-		return append(field, Mongos.dbo("$gte", Castors.me().castTo(d, java.util.Date.class)));
+	public Moo d_gte(String field, Date d) {
+		return append(field, Mongos.dbo("$gte", d));
 	}
 
 	/**
@@ -70,11 +70,11 @@ public class Moo extends MoChain {
 	 * @param field
 	 *            字段
 	 * @param d
-	 *            日期，格式为 yyyy-MM-dd HH:mm:ss
+	 *            日期
 	 * @return 新节点
 	 */
-	public Moo d_gt(String field, String d) {
-		return append(field, Mongos.dbo("$gt", Castors.me().castTo(d, java.util.Date.class)));
+	public Moo d_gt(String field, Date d) {
+		return append(field, Mongos.dbo("$gt", d));
 	}
 
 	/**
@@ -83,11 +83,11 @@ public class Moo extends MoChain {
 	 * @param field
 	 *            字段
 	 * @param d
-	 *            日期，格式为 yyyy-MM-dd HH:mm:ss
+	 *            日期
 	 * @return 新节点
 	 */
-	public Moo d_lte(String field, String d) {
-		return append(field, Mongos.dbo("$lte", Castors.me().castTo(d, java.util.Date.class)));
+	public Moo d_lte(String field, Date d) {
+		return append(field, Mongos.dbo("$lte", d));
 	}
 
 	/**
@@ -96,11 +96,11 @@ public class Moo extends MoChain {
 	 * @param field
 	 *            字段
 	 * @param d
-	 *            日期，格式为 yyyy-MM-dd HH:mm:ss
+	 *            日期
 	 * @return 新节点
 	 */
-	public Moo d_lt(String field, String d) {
-		return append(field, Mongos.dbo("$lt", Castors.me().castTo(d, java.util.Date.class)));
+	public Moo d_lt(String field, Date d) {
+		return append(field, Mongos.dbo("$lt", d));
 	}
 
 	/**
@@ -109,11 +109,11 @@ public class Moo extends MoChain {
 	 * @param field
 	 *            字段
 	 * @param d
-	 *            日期，格式为 yyyy-MM-dd HH:mm:ss
+	 *            日期
 	 * @return 新节点
 	 */
-	public Moo d_equals(String field, String d) {
-		return append(field, Castors.me().castTo(d, java.util.Date.class));
+	public Moo d_equals(String field, Date d) {
+		return append(field, d);
 	}
 
 	/**
@@ -127,6 +127,19 @@ public class Moo extends MoChain {
 	 */
 	public Moo ne(String field, Object obj) {
 		return append(field, Mongos.dbo("$ne", obj));
+	}
+
+	/**
+	 * 判断一个字段是否等于给定值，是 "append" 的一个别名
+	 * 
+	 * @param field
+	 *            字段
+	 * @param obj
+	 *            值
+	 * @return 新节点
+	 */
+	public Moo eq(String field, Object obj) {
+		return append(field, obj);
 	}
 
 	/**
@@ -496,10 +509,10 @@ public class Moo extends MoChain {
 	 * @param field
 	 *            字段名
 	 * @param d
-	 *            日期，格式为 yyyy-MM-dd HH:mm:ss
+	 *            日期
 	 * @return 链表对象
 	 */
-	public static Moo D_GT(String field, String d) {
+	public static Moo D_GT(String field, Date d) {
 		return NEW().d_gt(field, d);
 	}
 
@@ -509,10 +522,10 @@ public class Moo extends MoChain {
 	 * @param field
 	 *            字段名
 	 * @param d
-	 *            日期，格式为 yyyy-MM-dd HH:mm:ss
+	 *            日期
 	 * @return 链表对象
 	 */
-	public static Moo D_GTE(String field, String d) {
+	public static Moo D_GTE(String field, Date d) {
 		return NEW().d_gte(field, d);
 	}
 
@@ -522,10 +535,10 @@ public class Moo extends MoChain {
 	 * @param field
 	 *            字段名
 	 * @param d
-	 *            日期，格式为 yyyy-MM-dd HH:mm:ss
+	 *            日期
 	 * @return 链表对象
 	 */
-	public static Moo D_LT(String field, String d) {
+	public static Moo D_LT(String field, Date d) {
 		return NEW().d_lt(field, d);
 	}
 
@@ -535,10 +548,10 @@ public class Moo extends MoChain {
 	 * @param field
 	 *            字段名
 	 * @param d
-	 *            日期，格式为 yyyy-MM-dd HH:mm:ss
+	 *            日期
 	 * @return 链表对象
 	 */
-	public static Moo D_LTE(String field, String d) {
+	public static Moo D_LTE(String field, Date d) {
 		return NEW().d_lte(field, d);
 	}
 
@@ -548,10 +561,10 @@ public class Moo extends MoChain {
 	 * @param field
 	 *            字段名
 	 * @param d
-	 *            日期，格式为 yyyy-MM-dd HH:mm:ss
+	 *            日期
 	 * @return 链表对象
 	 */
-	public static Moo D_EQUALS(String field, String d) {
+	public static Moo D_EQUALS(String field, Date d) {
 		return NEW().d_equals(field, d);
 	}
 

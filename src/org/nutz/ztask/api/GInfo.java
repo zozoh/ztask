@@ -24,7 +24,7 @@ public class GInfo {
 	 */
 	@CoField
 	private String name;
-	
+
 	/**
 	 * 周报的发送目的帐号
 	 */
@@ -52,10 +52,16 @@ public class GInfo {
 	/**
 	 * 声明一组钩子
 	 * <p>
-	 * 每个字符串的格式为 "类型:处理器名"
-	 * <p>
-	 * 比如 "LABEL:syncLabel" <br>
+	 * 每个字符串的格式为 "类型:处理器名"<br>
 	 * 类型大小写不敏感，但是处理器名是 Ioc 容器的对象，大小写敏感
+	 * 
+	 * <pre>
+	 *    "LABEL:syncLabel" 
+	 *    或
+	 *    "*:xxxxx, xxxx"
+	 *    或
+	 *    "LABEL, COMMENT : xxx, xxx"
+	 * </pre>
 	 */
 	@CoField("hooks")
 	private String[] hooks;
@@ -171,7 +177,5 @@ public class GInfo {
 	public void setWeeklyTo(String weeklyTo) {
 		this.weeklyTo = weeklyTo;
 	}
-	
-	
 
 }

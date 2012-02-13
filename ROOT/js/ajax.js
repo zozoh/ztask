@@ -2,10 +2,17 @@ function ajaxError(e) {
     // alert("Ajax Error!\n" + $.dump(e));
     $.masker({
         closeIcon: true,
-        width:620,
-        height:400,
-        show: function(){
-            $(this).errbox(e.msg, e.data.reason, z.dump(e.data.stackTrace), true);
+        width: 620,
+        height: 400,
+        show: function() {
+            var err = e.data;
+            var reason = "Some error";
+            var detail = "...";
+            if(err) {
+                reason = err.reason;
+                detail = err.stackTrace;
+            }
+            $(this).errbox(e.msg, reason, z.dump(detail), true);
         }
     });
 }

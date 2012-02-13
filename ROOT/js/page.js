@@ -14,6 +14,39 @@ $(document.body).ready(function() {
     // 监视键盘
     z.watchKeyboard();
 
+    // 设置消息的自动更新机制
+    var jMsg = $("#msg_count");
+    if(jMsg.size() > 0) {
+        var msgInter = $("#sky").attr("msg-inter") * 1;
+        var _MSG_ID_;
+        var onMessageOK = function(re) {
+            var re = eval("(" + re + ")");
+            var oldCount = jMsg.text() * 1;
+            jMsg.text(re.data);
+            if(re.data > 0) {
+                jMsg.addClass("msg_found");
+            } else {
+                jMsg.removeClass("msg_found");
+            }
+            if(re.data > oldCount && typeof window.onMessageUpdate == "function") {
+                window.onMessageUpdate.apply(jMsg, [re.data]);
+            }
+            _MSG_ID_ = window.setInterval(messagerHandler, msgInter);
+        };
+        var messagerHandler = function() {
+            if(_MSG_ID_) {
+                window.clearInterval(_MSG_ID_);
+                _MSG_ID_ = null;
+            }
+            $.ajax({
+            url: "/ajax//message/count"
+            }).done(onMessageOK).fail(function() {
+                // 容忍 ...
+            });
+        }
+        messagerHandler();
+    }
+
     // 注册 ajax 事件
     $("#logo img").ajaxStart(function() {
     this.style.visibility = "visible";

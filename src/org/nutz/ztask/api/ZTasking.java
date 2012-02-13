@@ -43,6 +43,14 @@ public class ZTasking extends SimpleContext {
 		return this.getAs(referType, "$refer");
 	}
 
+	public String getReferString() {
+		return getReferAs(String.class);
+	}
+
+	public int getReferInt() {
+		return getReferAs(Integer.class);
+	}
+
 	public Date startTime() {
 		return startTime;
 	}

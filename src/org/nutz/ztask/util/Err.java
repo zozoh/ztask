@@ -4,6 +4,7 @@ import static org.nutz.web.Webs.Err.*;
 
 import org.nutz.web.WebException;
 import org.nutz.ztask.api.Hook;
+import org.nutz.ztask.api.Message;
 
 /**
  * 封装了本应用全部得错误
@@ -13,9 +14,21 @@ import org.nutz.ztask.api.Hook;
 public abstract class Err {
 
 	/**
-	 * 报告相关的错误
+	 * 消息相关的错误
 	 */
-	public static class R {
+	public static class M {
+
+		public static WebException NULL_MSG() {
+			return create("e.m.null_msg");
+		}
+
+		public static WebException NULL_OWNER(Message msg) {
+			return create("e.m.null_owner").reason(msg);
+		}
+
+		public static WebException NULL_TEXT(Message msg) {
+			return create("e.m.null_text").reason(msg);
+		}
 
 	}
 
@@ -49,6 +62,10 @@ public abstract class Err {
 
 		public static WebException NULL_TYPE(Hook hook) {
 			return create("e.h.null_type").reason(hook.toString());
+		}
+
+		public static WebException INVALID_STR(int index, String s) {
+			return create("e.h.invalid_str").reasonf("[%d] %s", index, s);
 		}
 
 	}

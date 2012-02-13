@@ -40,11 +40,11 @@ public class MongoTaskServiceTest extends ZTaskCase {
 	@Test
 	public void test_add_remove_edit_comments() {
 		Task a = tasks.createTask(t("A"));
-		tasks.addComment(a.get_id(), "c0");
-		tasks.addComment(a.get_id(), "c1");
-		tasks.addComment(a.get_id(), "c2");
-		tasks.addComment(a.get_id(), "c3");
-		tasks.addComment(a.get_id(), "c4");
+		tasks.addComment(a, "c0");
+		tasks.addComment(a, "c1");
+		tasks.addComment(a, "c2");
+		tasks.addComment(a, "c3");
+		tasks.addComment(a, "c4");
 
 		assertEquals(5, tasks.getTask(a.get_id()).getComments().length);
 		assertEquals("c0", tasks.getTask(a.get_id()).getComments()[0]);
@@ -53,18 +53,18 @@ public class MongoTaskServiceTest extends ZTaskCase {
 		assertEquals("c3", tasks.getTask(a.get_id()).getComments()[3]);
 		assertEquals("c4", tasks.getTask(a.get_id()).getComments()[4]);
 
-		a = tasks.deleteComments(a.get_id(), 5, 1, 3);
+		a = tasks.deleteComments(tasks.checkTask(a.get_id()), 5, 1, 3);
 		assertEquals(3, tasks.getTask(a.get_id()).getComments().length);
 		assertEquals("c0", tasks.getTask(a.get_id()).getComments()[0]);
 		assertEquals("c2", tasks.getTask(a.get_id()).getComments()[1]);
 		assertEquals("c4", tasks.getTask(a.get_id()).getComments()[2]);
 
-		a = tasks.deleteComments(a.get_id(), 1);
+		a = tasks.deleteComments(a, 1);
 		assertEquals(2, a.getComments().length);
 		assertEquals("c0", a.getComments()[0]);
 		assertEquals("c4", a.getComments()[1]);
 
-		a = tasks.setComment(a.get_id(), 1, "haha");
+		a = tasks.setComment(a, 1, "haha");
 		assertEquals("haha", a.getComments()[1]);
 		assertEquals("haha", tasks.getTask(a.get_id()).getComments()[1]);
 	}
@@ -123,7 +123,7 @@ public class MongoTaskServiceTest extends ZTaskCase {
 		Task a = tasks.createTask(t("A"));
 		Task t;
 
-		tasks.addComment(a.get_id(), "c0");
+		tasks.addComment(a, "c0");
 		t = tasks.getTask(a.get_id());
 		assertEquals(1, t.getComments().length);
 		assertEquals("c0", t.getComments()[0]);

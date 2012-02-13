@@ -36,6 +36,7 @@ var ioc = {
 		fields : {
 			hooks : { refer : 'hookService' },
 			labels : { refer : 'labelService' },
+			messages : { refer : 'messageService' },
 			users : { refer : 'userService' },
 			tasks : { refer : 'taskService' },
 			htasks : { refer : 'hookedTaskService' },

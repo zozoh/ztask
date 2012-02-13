@@ -3,11 +3,15 @@ package org.nutz.ztask.impl.mongo;
 import org.nutz.lang.Lang;
 import org.nutz.mongo.annotation.Co;
 import org.nutz.mongo.annotation.CoField;
+import org.nutz.mongo.annotation.CoId;
 import org.nutz.ztask.api.Hook;
 import org.nutz.ztask.api.HookType;
 
 @Co("hook")
 public class MongoHook implements Hook {
+
+	@CoId
+	private String _id;
 
 	@CoField("tp")
 	private HookType type;
@@ -16,7 +20,20 @@ public class MongoHook implements Hook {
 	private String handler;
 
 	@Override
-	public String getID() {
+	public String getId() {
+		return _id;
+	}
+
+	public String get_id() {
+		return _id;
+	}
+
+	public void set_id(String _id) {
+		this._id = _id;
+	}
+
+	@Override
+	public String getName() {
 		return type.toString() + ":" + handler;
 	}
 
@@ -39,7 +56,7 @@ public class MongoHook implements Hook {
 	}
 
 	public String toString() {
-		return getID();
+		return getName();
 	}
 
 	@Override

@@ -115,6 +115,12 @@ public class Task {
 	private String[] labels;
 
 	/**
+	 * 记录当前任务都有哪些关注者
+	 */
+	@CoField("wch")
+	private String[] watchers;
+
+	/**
 	 * 保存任务数量的统计
 	 * <ul>
 	 * <li>0 - ALL: 总的子任务数量
@@ -277,6 +283,14 @@ public class Task {
 
 	public void setOwner(String owner) {
 		this.owner = owner;
+	}
+
+	public String[] getWatchers() {
+		return watchers;
+	}
+
+	public void setWatchers(String[] watchers) {
+		this.watchers = watchers;
 	}
 
 	public TaskStatus getStatus() {

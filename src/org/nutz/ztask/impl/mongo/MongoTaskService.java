@@ -25,6 +25,7 @@ import org.nutz.ztask.api.TaskQuery;
 import org.nutz.ztask.api.TaskService;
 import org.nutz.ztask.api.TaskStack;
 import org.nutz.ztask.api.TaskStatus;
+import org.nutz.ztask.api.User;
 import org.nutz.ztask.util.Err;
 import org.nutz.ztask.util.ZTasks;
 
@@ -50,23 +51,64 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 	}
 
 	@Override
-	public Task addComment(String taskId, String comment) {
-		Task t = checkTask(taskId);
+	public Task addComment(Task t, String comment) {
 		dao.updateById(Task.class, t.get_id(), Moo.NEW().push("comments", comment));
+		return getTask(t.get_id());
+	}
+
+	@Override
+	public Task setComment(Task t, int index, String newText) {
+		dao.updateById(	Task.class,
+						t.get_id(),
+						Moo.SET("comments." + index, newText).set("lastModified", Times.now()));
+		return getTask(t.get_id());
+	}
+
+	@Override
+	public Task addWatchers(Task t, String... watchers) {
+		if (null == watchers || 0 == watchers.length)
+			return t;
+
+		if (null == t.getWatchers() || 0 == t.getWatchers().length) {
+			t.setWatchers(watchers);
+		} else {
+			List<String> list = new ArrayList<String>(t.getWatchers().length + watchers.length);
+			for (String w : watchers) {
+				if (!Lang.contains(t.getWatchers(), w))
+					list.add(w);
+			}
+			for (String w : t.getWatchers())
+				list.add(w);
+			t.setWatchers(list.toArray(new String[list.size()]));
+		}
+
+		dao.updateById(Task.class, t.get_id(), Moo.SET("watchers", t.getWatchers()));
+
 		return t;
 	}
 
 	@Override
-	public Task setComment(String taskId, int index, String newText) {
-		dao.updateById(	Task.class,
-						taskId,
-						Moo.SET("comments." + index, newText).set("lastModified", Times.now()));
-		return getTask(taskId);
+	public Task removeWatchers(Task t, String... watchers) {
+		if (null == watchers || 0 == watchers.length)
+			return t;
+
+		if (null == t.getWatchers() || 0 == t.getWatchers().length) {
+			return t;
+		}
+
+		List<String> list = new ArrayList<String>(t.getWatchers().length + watchers.length);
+		for (String w : t.getWatchers())
+			if (!Lang.contains(watchers, w))
+				list.add(w);
+		t.setWatchers(list.toArray(new String[list.size()]));
+
+		dao.updateById(Task.class, t.get_id(), Moo.SET("watchers", t.getWatchers()));
+
+		return t;
 	}
 
 	@Override
-	public Task deleteComments(String taskId, int... indexes) {
-		Task t = this.checkTask(taskId);
+	public Task deleteComments(Task t, int... indexes) {
 		if (null != t.getComments() && null != indexes && indexes.length > 0) {
 			List<String> cmts = new ArrayList<String>(t.getComments().length);
 			// 先排个序
@@ -81,7 +123,7 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 			t.setComments(cmts.toArray(new String[cmts.size()]));
 			dao.updateById(Task.class, t.get_id(), Moo.SET("comments", t.getComments()));
 		}
-		return t;
+		return getTask(t.get_id());
 	}
 
 	@Override
@@ -218,6 +260,9 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 		// 首先作为无父，无 stack 的任务插入
 		task.setStack(ZTasks.NULL_STACK);
 		task.setParentId(null);
+		// 设置默认关注者
+		if (!Strings.isBlank(task.getCreater()))
+			task.setWatchers(Lang.array(task.getCreater()));
 		// 设置创建时间
 		task.setStatus(TaskStatus.NEW);
 		task.setCreateTime(Times.now());
@@ -723,7 +768,7 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 
 	@Override
 	public TaskStack getStack(String stackName) {
-		if (Strings.isBlank(stackName))
+		if (ZTasks.isBlankStack(stackName))
 			return null;
 		return dao.findOne(TaskStack.class, Moo.NEW().append("name", stackName));
 	}
@@ -846,8 +891,8 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 		// 处理时间范围
 		if (null != tq.qTimeScope()) {
 			Date[] ds = tq.qTimeScope();
-			q.d_gte(tq.getSortBy(), Times.sDT(ds[0]));
-			q.d_lte(tq.getSortBy(), Times.sDT(ds[1]));
+			q.d_gte(tq.getSortBy(), ds[0]);
+			q.d_lte(tq.getSortBy(), ds[1]);
 
 		}
 
@@ -860,6 +905,21 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 		if (null != tq.qStatus()) {
 			String[] ss = Castors.me().castTo(tq.qStatus(), String[].class);
 			q.inArray("status", ss);
+		}
+
+		// 处理 watcher
+		if (null != tq.qWatchers()) {
+			// 自己
+			if (0 == tq.qWatchers().length) {
+				User me = ZTasks.getME();
+				if (null != me) {
+					q.eq("watchers", me.getName());
+				}
+			}
+			// 其他人
+			else {
+				q.all("watchers", tq.qWatchers());
+			}
 		}
 
 		// 处理 creater

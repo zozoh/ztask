@@ -41,6 +41,14 @@ var ioc = {
 	// ~ End bean
 	},
 	/*
+	 * 消息服务类
+	 */
+	messageService : {
+		parent : 'mongoService',
+		type : 'org.nutz.ztask.impl.mongo.MongoMessageService'
+	// ~ End bean
+	},
+	/*
 	 * 钩子服务类
 	 */
 	hookService : {

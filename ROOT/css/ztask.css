@@ -1,0 +1,224 @@
+/*---------------------------------------------------------- 全局设定 ------*/
+* {
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
+
+.clr {
+    clear: both;
+    height: 1px;
+    line-height: 1px;
+    overflow: hidden;
+}
+
+.blank {
+    color: #AAA;
+}
+
+.timestamp {
+    font-size: 10px;
+    color: #CCC;
+    font-weight: normal;
+    font-style: italic;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.hdn {
+    display: none;
+}
+
+body, td, th, font, p {
+    font-size: 12px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    margin: 0;
+    overflow: hidden;
+}
+
+/*---------------------------------------------------------- 通用的A ------*/
+a.lnk {
+    text-decoration: none;
+    color: #08F;
+}
+
+a.lnk:hover {
+    text-decoration: underline;
+    color: #4AF;
+}
+
+a.lnkb {
+    text-decoration: none;
+    color: #ADF;
+}
+
+a.lnkb:hover {
+    text-decoration: underline;
+    color: #FFF;
+}
+
+/*---------------------------------------------------------- #sky 部分 ------*/
+.menu a {
+    color: #33E;
+    text-decoration: none;
+}
+
+.menu a:hover {
+    color: #88F;
+}
+
+#sky {
+    position: fixed;
+    background-color: rgba(0,0,0,0.6);
+    height: 51px;
+    line-height: 50px;
+    padding: 0 180px 0 122px;
+    border-bottom: 1px dotted #F80;
+    z-index: 100;
+}
+
+#sky a {
+    color: #EEE;
+    text-decoration: none;
+}
+
+#sky a:hover {
+    color: #FFF;
+    text-shadow: 1px 0 0px #000;
+}
+
+#logo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 120px;
+    height: 60px;
+    background: #EEE url(pics/ztask_logo.png) no-repeat;
+    border: 1px dotted #F80;
+    border-top: 0;
+    border-left: 0;
+    border-radius: 0 0 20px 0;
+    box-shadow: 0px 0px 10px #666;
+}
+
+#logo img {
+    width: 43px;
+    height: 43px;
+    margin: 8px 30px;
+    visibility: hidden;
+}
+
+#lnks {
+    float: left;
+    width: 50%;
+}
+
+#sky .lnk_menu a {
+    display: inline-block;
+    padding: 0 10px;
+    font-size: 16px;
+}
+
+#sky .lnk_menu a:hover {
+    background-color: rgba(255,255,255,0.1);
+}
+
+#sky .lnk_menu a.hlt, #lnks a.hlt:hover {
+    color: #FFF;
+    font-weight: bold;
+    background-color: #F80;
+    text-shadow: 0 0 2px #FFF;
+}
+
+#menu {
+    float: right;
+    width: 50%;
+    height: 50px;
+}
+
+#menu ul {
+    list-style: none;
+    padding: 10px;
+    margin: 0;
+    text-align: right;
+    line-height: 30px;
+}
+
+#menu ul li {
+    display: inline-block;
+    padding: 0 12px;
+    border-left: 1px solid #888;
+    cursor: pointer;
+}
+
+#menu ul li:last-child {
+    border-right: 1px solid #888;
+}
+
+#corner {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 180px;
+    text-align: right;
+    padding-right: 20px;
+    color: #DDD;
+    font-size: 14px;
+}
+
+/*-------------------------------------------------------- 消息计数 ------*/
+#msg_count{
+    display:inline-block;
+    vertical-align:middle;
+    background-color:rgba(255,255,255,0.4);
+    font-style:normal;
+    font-size:14px;
+    font-weight: normal;
+    line-height: 24px;
+    height:24px;
+    min-width:24px;
+    text-align: center;
+    color:#FFF;
+    border-radius: 4px;
+    margin-bottom:5px;
+}
+
+#msg_count.msg_found{
+    color:#FF0;
+    font-weight: bold;
+}
+
+/*---------------------------------------------------------- 滚动条 ------*/
+.scro::-webkit-scrollbar,
+.hierachy_block_hlt::-webkit-scrollbar {
+    width: 16px;
+    height: 16px;
+}
+
+.scro::-webkit-scrollbar-thumb,
+.hierachy_block_hlt::-webkit-scrollbar-thumb {
+    background-color: rgba(0,0,0,0.1);
+    border-radius: 2px;
+}
+
+.scro::-webkit-scrollbar-button,
+.hierachy_block_hlt::-webkit-scrollbar-button {
+    width: 0;
+    height: 0;
+    display: none;
+}
+
+.scro::-webkit-scrollbar-corner,
+.hierachy_block_hlt::-webkit-scrollbar-corner {
+    background-color: transparent;
+}
+
+/*---------------------------------------------------------- 禁止选择 ------*/
+#sky, .menu .task_menu, .task_labels {
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+}

@@ -7,6 +7,7 @@ import org.nutz.lang.Times;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
 import org.nutz.mongo.MongoConnector;
+import org.nutz.mongo.Mongos;
 import org.nutz.mongo.util.MCur;
 import org.nutz.mongo.util.Moo;
 import org.nutz.ztask.api.Hook;
@@ -34,7 +35,7 @@ public class MongoHookService extends AbstractMongoService implements HookServic
 
 	@Override
 	public Hooking doHook(HookType htp, Task t, Object refer) {
-		List<? extends Hook> list = this.getHooks(htp);
+		List<? extends Hook> list = this.list(htp);
 		if (list.isEmpty())
 			return null;
 
@@ -87,20 +88,23 @@ public class MongoHookService extends AbstractMongoService implements HookServic
 	}
 
 	@Override
-	public boolean removeHook(HookType htp, String handler) {
-		return dao.remove(HT, Moo.NEW("type", htp.toString()).append("handler", handler))
-					.getLastError()
-					.ok();
+	public Hook remove(HookType htp, String handler) {
+		return dao.findAndRemove(HT, Moo.NEW("type", htp.toString()).eq("handler", handler));
 	}
 
 	@Override
-	public void clearHooks() {
+	public Hook removeById(String hookId) {
+		return dao.findAndRemove(HT, Mongos.dboId(hookId));
+	}
+
+	@Override
+	public void clear() {
 		dao.remove(HT, null);
 	}
 
 	@Override
-	public boolean addHook(Hook hook) {
-		if (null != getHook(hook.getType(), hook.getHandler()))
+	public boolean add(Hook hook) {
+		if (null != get(hook.getType(), hook.getHandler()))
 			return false;
 
 		// 检查类型
@@ -117,12 +121,12 @@ public class MongoHookService extends AbstractMongoService implements HookServic
 	}
 
 	@Override
-	public Hook getHook(HookType htp, String handler) {
+	public Hook get(HookType htp, String handler) {
 		return dao.findOne(HT, Moo.NEW("type", htp.toString()).append("handler", handler));
 	}
 
 	@Override
-	public List<? extends Hook> getHooks(HookType htp) {
+	public List<? extends Hook> list(HookType htp) {
 		return dao.find(HT, null == htp ? null : Moo.NEW("type", htp.toString()), MCur.ASC("_id"));
 	}
 

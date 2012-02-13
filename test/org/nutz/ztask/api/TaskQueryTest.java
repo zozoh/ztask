@@ -11,6 +11,67 @@ import static org.nutz.ztask.api.TaskQuery.*;
 public class TaskQueryTest {
 
 	@Test
+	public void test_by_watchers() {
+		TaskQuery tq;
+
+		tq = NEW("F()");
+		assertNull(tq.qText());
+		assertNull(tq.qRegex());
+		assertNull(tq.qID());
+		ASTR(tq.qCreaters());
+		ASTR(tq.qOwners());
+		ASTR(tq.qLabels());
+		AD(tq.qTimeScope());
+		AS(tq.qStatus());
+		assertEquals(0, tq.qWatchers().length);
+
+		tq = NEW("abc");
+		assertEquals("abc", tq.qText());
+		assertNull(tq.qRegex());
+		assertNull(tq.qID());
+		ASTR(tq.qCreaters());
+		ASTR(tq.qOwners());
+		ASTR(tq.qLabels());
+		AD(tq.qTimeScope());
+		AS(tq.qStatus());
+		assertNull(tq.qWatchers());
+
+		tq = NEW("abc F()");
+		assertEquals("abc", tq.qText());
+		assertNull(tq.qRegex());
+		assertNull(tq.qID());
+		ASTR(tq.qCreaters());
+		ASTR(tq.qOwners());
+		ASTR(tq.qLabels());
+		AD(tq.qTimeScope());
+		AS(tq.qStatus());
+		assertEquals(0, tq.qWatchers().length);
+
+		tq = NEW("abc F(a)");
+		assertEquals("abc", tq.qText());
+		assertNull(tq.qRegex());
+		assertNull(tq.qID());
+		ASTR(tq.qCreaters());
+		ASTR(tq.qOwners());
+		ASTR(tq.qLabels());
+		AD(tq.qTimeScope());
+		AS(tq.qStatus());
+		ASTR(tq.qWatchers(), "a");
+
+		tq = NEW("abc F(aaa,bbb,ccd)");
+		assertEquals("abc", tq.qText());
+		assertNull(tq.qRegex());
+		assertNull(tq.qID());
+		ASTR(tq.qCreaters());
+		ASTR(tq.qOwners());
+		ASTR(tq.qLabels());
+		AD(tq.qTimeScope());
+		AS(tq.qStatus());
+		ASTR(tq.qWatchers(), "aaa", "bbb", "ccd");
+
+	}
+
+	@Test
 	public void test_label_with_color() {
 		TaskQuery tq;
 

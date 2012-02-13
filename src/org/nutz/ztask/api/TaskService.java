@@ -36,37 +36,59 @@ public interface TaskService extends AbstractService {
 	 * 为了速度，这个函数可以仅仅增加 Task.comments，但是并不取回所有的 comment <br>
 	 * 因此在返回的 Task 对象里，可能不包括所有得 comments
 	 * 
-	 * @param taskId
-	 *            任务 ID
+	 * @param t
+	 *            任务
 	 * @param comment
 	 *            注释
 	 * @return Task 对象
 	 */
-	Task addComment(String taskId, String comment);
+	Task addComment(Task t, String comment);
 
 	/**
 	 * 移除任务的一组注释说明
 	 * 
-	 * @param taskId
-	 *            任务 ID
+	 * @param t
+	 *            任务
 	 * @param indexes
 	 *            说明的下标，0 base
 	 * @return 重新取回 Task 对象
 	 */
-	Task deleteComments(String taskId, int... indexes);
+	Task deleteComments(Task t, int... indexes);
 
 	/**
 	 * 修改某一个 comment
 	 * 
-	 * @param taskId
-	 *            任务 ID
+	 * @param t
+	 *            任务
 	 * @param index
 	 *            comment 的位置
 	 * @param newText
 	 *            新文本
 	 * @return 重新取回 Task 对象
 	 */
-	Task setComment(String taskId, int index, String newText);
+	Task setComment(Task t, int index, String newText);
+
+	/**
+	 * 为任务增加关注者，本函数会自动判断重复
+	 * 
+	 * @param t
+	 *            任务
+	 * @param watchers
+	 *            关注者名列表，列表中的名称与老关注者融合
+	 * @return 重新取回的 Task 对象
+	 */
+	Task addWatchers(Task t, String... watchers);
+
+	/**
+	 * 为任务取消关注者
+	 * 
+	 * @param t
+	 *            任务
+	 * @param watchers
+	 *            关注者名列表，列表中的名称从老关注者中分离
+	 * @return 重新取回的 Task 对象
+	 */
+	Task removeWatchers(Task t, String... watchers);
 
 	/**
 	 * 根据一个 TASK ID 得到当前任务的根任务，如果当前的任务就是根，那么就返回

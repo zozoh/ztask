@@ -8,7 +8,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.nutz.dao.Chain;
 import org.nutz.ioc.annotation.InjectName;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
@@ -30,6 +29,7 @@ import org.nutz.ztask.util.ZTasks;
 @Ok("ajax")
 @Fail("ajax")
 @At("/ajax")
+@Chain("ajax")
 public class AjaxModule {
 
 	@Inject("java:$conf.getInt('sys-task-len-min')")
@@ -46,6 +46,38 @@ public class AjaxModule {
 		Calendar from = Times.C(year + "-01-01 00:00:00");
 		Calendar to = Times.C(year + "-12-31 23:59:59");
 		return factory.reportor().getBy(from, to);
+	}
+
+	@At("/message/count")
+	public long getMessageCount(@Attr(scope = Scope.SESSION, value = Webs.ME) User me) {
+		return factory.messages().countNew(me.getName());
+	}
+
+	@At("/message/list")
+	public List<Message> getMessageList(@Param("kwd") String keyword,
+										@Param("lstId") String lastMsgId,
+										@Param("lmt") int limit,
+										@Attr(scope = Scope.SESSION, value = Webs.ME) User me) {
+		return factory.messages().list(me.getName(), keyword, lastMsgId, limit);
+	}
+
+	@At("/message/set/read")
+	public Message doSetMessageRead(@Param("mid") String msgId,
+									@Param("read") boolean read,
+									@Attr(scope = Scope.SESSION, value = Webs.ME) User me) {
+		Message msg = factory.messages().get(msgId);
+		if (null == msg) {
+			factory.messages().setAllRead(me.getName(), read);
+		} else {
+			factory.messages().setRead(msg, read);
+		}
+		return null == msg ? null : factory.messages().get(msg.get_id());
+	}
+
+	@At("/message/del")
+	public Message doSetMessageRead(@Param("mid") String msgId,
+									@Attr(scope = Scope.SESSION, value = Webs.ME) User me) {
+		return factory.messages().remove(msgId);
 	}
 
 	@At("/label/tops")
@@ -88,13 +120,13 @@ public class AjaxModule {
 								@Param("txt") String text,
 								@Attr(scope = Scope.SESSION, value = Webs.ME) User me) {
 		text = ZTasks.wrapComment(text, me.getName());
-		factory.htasks().addComment(taskId, text);
+		factory.htasks().addComment(factory.tasks().checkTask(taskId), text);
 		return text;
 	}
 
 	@At("/do/comment/del")
 	public Task doDeleteComment(@Param("tid") String taskId, @Param("i") int index) {
-		return factory.htasks().deleteComments(taskId, index);
+		return factory.htasks().deleteComments(factory.tasks().checkTask(taskId), index);
 	}
 
 	@At("/do/comment/set")
@@ -103,8 +135,22 @@ public class AjaxModule {
 								@Param("txt") String text,
 								@Attr(scope = Scope.SESSION, value = Webs.ME) User me) {
 		text = ZTasks.wrapComment(text, me.getName());
-		factory.htasks().setComment(taskId, index, ZTasks.wrapComment(text, me.getName()));
+		factory.htasks().setComment(factory.tasks().checkTask(taskId),
+									index,
+									ZTasks.wrapComment(text, me.getName()));
 		return text;
+	}
+
+	@At("/task/do/watch")
+	public Task doWatchTask(@Param("tid") String taskId,
+							@Attr(scope = Scope.SESSION, value = Webs.ME) User me) {
+		return factory.htasks().addWatchers(factory.tasks().checkTask(taskId), me.getName());
+	}
+
+	@At("/task/do/unwatch")
+	public Task doUnWatchTask(	@Param("tid") String taskId,
+								@Attr(scope = Scope.SESSION, value = Webs.ME) User me) {
+		return factory.htasks().removeWatchers(factory.tasks().checkTask(taskId), me.getName());
 	}
 
 	@AdaptBy(type = JsonAdaptor.class)
@@ -233,7 +279,7 @@ public class AjaxModule {
 	public Map<String, Object> getStackDetail(@Param("s") String stackName) {
 		TaskStack s = factory.htasks().checkStack(stackName);
 		List<Task> ts = factory.htasks().getTasksInStack(s, null);
-		return Chain.make("stack", s).add("tasks", ts).toMap();
+		return org.nutz.dao.Chain.make("stack", s).add("tasks", ts).toMap();
 	}
 
 	@At("/stack/children")

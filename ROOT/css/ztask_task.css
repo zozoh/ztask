@@ -17,6 +17,20 @@
     background-color: #FEA;
 }
 
+.task_favo {
+    display: block;
+    position:absolute;
+    top:4px;
+    width: 16px;
+    height: 16px;
+    background: url(pics/icons.png) no-repeat -16px -80px;
+    cursor: pointer;
+}
+
+.task_favo_on {
+    background-position: 0 -80px;
+}
+
 .task:after, .task_labels:after, .task_menu:after {
     content: ".";
     display: block;
@@ -316,6 +330,10 @@
 }
 
 /*--------------------------------------------------------- direction:left --*/
+.hierachy_left .task_favo{
+    right:12px;
+}
+
 .hierachy_left .task_nums {
     right: 12px;
 }
@@ -365,6 +383,10 @@
 }
 
 /*--------------------------------------------------------- direction:right --*/
+.hierachy_right .task_favo{
+    left:12px;
+}
+
 .hierachy_right .task_nums {
     left: 8px;
 }

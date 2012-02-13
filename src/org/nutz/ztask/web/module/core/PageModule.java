@@ -177,6 +177,13 @@ public class PageModule {
 	/**
 	 * 标签界面
 	 */
+	@At("/page/message")
+	@Ok("jsp:jsp.message")
+	public void showMessagePage() {}
+
+	/**
+	 * 标签界面
+	 */
 	@At("/page/label")
 	@Ok("jsp:jsp.label")
 	public void showLabelPage() {}

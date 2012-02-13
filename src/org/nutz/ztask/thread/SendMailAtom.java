@@ -3,6 +3,7 @@ package org.nutz.ztask.thread;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.nutz.lang.Lang;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
 import org.nutz.mail.AfterEach;
@@ -47,6 +48,12 @@ public class SendMailAtom extends AbstractAtom {
 					return AfterEach.REMOVE;
 
 				List<User> usrs = new LinkedList<User>();
+
+				// 没有合法的收件人，删除
+				if (null == mo.getTos() || mo.getTos().length == 0) {
+					return AfterEach.REMOVE;
+				}
+
 				// 用户必须存在
 				for (String to : mo.getTos()) {
 					User u = factory.users().get(to);
@@ -63,11 +70,17 @@ public class SendMailAtom extends AbstractAtom {
 					return AfterEach.REMOVE;
 				}
 				// 发送
-				if (log.isDebugEnabled())
-					log.debugf(	" -- mail[%d]:>> [%s] >> %d user",
+				if (log.isDebugEnabled()) {
+					String[] mailAddresses = new String[usrs.size()];
+					int i = 0;
+					for (User u : usrs)
+						mailAddresses[i++] = u.getEmail().toString();
+					log.debugf(	" -- mail[%d]:>> [%s] >> %d users (%s)",
 								mo.getRetryCount(),
 								mo.getSubject(),
-								usrs.size());
+								usrs.size(),
+								Lang.concat(",", mailAddresses));
+				}
 				String re = ZTasks.sendTextMail(smtp, mo.getSubject(), mo.getMailBody(), usrs);
 
 				if (log.isDebugEnabled())

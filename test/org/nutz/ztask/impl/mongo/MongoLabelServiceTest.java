@@ -14,13 +14,6 @@ import org.nutz.ztask.api.TaskService;
 
 public class MongoLabelServiceTest extends ZTaskCase {
 
-	private LabelService lbls;
-
-	protected void onBefore() {
-		lbls = this.getService(LabelService.class);
-		dao.create(Label.class, true);
-	}
-
 	@Test
 	public void test_sync_task_label() {
 		// 准备 Task
@@ -119,4 +112,10 @@ public class MongoLabelServiceTest extends ZTaskCase {
 		assertEquals(0, ls.size());
 	}
 
+	private LabelService lbls;
+
+	protected void onBefore() {
+		lbls = this.getService(LabelService.class);
+		dao.create(Label.class, true);
+	}
 }

@@ -35,6 +35,7 @@ function task_events_bind(selection, opt) {
     selection.delegate(".task_ing", "click", task_events_on_done);
     selection.delegate(".task_labels *", "click", task_events_on_label);
     selection.delegate(".task_content", "click", task_events_on_showDetail);
+    selection.delegate(".task_favo", "click", task_events_on_watchOrNot);
 
     // 标签事件
     selection.delegate(".task_lbe", "click", cancel_bubble);
@@ -79,7 +80,7 @@ function task_events_on_label(e) {
     // 建立一个 html，插入到标签容器中
     var jq = $(task_html_lbe()).prependTo($(".task_labels_gasket",ee.jTask)).attr("old-value", lbs.join(","));
     jq.css({
-        width: ee.jTask.innerWidth() - 30,
+        width:   ee.jTask.innerWidth() - 30,
         top: jLbs.outerHeight(),
     });
     // 设立 body 取消事件
@@ -137,6 +138,27 @@ function _task_lbe_redraw_labels_(s) {
     jLbs.find(".task_labels_item").remove();
     // 添加新的
     jLbs.html(task_html_labels(t.labels));
+}
+
+/**
+ * 事件处理: 进入查看一个堆栈的子堆栈
+ */
+function task_events_on_watchOrNot(e) {
+    e.stopPropagation();
+    var ee = _task_obj(this);
+    // 收藏或者取消收藏，预先判断一下
+    var jFavo = $(this);
+    var isOn = jFavo.hasClass("task_favo_on");
+    var url = isOn ? "/ajax/task/do/unwatch" : "/ajax/task/do/watch";
+    // 发送请求
+    ajax.post(url, {
+        tid: ee.t._id
+    }, function(re) {
+        var t = re.data;
+        ee.jTask.data("task", t);
+        var jq = task_html.apply(ee.jTask, [t, "replace"]);
+        z.blinkIt(jq);
+    });
 }
 
 /**

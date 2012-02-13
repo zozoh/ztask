@@ -10,9 +10,14 @@ package org.nutz.ztask.api;
 public interface Hook {
 
 	/**
+	 * @return 钩子的内部标识号
+	 */
+	String getId();
+
+	/**
 	 * @return 钩子的唯一标识符，一般是钩子类型+处理器名
 	 */
-	String getID();
+	String getName();
 
 	/**
 	 * @return 钩子类型

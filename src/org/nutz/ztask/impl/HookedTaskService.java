@@ -1,6 +1,7 @@
 package org.nutz.ztask.impl;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -53,20 +54,30 @@ public class HookedTaskService implements TaskService {
 		return tasks.getTopTask(taskId);
 	}
 
-	public Task addComment(String taskId, String comment) {
-		Task t = tasks.addComment(taskId, comment);
+	public Task addComment(Task t, String comment) {
+		t = tasks.addComment(t, comment);
 		hooks.doHook(HookType.COMMENT, t, -1);
 		return t;
 	}
 
-	public Task deleteComments(String taskId, int... indexes) {
-		return tasks.deleteComments(taskId, indexes);
+	public Task deleteComments(Task t, int... indexes) {
+		return tasks.deleteComments(t, indexes);
 	}
 
-	public Task setComment(String taskId, int index, String newText) {
-		Task t = tasks.setComment(taskId, index, newText);
+	public Task setComment(Task t, int index, String newText) {
+		t = tasks.setComment(t, index, newText);
 		hooks.doHook(HookType.COMMENT, t, index);
 		return t;
+	}
+
+	@Override
+	public Task addWatchers(Task t, String... watchers) {
+		return tasks.addWatchers(t, watchers);
+	}
+
+	@Override
+	public Task removeWatchers(Task t, String... watchers) {
+		return tasks.removeWatchers(t, watchers);
 	}
 
 	public Task checkTopTask(String taskId) {
@@ -316,22 +327,57 @@ public class HookedTaskService implements TaskService {
 	private void syncHooks(GInfo info) {
 		// 清除所有的钩子
 		if (null == info.getHooks() || info.getHooks().length == 0) {
-			hooks.clearHooks();
+			hooks.clear();
 		}
 		// 开始同步钩子
 		else {
-			// 记录老钩子
-			List<? extends Hook> list = hooks.getHooks(null);
+			// 首先取出老钩子，以便比对只用
+			List<? extends Hook> list = hooks.list(null);
 			Map<String, Hook> all = new HashMap<String, Hook>();
 			for (Hook h : list)
-				all.put(h.getID(), h);
+				all.put(h.getName(), h);
 
 			if (log.isDebugEnabled())
 				log.debugf("Found %d hooks in sys", all.size());
 
-			// 循环新钩子
+			/*
+			 * 解析配置文件，支持 *:xxx,xxx 的写法
+			 */
 			int i = 0;
+			List<String> strs = new LinkedList<String>();
 			for (String s : info.getHooks()) {
+				String[] ss = Strings.splitIgnoreBlank(s, ":");
+				// 无效输入
+				if (ss.length != 2)
+					throw Err.H.INVALID_STR(i, s);
+
+				String[] hhNames = Strings.splitIgnoreBlank(ss[1], ",");
+
+				// 全部的钩子类型
+				if (ss[0].equals("*")) {
+					for (HookType ht : HookType.values()) {
+						for (String hhName : hhNames)
+							strs.add(ht + ":" + hhName);
+					}
+				}
+				// 1-n 个钩子类型
+				else {
+					for (String htName : Strings.splitIgnoreBlank(ss[0], ",")) {
+						HookType ht = HookType.valueOf(htName.toUpperCase());
+						for (String hhName : hhNames)
+							strs.add(ht + ":" + hhName);
+					}
+				}
+
+				// 自增
+				i++;
+			}
+
+			/*
+			 * 循环新传进来的钩子配置信息
+			 */
+			i = 0;
+			for (String s : strs) {
 				String[] ss = Strings.splitIgnoreBlank(s, ":");
 
 				MongoHook h = new MongoHook();
@@ -343,17 +389,20 @@ public class HookedTaskService implements TaskService {
 					throw Err.H.NO_HANDLER(h);
 
 				// 有这个钩子 ...
-				if (all.containsKey(h.getID())) {
-					all.remove(h.getID());
+				if (all.containsKey(h.getName())) {
+					all.remove(h.getName());
 					if (log.isDebugEnabled())
 						log.debugf("  ..%2d) %s", i, h);
 				}
 				// 否则，新钩子，插入
 				else {
-					hooks.addHook(h);
+					hooks.add(h);
 					if (log.isDebugEnabled())
 						log.debugf("  ++%2d) %s ", i, h);
 				}
+
+				// 自增
+				i++;
 			}
 
 			// 最后删掉余下的老钩子
@@ -361,7 +410,7 @@ public class HookedTaskService implements TaskService {
 				log.debugf("It will remove %d from sys", all.size());
 			i = 0;
 			for (Hook h : all.values()) {
-				hooks.removeHook(h.getType(), h.getHandler());
+				hooks.removeById(h.getId());
 				if (log.isDebugEnabled())
 					log.debugf("  --%2d) %s ", i, h);
 			}

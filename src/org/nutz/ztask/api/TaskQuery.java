@@ -34,6 +34,9 @@ import org.nutz.ztask.util.ZTasks;
  * 
  * = 指定某几种任务状态 ==
  *    '%(NEW,ING)'   // 状态为给定中的几种，忽略大小写
+ *    
+ * = 指定查看被某些用户关注的的任务
+ *    'F(用户A,用户B)'  // 如果 F() 则表示查看自己收藏的
  * 
  * = 指定一个字段，用正则表达式 ==
  *    即搜索字符串，遇到第一个百分号，之后所有的内容都是正则表达式
@@ -93,6 +96,17 @@ public class TaskQuery {
 	}
 
 	/**
+	 * null 表示没有 watchers 的限定，否则用一个数组表示 watchers 的名字列表
+	 * <p>
+	 * 如果返回一个长度为0的数组，则表示 "F()"
+	 * 
+	 * @return 名称列表
+	 */
+	public String[] qWatchers() {
+		return _kwd_.watchers;
+	}
+
+	/**
 	 * @return null 表示没有 creater 的限定，否则用一个数组表示 creater 的名字列表
 	 */
 	public String[] qCreaters() {
@@ -126,6 +140,8 @@ public class TaskQuery {
 		private String[] creaters;
 
 		private TaskStatus[] status;
+
+		private String[] watchers;
 
 		private String text;
 
@@ -185,6 +201,14 @@ public class TaskQuery {
 				re = find("(#[(])([^)]+)([)])");
 				if (null != re) {
 					labels = Strings.splitIgnoreBlank(re[2], "[ \t\n\r,:]");
+				}
+			}
+
+			// 统计: watchers
+			if (text.length() > 0) {
+				re = find("(F[(])([^)]*)([)])");
+				if (null != re) {
+					watchers = Strings.splitIgnoreBlank(re[2], "[ \t\n\r,:]");
 				}
 			}
 

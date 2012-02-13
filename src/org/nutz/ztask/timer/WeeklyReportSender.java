@@ -40,7 +40,7 @@ public class WeeklyReportSender implements TimerHandler {
 
 		MailObj mo = ZTasks.textMail("Weekly:" + rpt.getFullName(), sb.toString());
 		mo.setTos(Lang.array(u.getName()));
-		factory.mails().saveMail(mo);
+		factory.mails().joinMail(mo);
 
 		return "push in queue";
 	}

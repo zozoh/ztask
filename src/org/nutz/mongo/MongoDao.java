@@ -195,6 +195,113 @@ public class MongoDao {
 	}
 
 	/**
+	 * 根据条件修改并返回一个对象
+	 * 
+	 * @param <T>
+	 * @param type
+	 *            对象类型
+	 * @param q
+	 *            查询对象
+	 * @param keys
+	 *            过滤键
+	 * @param mcur
+	 *            游标的设定
+	 * @param obj
+	 *            可更新的对象
+	 * @return 匹配的对象
+	 */
+	public <T> T findAndModify(Class<T> type, Object q, Object obj) {
+		return findAndModify(type, q, null, obj);
+	}
+
+	/**
+	 * 根据条件修改并返回一个对象
+	 * 
+	 * @param <T>
+	 * @param type
+	 *            对象类型
+	 * @param q
+	 *            查询对象
+	 * @param mcur
+	 *            游标的设定
+	 * @param obj
+	 *            可更新的对象
+	 * @return 匹配的对象
+	 */
+	@SuppressWarnings("unchecked")
+	public <T> T findAndModify(Class<T> type, Object q, MCur cur, Object obj) {
+		MongoEntity moe = Mongos.entity(type);
+		return (T) findAndModify(moe.getCollectionName(q), moe, q, cur, obj);
+	}
+
+	/**
+	 * 根据条件修改并返回一个对象
+	 * 
+	 * @param collName
+	 *            集合名
+	 * @param q
+	 *            查询对象
+	 * @param keys
+	 *            过滤键
+	 * @param mcur
+	 *            游标的设定
+	 * @param obj
+	 *            可更新的对象
+	 * @return 匹配的对象
+	 */
+	public NutMap findAndModify(String collName, Object q, Object obj) {
+		return findAndModify(collName, q, null, obj);
+	}
+
+	/**
+	 * 根据条件修改并返回一个对象
+	 * 
+	 * @param collName
+	 *            集合名
+	 * @param q
+	 *            查询对象
+	 * @param mcur
+	 *            游标的设定
+	 * @param obj
+	 *            可更新的对象
+	 * @return 匹配的对象
+	 */
+	public NutMap findAndModify(String collName, Object q, MCur cur, Object obj) {
+		MongoEntity moe = Mongos.entity(NutMap.class);
+		return (NutMap) findAndModify(collName, moe, q, cur, obj);
+	}
+
+	/**
+	 * 根据条件删除并返回一个对象
+	 * 
+	 * @param <T>
+	 * @param type
+	 *            对象类型
+	 * @param q
+	 *            查询对象
+	 * @return 匹配的对象
+	 */
+	@SuppressWarnings("unchecked")
+	public <T> T findAndRemove(Class<T> type, Object q) {
+		MongoEntity moe = Mongos.entity(type);
+		return (T) findAndRemove(moe.getCollectionName(q), moe, q);
+	}
+
+	/**
+	 * 根据条件删除并返回一个对象
+	 * 
+	 * @param collName
+	 *            集合名
+	 * @param q
+	 *            查询对象
+	 * @return 匹配的对象
+	 */
+	public NutMap findAndRemove(String collName, Object q) {
+		MongoEntity moe = Mongos.entity(NutMap.class);
+		return (NutMap) findAndRemove(collName, moe, q);
+	}
+
+	/**
 	 * 根据 Map 或者 JSON 字符串或者 POJO 执行查询
 	 * 
 	 * @param <T>
@@ -593,6 +700,80 @@ public class MongoDao {
 		return db.getName();
 	}
 
+	/**
+	 * 根据条件删除并返回一个对象
+	 * 
+	 * @param collName
+	 *            集合名
+	 * @param moe
+	 *            实体
+	 * @param q
+	 *            查询条件
+	 * 
+	 * @return 匹配的对象
+	 */
+	private Object findAndRemove(String collName, MongoEntity moe, Object q) {
+		if (db.collectionExists(collName)) {
+			DBCollection coll = db.getCollection(collName);
+
+			// 转换...
+			DBObject query = moe.formatObject(q);
+
+			DBObject dbo = coll.findAndRemove(query);
+
+			return moe.toObject(dbo);
+		}
+		return null;
+	}
+
+	/**
+	 * 根据条件修改并返回一个对象
+	 * 
+	 * @param collName
+	 *            集合名
+	 * @param moe
+	 *            实体
+	 * @param q
+	 *            查询对象
+	 * @param keys
+	 *            过滤键
+	 * @param o
+	 *            要更新的对象
+	 * @return 匹配的对象
+	 */
+	private Object findAndModify(String collName, MongoEntity moe, Object q, MCur mcur, Object o) {
+		if (db.collectionExists(collName)) {
+			DBCollection coll = db.getCollection(collName);
+
+			// 转换...
+			DBObject query = moe.formatObject(q);
+			DBObject update = moe.formatObject(o);
+			DBObject sort = null == mcur ? Mongos.dbo() : moe.formatObject(mcur.toMap());
+
+			DBObject dbo = coll.findAndModify(query, sort, update);
+
+			return moe.toObject(dbo);
+		}
+		return null;
+	}
+
+	/**
+	 * 根据条件迭代
+	 * 
+	 * @param <T>
+	 * @param callback
+	 *            迭代的回调
+	 * @param collName
+	 *            集合名
+	 * @param moe
+	 *            实体
+	 * @param q
+	 *            查询对象
+	 * @param keys
+	 *            过滤键
+	 * @param mcur
+	 *            游标的设定
+	 */
 	@SuppressWarnings("unchecked")
 	private <T> void _each(	Each<T> callback,
 							String collName,

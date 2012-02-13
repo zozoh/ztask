@@ -46,9 +46,18 @@ public interface HookService {
 	 *            钩子类型
 	 * @param handler
 	 *            处理器名
-	 * @return true 移除成功，fales 表示没有这个钩子
+	 * @return 旧钩子，null 表示木有这个数据
 	 */
-	boolean removeHook(HookType htp, String handler);
+	Hook remove(HookType htp, String handler);
+
+	/**
+	 * 移除一个钩子
+	 * 
+	 * @param hookId
+	 *            钩子的 ID
+	 * @return 旧钩子，null 表示木有这个数据
+	 */
+	Hook removeById(String hookId);
 
 	/**
 	 * 增加一个钩子，如果系统中已经有这个钩子了，则
@@ -57,7 +66,7 @@ public interface HookService {
 	 *            钩子
 	 * @return true 增加成功，fales 表示已经有这个钩子了，没必要增加
 	 */
-	boolean addHook(Hook hook);
+	boolean add(Hook hook);
 
 	/**
 	 * 根据一个钩子类型以及一个处理器名称，获取一个钩子对象
@@ -68,12 +77,12 @@ public interface HookService {
 	 *            处理器名
 	 * @return 钩子
 	 */
-	Hook getHook(HookType htp, String handler);
+	Hook get(HookType htp, String handler);
 
 	/**
 	 * 清除所有的钩子
 	 */
-	void clearHooks();
+	void clear();
 
 	/**
 	 * 根据事件类型，获取某一类型的钩子
@@ -82,6 +91,6 @@ public interface HookService {
 	 *            钩子类型，如果为 null 表示获取全部钩子
 	 * @return 钩子列表
 	 */
-	List<? extends Hook> getHooks(HookType htp);
+	List<? extends Hook> list(HookType htp);
 
 }
