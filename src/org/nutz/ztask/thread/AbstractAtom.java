@@ -54,21 +54,21 @@ public abstract class AbstractAtom implements Atom {
 
 	@Override
 	public void run() {
-		// @记录:启动时间
-		this.upAt = Times.now();
 
 		// 主锁
 		GlobalLock lock = this.getMyLock();
 
 		while (!lock.isStop()) {
 			// 唤醒 ...
+			// @记录:启动时间
+			this.upAt = Times.now();
+
 			if (log.isInfoEnabled())
-				log.infof("up @ %s", Times.sDTms(Times.now()));
+				log.infof("up @ %s", Times.sDTms(upAt));
 
 			// 运行
-			long interval = 0;
 			try {
-				interval = exec();
+				sleepTime = exec();
 			}
 			// 确保不会崩溃
 			catch (Throwable e) {
@@ -77,24 +77,23 @@ public abstract class AbstractAtom implements Atom {
 			}
 
 			// 保证间隔时间不少于 1 秒
-			if (interval > 0)
-				interval = Math.max(1000, interval);
-
-			// 等待 ...
-			if (log.isInfoEnabled())
-				log.infof("sleep %d ms...", interval);
+			if (sleepTime > 0)
+				sleepTime = Math.max(1000, sleepTime);
 
 			// @记录:睡眠前 ...
-			this.sleepTime = interval;
 			this.sleepAt = Times.now();
 			this.runCount++;
+
+			// 睡眠 ...
+			if (log.isInfoEnabled())
+				log.infof("sleep(%d) %d ms @ %s...", runCount, sleepTime, Times.sDTms(sleepAt));
 
 			// 睡眠
 			synchronized (lock) {
 				try {
 					// 等待一个固定的秒数
-					if (interval > 0)
-						lock.wait(interval);
+					if (sleepTime > 0)
+						lock.wait(sleepTime);
 					// 无限等待
 					else
 						lock.wait();
