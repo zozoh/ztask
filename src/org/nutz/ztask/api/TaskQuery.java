@@ -192,7 +192,7 @@ public class TaskQuery {
 			if (text.length() > 0) {
 				re = find("(@C[(])([^)]+)([)])");
 				if (null != re) {
-					creaters = Strings.splitIgnoreBlank(re[2], ZTasks.REG_NOWORD);
+					creaters = Strings.splitIgnoreBlank(re[2], "[ \t\n\r,]");
 				}
 			}
 
@@ -200,7 +200,7 @@ public class TaskQuery {
 			if (text.length() > 0) {
 				re = find("(#[(])([^)]+)([)])");
 				if (null != re) {
-					labels = Strings.splitIgnoreBlank(re[2], "[ \t\n\r,:]");
+					labels = Strings.splitIgnoreBlank(re[2], "[ \t\n\r,]");
 				}
 			}
 

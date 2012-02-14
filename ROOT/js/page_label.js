@@ -24,13 +24,14 @@ function redrawLables(lbs) {
         // 输出
         for(var i = 0; i < lbs.length; i++) {
             var lb = lbs[i];
+            var lbo = task_lable_obj(lb.name);
             var fz = Math.max(14, 60 * (lb.count - min) / de);
             var fontSize = "font-size:" + fz + "px;";
-            var style = lb.color ? ' color:' + lb.color + ';' : "";
+            var style = lbo.color ? ' color:' + lbo.color + ';' : "";
             var html = '<span class="label" lb-id="' + lb._id + '"  lb-count="' + lb.count + '"';
             html += ' style="' + style + fontSize + '">';
             html += '<b class="lb_name">' + lb.name + '</b>';
-            html += '<em ' + (lb.color ? 'style="background-color:' + lb.color + ';"' : "") + '>' + lb.count + '</em>';
+            html += '<em ' + (lbo.color ? 'style="background-color:' + lbo.color + ';"' : "") + '>' + lb.count + '</em>';
             html += '</span>';
             $(html).appendTo(jLbs);
         }

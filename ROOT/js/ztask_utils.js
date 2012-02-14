@@ -361,17 +361,24 @@ function task_html_labels(lbs) {
     return html;
 }
 
-var _LB_COLOR = /^([^#]*)(#[0-9A-F]{3})$/;
+var _LB_COLOR = /^([^#]*)(:[0-9a-zA-Z]+)$/;
 function task_lable_obj(lb) {
     if(!lb)
         return null;
     var ms = _LB_COLOR.exec(lb);
-    return ms ? {
-        name: lb,
-        color: ms[2],
-        style: 'background-color:' + ms[2] + ';color:#FFF;',
-        text: ms[1]
-    } : {
+    if(ms) {
+        var color = ms[2].substring(1);
+        if(color.match(/[0-9a-fA-F]{3,6}/))
+            color = "#" + color;
+        return {
+            name: lb,
+            color: color,
+            style: 'background-color:' + color + ';color:#FFF;',
+            text: ms[1]
+        };
+    }
+    // 没有颜色
+    return {
         name: lb,
         style: "",
         text: lb

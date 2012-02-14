@@ -54,9 +54,9 @@ public interface LabelService extends AbstractService {
 	 * 支持特殊格式的字符串
 	 * 
 	 * <pre>
-	 *    标签名[#颜色][:计数]
+	 *    标签名[:颜色][?计数]
 	 * 比如:
-	 *    save("A", "B:3","C#FF0" "D#F80:45");
+	 *    save("A", "B?3","C#FF0" "D#F80?45");
 	 * </pre>
 	 * 
 	 * @param lbs

@@ -64,13 +64,13 @@ public class AddNotify implements HookHandler {
 		 * 根据类型进行判断
 		 */
 		switch (htp) {
-		// @${u.name} 为任务 ${t._id} "${t.brief}" 重设了标签: ${str}
+		// @${u.name} 为任务 ${t._id} "${t.brief}" 重设了标签: #${str}#
 		case LABEL:
 			_N(	me,
 				t.getStack(),
 				htp,
 				ing,
-				Lang.length(t.getLabels()) == 0 ? "--" : Lang.concat(t.getLabels()).toString());
+				Lang.length(t.getLabels()) == 0 ? "--" : Lang.concat(",", t.getLabels()).toString());
 			break;
 
 		// @${u.name} 对任务 ${t._id} "${t.brief}" 做了补充说明: ${str}
@@ -89,32 +89,32 @@ public class AddNotify implements HookHandler {
 			_N(me, t.getStack(), htp, ing, null);
 			break;
 
-		// @${u.name} 开始执行任务 ${t._id} ${t.brief}了
+		// @${u.name} 开始执行任务 ${t._id} "${t.brief}"
 		case RESTART:
 			_N(me, t.getStack(), htp, ing, null);
 			break;
 
-		// @${u.name} 挂起了任务 ${t._id} ${t.brief}了
+		// @${u.name} 挂起了任务 "${t.brief}"
 		case HUNGUP:
 			_N(me, t.getStack(), htp, ing, null);
 			break;
 
-		// @${u.name} 向堆栈 [${t.stack}] 压入了任务 ${t._id} ${t.brief}了
+		// @${u.name} 向堆栈 [${t.stack}] 压入了任务 ${t._id} "${t.brief}"
 		case PUSH:
 			_N(me, t.getStack(), htp, ing, null);
 			break;
 
-		// @${u.name} 完成了任务 ${t._id} ${t.brief}了
+		// @${u.name} 完成了任务 ${t._id} "${t.brief}"
 		case DONE:
 			_N(me, ing.getReferString(), htp, ing, null);
 			break;
 
-		// @${u.name} 拒绝了任务 ${t._id} ${t.brief}了
+		// @${u.name} 拒绝了任务 ${t._id} "${t.brief}"
 		case REJECT:
 			_N(me, ing.getReferString(), htp, ing, null);
 			break;
 
-		// @${u.name} 删除了任务 ${t._id} ${t.brief}了
+		// @${u.name} 删除了任务 ${t._id} "${t.brief}"
 		case DROP:
 			_N(me, t.getStack(), htp, ing, null);
 			break;
@@ -232,7 +232,7 @@ public class AddNotify implements HookHandler {
 
 		// LABEL
 		dft_msgs.put(	"notify.LABEL",
-						"@${u.name} reseted labels: [${str}] for task ${t._id} ${t.brief}");
+						"@${u.name} reseted labels: #${str}# for task ${t._id} \"${t.brief}\"");
 
 		// COMMENT
 		dft_msgs.put(	"notify.COMMENT",

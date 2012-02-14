@@ -10,7 +10,6 @@ import java.util.regex.Pattern;
 
 import org.nutz.lang.Each;
 import org.nutz.lang.Lang;
-import org.nutz.lang.Strings;
 import org.nutz.mongo.MongoConnector;
 import org.nutz.mongo.util.MCur;
 import org.nutz.mongo.util.Moo;
@@ -57,7 +56,7 @@ public class MongoLabelService extends AbstractMongoService implements LabelServ
 				if (null != c) {
 					// 不等，就更新
 					if (lb.getCount() != c) {
-						saves.add(lb.getName() + ":" + c);
+						saves.add(lb.getName() + "?" + c);
 					}
 					// 否则直接保存到结果中
 					else {
@@ -81,7 +80,7 @@ public class MongoLabelService extends AbstractMongoService implements LabelServ
 		// 增加不存在的标签
 		if (!map.isEmpty())
 			for (Map.Entry<String, Integer> en : map.entrySet()) {
-				saves.add(en.getKey() + ":" + en.getValue());
+				saves.add(en.getKey() + "?" + en.getValue());
 			}
 
 		// 执行更新
@@ -125,7 +124,7 @@ public class MongoLabelService extends AbstractMongoService implements LabelServ
 		return dao.find(Label.class, Moo.NEW("parent", labelName), MCur.NEW().asc("name"));
 	}
 
-	private static final Pattern _LB_ = Pattern.compile("^([^#:]*)(#[0-9A-F]{3})?(:[0-9]+)?$");
+	private static final Pattern _LB_ = Pattern.compile("^(([^#:?]*)(:[0-9a-zA-Z]+)?)([?][0-9]+)?$");
 
 	@Override
 	public List<Label> save(String... lbs) {
@@ -137,10 +136,8 @@ public class MongoLabelService extends AbstractMongoService implements LabelServ
 				throw Lang.makeThrow("Error label string '%s'", lb);
 
 			Label l = new Label();
-			l.setText(m.group(1));
-			l.setColor(m.group(2));
-			l.setCount(null == m.group(3) ? 0 : Integer.parseInt(m.group(3).substring(1)));
-			l.setName(l.getText() + Strings.sBlank(l.getColor(), ""));
+			l.setCount(null == m.group(4) ? 0 : Integer.parseInt(m.group(4).substring(1)));
+			l.setName(m.group(1));
 
 			Label dbL = get(l.getName());
 

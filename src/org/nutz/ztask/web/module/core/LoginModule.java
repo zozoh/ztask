@@ -26,7 +26,7 @@ public class LoginModule {
 	private ZTaskFactory factory;
 
 	@At("/login")
-	@Ok(">>:/page/mystack")
+	@Ok(">>:/page/message")
 	public void doLogin(@Param("nm") String name, @Param("pwd") String password, HttpSession sess) {
 		// 验证
 		User u = factory.users().verify(name, password);

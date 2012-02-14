@@ -1,6 +1,5 @@
 package org.nutz.ztask.api;
 
-import org.nutz.lang.Strings;
 import org.nutz.mongo.annotation.Co;
 import org.nutz.mongo.annotation.CoField;
 import org.nutz.mongo.annotation.CoId;
@@ -15,12 +14,6 @@ public class Label {
 
 	@CoField("nm")
 	private String name;
-
-	@CoField("txt")
-	private String text;
-
-	@CoField
-	private String color;
 
 	@CoField("pnm")
 	private String parent;
@@ -60,24 +53,8 @@ public class Label {
 		this.count = count;
 	}
 
-	public String getText() {
-		return text;
-	}
-
-	public void setText(String text) {
-		this.text = text;
-	}
-
-	public String getColor() {
-		return color;
-	}
-
-	public void setColor(String color) {
-		this.color = color;
-	}
-
 	public String toString() {
-		return text + (Strings.sBlank(color, "")) + ":" + count;
+		return String.format("%s%s:%d", name, null == parent ? "" : "/" + parent, count);
 	}
 
 }
