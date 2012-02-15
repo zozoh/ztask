@@ -22,7 +22,15 @@ $(document.body).ready(function() {
         var onMessageOK = function(re) {
             var re = eval("(" + re + ")");
             var oldCount = jMsg.text() * 1;
+
+            // 更新信息
+            if(document.title)
+                document.title = document.title.replace(/([(])([0-9]+)([)])(.*)/, "(" + re.data + ")$4");
+            else if(window.title)
+                window.title = window.title.replace(/([(])([0-9]+)([)])(.*)/, "(" + re.data + ")$4");
             jMsg.text(re.data);
+
+            // 更新 #sky 样式
             if(re.data > 0) {
                 jMsg.addClass("msg_found");
             } else {
@@ -31,6 +39,8 @@ $(document.body).ready(function() {
             if(re.data > oldCount && typeof window.onMessageUpdate == "function") {
                 window.onMessageUpdate.apply(jMsg, [re.data]);
             }
+
+            // 设置下一轮回调
             _MSG_ID_ = window.setInterval(messagerHandler, msgInter);
         };
         var messagerHandler = function() {
