@@ -1,7 +1,11 @@
 package org.nutz.ztask.hook;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Lang;
@@ -64,6 +68,9 @@ public class AddNotify implements HookHandler {
 		 * 根据类型进行判断
 		 */
 		switch (htp) {
+		case CREATE:
+			_N(me, t.getStack(), htp, ing, null);
+			break;
 		// @${u.name} 为任务 ${t._id} "${t.brief}" 重设了标签: #${str}#
 		case LABEL:
 			_N(	me,
@@ -154,26 +161,42 @@ public class AddNotify implements HookHandler {
 		/*
 		 * 寻找消息接收者
 		 */
-		HashMap<String, User> accepters = new HashMap<String, User>();
+		HashMap<String, User> accepterMap = new HashMap<String, User>();
+
+		// 堆栈关注者
 		TaskStack stack = ing.factory().tasks().getStack(stackName);
 		if (null != stack && null != stack.getWatchers())
 			for (String nm : stack.getWatchers())
 				if (!me.getName().equals(nm)) {
 					User u = ing.factory().users().get(nm);
 					if (null != u)
-						accepters.put(nm, u);
+						accepterMap.put(nm, u);
 				}
 
+		// 任务关注者
 		if (null != ing.t().getWatchers())
 			for (String nm : ing.t().getWatchers())
 				if (!me.getName().equals(nm)) {
 					User u = ing.factory().users().get(nm);
 					if (null != u)
-						accepters.put(nm, u);
+						accepterMap.put(nm, u);
 				}
 
+		// 被提及的人
+		String[] unms;
+		if (!Strings.isBlank(str)) {
+			unms = this.findUserName(str);
+		} else {
+			unms = this.findUserName(ing.t().getText());
+		}
+		for (String unm : unms) {
+			User u = ing.factory().users().get(unm);
+			if (null != u)
+				accepterMap.put(unm, u);
+		}
+
 		// 没有接受者，跳过
-		if (accepters.isEmpty())
+		if (accepterMap.isEmpty())
 			return;
 
 		/*
@@ -217,8 +240,31 @@ public class AddNotify implements HookHandler {
 		String text = seg.render(context).toString();
 
 		// 保存消息
-		for (String nm : accepters.keySet())
+		for (String nm : accepterMap.keySet())
 			ing.factory().messages().add(text, nm);
+	}
+
+	private final static Pattern REG_USER = Pattern.compile("(@)([^ \r\n\t@:#?]+)("
+															+ ZTasks.REG_NOWORD
+															+ ")");
+
+	/**
+	 * 从一段字符串中提取用户名称数组
+	 * 
+	 * @param str
+	 *            字符串
+	 * @return 用户名称数组
+	 */
+	private String[] findUserName(String str) {
+		if (Strings.isBlank(str))
+			return new String[0];
+
+		List<String> list = new LinkedList<String>();
+		Matcher m = REG_USER.matcher(str);
+		while (m.find()) {
+			list.add(Strings.trim(m.group(2)));
+		}
+		return list.toArray(new String[list.size()]);
 	}
 
 	/*
@@ -229,6 +275,9 @@ public class AddNotify implements HookHandler {
 	static {
 		// --
 		dft_msgs.put("--", "@${u.name} ${htp} ${t._id} \"${t.brief}\" :: ${str}");
+
+		// CREATE
+		dft_msgs.put("notify.CREATE", "@${u.name} created task ${t._id} \"${t.brief}\"");
 
 		// LABEL
 		dft_msgs.put(	"notify.LABEL",
