@@ -88,6 +88,7 @@ public class PageModule {
 	@Ok("jsp:jsp.monitor.brief")
 	public String showMonitorSchedule(ServletRequest req) {
 		req.setAttribute("title", "zTask schedule dump");
+		req.setAttribute("now", Times.sDTms(Times.now()));
 		return factory.schedule().toString();
 	}
 
@@ -101,7 +102,7 @@ public class PageModule {
 	public String showMonitorThreads(	ServletRequest req,
 										@Attr(scope = Scope.APP, value = "$atoms") AbstractAtom[] atoms) {
 		req.setAttribute("title", "zTask threads");
-
+		req.setAttribute("now", Times.sDTms(Times.now()));
 		StringBuilder sb = new StringBuilder();
 		for (AbstractAtom atom : atoms) {
 			sb.append(" - ").append(atom.getRuntimeInfo()).append("\n\n");

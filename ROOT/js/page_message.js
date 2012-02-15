@@ -1,6 +1,7 @@
 function main() {
     var jArena = $(".msg_arena");
     msg_events_bind.apply(jArena);
+    msg_do_reload(jArena, true);
 }
 
 function onMessageUpdate() {

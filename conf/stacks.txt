@@ -13,6 +13,7 @@
  - ${name} @zft
 运维 @amber
  - ${name} @amber
+ - ${name} @lina
  - ${name} @liuhe
  - ${name} @superman
 市场 @stone

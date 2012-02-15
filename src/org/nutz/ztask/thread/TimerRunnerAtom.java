@@ -18,7 +18,7 @@ public class TimerRunnerAtom extends AbstractAtom {
 
 	@Override
 	protected long exec() {
-		// 首先以间隔 1000 ms 的时间，自选等待 schedule 的准备完成
+		// 首先以间隔 1000 ms 的时间，自旋等待 schedule 的准备完成
 		while (!factory.schedule().isReady() && !factory.schedule().isStop()) {
 
 			if (log.isDebugEnabled())
