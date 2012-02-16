@@ -42,7 +42,7 @@
 }
 
 .task_doc_p_1, .task_doc_p_2 {
-    margin:6px 6px 12px 30px;
+    margin:0 6px 0 30px;
 }
 
 .task_doc h3, .task_doc h4, .task_doc h5, .task_doc h6{
@@ -53,12 +53,12 @@
 }
 
 .task_doc_p_3, .task_doc_p_4, .task_doc p_5, .task_doc_p_6 {
-    margin:6px 6px 12px 50px;
+    margin:0 6px 0 50px;
 }
 
-.task_doc p {
-    padding:6px;
-    border-left:2px solid #EEE;
+.task_doc pre {
+    padding:10px;
+    border-left:3px solid #EEE;
 }
 
 .task_doc_empty{

@@ -92,7 +92,7 @@ function task_draw_all_as_doc(selector, t, depth) {
     // 正文
     if(t.comments && t.comments.length > 0) {
         for(var i = 0; i < t.comments.length; i++) {
-            $('<p class="task_doc_p_'+depth+'">' + t.comments[i] + '</p>').appendTo(selection);
+            $('<pre class="task_doc_p_'+depth+'">' + t.comments[i] + '</pre>').appendTo(selection);
         }
     } else {
         // 显示空
