@@ -14,14 +14,15 @@ String url = request.getRequestURI();
             ${msg['ui.report']}
         </a><a href="${base}/page/message" <%=url.endsWith("/message.jsp")?"class=\"hlt\"":""%>>
             ${msg['ui.message']} <i id="msg_count">0</i>
-        </a><a href="${base}/page/sys" <%=url.endsWith("/sys.jsp")?"class=\"hlt\"":""%>>
-            ${msg['ui.sys']}
         </a>
     </div>
     <div id="menu"></div>
     <div id="corner" class="lnk_menu">
         <a id="myname" href="${base}/page/mystack" 
             <%=url.endsWith("/mystack.jsp")?"class=\"hlt\"":""%>>${me.name}</a>
+        <a href="${base}/page/sys" <%=url.endsWith("/sys.jsp")?"class=\"hlt\"":""%>>
+            ${msg['ui.sys']}
+        </a>
         <a href="${base}/do/logout">${msg['ui.logout']}</a>
     </div>
 </div>

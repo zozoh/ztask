@@ -20,7 +20,7 @@
     <% /*===============================================右侧=*/ %>
     <div id="R"><div class="WP scro"><div id="labels"></div></div></div>
     <% /*========================================Task Detail DOM=*/ %>
-    <%@include file="/WEB-INF/jsp/include/_task_comment.jsp" %>
+    <%@include file="/WEB-INF/jsp/include/_task_detail.jsp" %>
     <% /*==========================================本地化字符串支持=*/ %>   
     <%@include file="/WEB-INF/jsp/include/_msgs.jsp" %>
 </body>

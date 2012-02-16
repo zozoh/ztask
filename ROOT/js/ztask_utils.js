@@ -132,7 +132,7 @@ function task_wrap_comment(str) {
  * @return HTML 字符串
  */
 function task_format_id(tid) {
-    var html = '<a href="/page/task#' + tid + '">';
+    var html = '<a href="/page/stack#t:\'' + tid + '\'">';
     html += tid.replace(/(\w{8})(\w{6})(\w{4})(\w{6})/, "<u>$1</u><em>$2</em><b>$3</b><i>$4</i>");
     html += '</a>';
     return html;
@@ -394,9 +394,9 @@ function task_lable_obj(lb) {
  */
 function task_replace(t, blink) {
     var t = this.data("task");
-    var jTask = task_html.apply(this, [t, {
-        mode: "replace"
-    }]);
+    var opt = $(this).data("task-html-opt") || {};
+    opt.mode = "replace";
+    var jTask = task_html.apply(this, [t, opt]);
     if(blink <= 0)
         return;
     z.blinkIt(jTask, blink || 800);

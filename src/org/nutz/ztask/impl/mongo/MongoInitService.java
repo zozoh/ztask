@@ -54,7 +54,7 @@ public class MongoInitService extends AbstractMongoService implements InitServic
 
 		// 得到系统中所有的 TaskStack，并做成散列，以便得到需要删除的堆栈信息
 		final Map<String, TaskStack> alls = new HashMap<String, TaskStack>();
-		factory.htasks().eachStack(new Each<TaskStack>() {
+		factory.htasks().eachStack(false, null, new Each<TaskStack>() {
 			public void invoke(int index, TaskStack s, int length) {
 				alls.put(s.getName(), s);
 			}

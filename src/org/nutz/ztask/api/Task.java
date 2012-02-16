@@ -85,6 +85,12 @@ public class Task {
 	private Date popAt;
 
 	/**
+	 * 计划完成时间
+	 */
+	@CoField("at_plan")
+	private Date planAt;
+
+	/**
 	 * 所在堆栈的名称
 	 */
 	@CoField("stack")
@@ -247,6 +253,14 @@ public class Task {
 
 	public void setPopAt(Date popAt) {
 		this.popAt = popAt;
+	}
+
+	public Date getPlanAt() {
+		return planAt;
+	}
+
+	public void setPlanAt(Date planAt) {
+		this.planAt = planAt;
 	}
 
 	public String[] getLabels() {

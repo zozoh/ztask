@@ -4,18 +4,33 @@ function main() {
     if(kwd) {
         $(".srch_keyword input").val(kwd);
     }
-    // 事件
-    $(".srch_keyword input").change(onClickSearch);
-    $(".srch_do").click(onClickSearch).click();
-    // 绑定通用 Task 事件
-    task_events_bind(document.body, {
+    // 绑定左侧 Task 事件
+    task_events_bind("#L", {
+        detail: onClickDetail,
         reject: task_replace,
         renew: task_replace,
+        restart: task_replace,
         done: task_replace
     });
+
+    // 绑定右侧 Task 事件
+    task_events_bind("#R", {
+        reject: task_replace,
+        renew: task_replace,
+        restart: task_replace,
+        done: task_replace
+    });
+
     // 事件: 查看 Task 详情
     $("#L").delegate(".task_detail", "click", onClickDetail);
     $("#R").delegate(".task_refresh", "click", onClickDetail);
+
+    // 初始化选择器
+    if(z.pgan())
+        $(".srch_keyword input").val(z.pgan());
+
+    // 发出初始化事件
+    $(".srch_do").click();
 }
 
 function drawDetail(t, subTasks) {
@@ -25,70 +40,78 @@ function drawDetail(t, subTasks) {
     // 先绘制头部得 task
     var jTask = task_html.apply(jTHei, [t, {
         goin: "refresh",
-        menu: "edit,label"
+        menu: "edit"
     }]);
     z.blinkIt(jTask, 500);
-    // 如果没有 newer ，绘制它
-    if($("#tsubs .newtask").size() == 0)
-        task_newer_appendTo("#tsubs");
     // 调整布局
     adjustLayout();
-    // 绘制底部的 .hierachy
-    hierachy_init.apply($("#tsubs"), [{
-        direction: 'right',
-        append: function(t) {
-            task_html.apply(this, [t]);
-        },
-        events: {
-            "click:.hierachy_crumb_item_hlt": function() {
-                ajax.get("/ajax/task/children", {
-                    tid: $(this).attr("task-id")
-                }, function(re) {
-                    $("#tsubs .hierachy_erratic").remove();
-                    hierachy_redraw.apply($("#tsubs"), [re.data]);
-                });
-            }
-        }
-    }, task_format_title(t), subTasks]);
-    // 最后保存一下 TaskId
-    $("#tsubs .hierachy_crumb_item_hlt").attr("task-id", t._id);
+    // 绘制详情
+    task_draw_all_as_doc("#tsubs", t);
 }
 
 function onClickDetail() {
-    var t = task_jtask(this).data("task");
+    var t = this.t || _task_obj(this).t;
     ajax.get("/ajax/task/self", {
-        tid: t._id
+        tid: t._id,
+        recur: true
     }, function(re) {
         drawDetail(re.data, re.data.children);
     });
 }
 
-function onClickSearch() {
-    var jsrch = $(this).parents(".srch");
-    if(jsrch.size() <= 0)
+function on_draw_search_result(ts) {
+    if(!ts)
         return;
-    var form = {
-        keyword: $(".srch_keyword input", jsrch).val(),
-        order: $(".srch_sort_order", jsrch).droplist("get").value,
-        sortBy: $(".srch_sort_by", jsrch).droplist("get").value,
-        limit: 100
-    };
-    ajax.json("/ajax/task/query", form, function(re) {
-        var ts = re.data;
-        var jTasks = $("#tasks").empty();
-        for(var i = 0; i < ts.length; i++) {
-            appendTask(jTasks, ts[i]);
+    var jTasks = $("#tasks").empty();
+    for(var i = 0; i < ts.length; i++) {
+        appendTask(jTasks, ts[i]);
+    }
+    // 只有一个结果，点击它
+    if(1 == ts.length) {
+        $(".task_content", jTasks).first().click();
+    }
+}
+
+/**
+ * 将一个任务，以及其所有的子孙，显示成一篇文章的样子
+ *
+ * @param selector - 一个选区，里面将放置 task 的内容
+ * @param t - 已经被加载了所有子孙节点的 task 对象
+ * @param depth - 标题大纲级别，从 1 开始，如果未定以，则为 1
+ */
+function task_draw_all_as_doc(selector, t, depth) {
+    depth = Math.min(6, Math.max(1, depth || 1));
+    var selection = $(selector).empty();
+    // 确保在 .task_doc 中
+    if(!selection.hasClass("task_doc") && selection.parents("task_doc")) {
+        selection.addClass("task_doc");
+    }
+    // 标题
+    var jTitle = $('<h'+depth+'>'+t.text+'</h'+depth+'>').appendTo(selection);
+
+    // 正文
+    if(t.comments && t.comments.length > 0) {
+        for(var i = 0; i < t.comments.length; i++) {
+            $('<p class="task_doc_p_'+depth+'">' + t.comments[i] + '</p>').appendTo(selection);
         }
-        // 只有一个结果，点击它
-        if(1 == ts.length) {
-            $(".task_goin", jTasks).first().click();
+    } else {
+        // 显示空
+        if(depth == 1 && (!t.children || t.children.length == 0)) {
+            $('<div class="task_doc_empty"></div>').appendTo(selection).text(z.msg("task.empty"));
         }
-    });
+    }
+    // 子任务
+    if(t.children)
+        for(var i = 0; i < t.children.length; i++) {
+            var jDiv = $('<div class="task_doc_sub task_doc_sub_'+depth+'"></div>').appendTo(selection);
+            task_draw_all_as_doc(jDiv, t.children[i], depth + 1);
+        }
 }
 
 function appendTask(jTasks, t, menu) {
     task_html.apply(jTasks, [t, {
         menu: menu,
+        viewType: "brief",
         goin: "detail"
     }]);
 }
@@ -96,36 +119,9 @@ function appendTask(jTasks, t, menu) {
 function initLayout() {
     // 绑定 Task Comment 事件
     task_detail_bind();
-    
-    // 初始化下拉菜单
-    var jsrch = $("#LT");
-    $(".srch_sort_by", jsrch).droplist({
-        data: [{
-            text: z.msg('task.createTime'),
-            value: "createTime"
-        }, {
-            text: z.msg('task.lastModified'),
-            value: "lastModified"
-        }, {
-            text: z.msg('task.popAt'),
-            value: "popAt"
-        }, {
-            text: z.msg('task.pushAt'),
-            value: "pushAt"
-        }, {
-            text: z.msg('task.startAt'),
-            value: "startAt"
-        }]
-    });
-    $(".srch_sort_order", jsrch).droplist({
-        data: [{
-            text: z.msg('srch.desc'),
-            value: "DESC"
-        }, {
-            text: z.msg('srch.asc'),
-            value: "ASC"
-        }]
-    });
+
+    // 绑定搜索事件
+    task_search_bind("#LT", on_draw_search_result);
 }
 
 function adjustLayout() {

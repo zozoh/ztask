@@ -19,19 +19,13 @@ function onSave() {
 }
 
 function initLayout() {
-    // init HTML
-    var html = '<ul>';
-    html += '<li><a class="save">' + z.msg("sys.save") + '</a></li>';
-    html += '</ul>';
-    // Add to DOM
-    $(html).appendTo(this);
-    // 初始化事件
-    $("#menu .save").click(onSave);
+    $(".save").click(onSave);
 }
 
 function adjustLayout() {
+    var btnH = $("#btns").outerHeight();
     $("#arena").css({
         width: this.width,
-        height: this.height
+        height: this.height - btnH
     });
 }

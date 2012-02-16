@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.nutz.ioc.annotation.InjectName;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
-import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
 import org.nutz.lang.Times;
 import org.nutz.mvc.Scope;
@@ -198,11 +197,6 @@ public class AjaxModule {
 		return t;
 	}
 
-	@At("/task/topnews")
-	public List<Task> getTopNewTasks() {
-		return factory.htasks().getTopNewTasks();
-	}
-
 	@At("/task/children")
 	public List<Task> getChildrenTasks(@Param("tid") String taskId, HttpServletRequest req) {
 		return factory.htasks().getChildTasks(taskId);
@@ -220,8 +214,8 @@ public class AjaxModule {
 	}
 
 	@At("/task/self")
-	public Task getTaskSelfAndChildren(@Param("tid") String taskId) {
-		return factory.htasks().loadTaskChildren(factory.htasks().checkTask(taskId));
+	public Task getTaskSelfAndChildren(@Param("tid") String taskId, @Param("recur") boolean recur) {
+		return factory.htasks().loadTaskChildren(factory.htasks().checkTask(taskId), recur);
 	}
 
 	@At("/task/del")
@@ -287,17 +281,28 @@ public class AjaxModule {
 		return factory.htasks().getChildStacks(stackName);
 	}
 
-	@At("/stack/tops")
-	public List<TaskStack> getTopStacks() {
-		return factory.htasks().getTopStacks();
-	}
+	@At("/stack/query")
+	public List<TaskStack> queryStacks(	@Param("mine") boolean mine,
+										@Param("favo") boolean favo,
+										@Param("snms") String[] snms,
+										@Attr(scope = Scope.SESSION, value = Webs.ME) User me) {
+		// 精确读取
+		if (null != snms && snms.length > 0) {
+			List<TaskStack> list = new ArrayList<TaskStack>(snms.length);
+			for (String snm : snms) {
+				TaskStack s = factory.htasks().getStack(snm);
+				if (null != s)
+					list.add(s);
+			}
+			return list;
+		}
 
-	@At("/stack/myfavos")
-	public List<TaskStack> getMyFavoStacks(@Attr(scope = Scope.SESSION, value = Webs.ME) User me) {
-		List<TaskStack> re = factory.htasks().getMyFavoStacks(me.getName());
-		if (re.isEmpty())
-			re = Lang.list(factory.htasks().getStack(me.getName()));
-		return re;
+		// 读取我收藏的
+		if (favo)
+			return factory.htasks().getMyFavoStacks(me.getName());
+
+		// 读取根或者属于我的
+		return factory.htasks().getStacks(!mine, (mine ? me.getName() : null));
 	}
 
 	/**

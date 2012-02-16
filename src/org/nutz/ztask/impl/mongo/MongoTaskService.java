@@ -197,8 +197,16 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 	}
 
 	@Override
-	public void eachStack(Each<TaskStack> callback) {
-		dao.each(callback, TaskStack.class, null, null);
+	public void eachStack(boolean onlyTop, String ownerName, Each<TaskStack> callback) {
+		Moo q = Moo.NEW();
+
+		if (onlyTop)
+			q.eq("parentName", null);
+
+		if (!Strings.isBlank(ownerName))
+			q.eq("owner", ownerName);
+
+		dao.each(callback, TaskStack.class, q, null);
 	}
 
 	@Override
@@ -207,10 +215,13 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 	}
 
 	@Override
-	public Task loadTaskChildren(Task task) {
+	public Task loadTaskChildren(Task task, boolean recur) {
 		if (null == task)
 			return null;
 		task.setChildren(getChildTasks(task.get_id()));
+		if (recur && null != task.getChildren())
+			for (Task child : task.getChildren())
+				loadTaskChildren(child, recur);
 		return task;
 	}
 
@@ -751,8 +762,14 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 	}
 
 	@Override
-	public List<TaskStack> getTopStacks() {
-		return getChildStacks(null);
+	public List<TaskStack> getStacks(boolean onlyTop, String ownerName) {
+		final List<TaskStack> list = new LinkedList<TaskStack>();
+		this.eachStack(onlyTop, ownerName, new Each<TaskStack>() {
+			public void invoke(int index, TaskStack s, int length) {
+				list.add(s);
+			}
+		});
+		return list;
 	}
 
 	@Override
@@ -887,6 +904,10 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 			q.append("_id", tq.qID());
 			return;
 		}
+
+		// 处理 onlyTop
+		if (tq.isOnlyTop())
+			q.append("parentId", null);
 
 		// 处理时间范围
 		if (null != tq.qTimeScope()) {

@@ -118,6 +118,14 @@
     background-color: #FFF;
 }
 
+#task_detail .task_cmt_size {
+    float: right;
+    margin: 2px 12px;
+    font-size: 10px;
+    color: #00F;
+    cursor: pointer;
+}
+
 #task_detail .task_cmt_add {
     display: block;
     float: right;

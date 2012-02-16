@@ -14,10 +14,40 @@ function task_detail_bind() {
         task_detail_redraw_comments.apply(jDetail);
         z.local.set("ztask-comment-asc", task_detail_asc(jDetail));
     });
+    $(document.body).delegate(".task_cmt_size", "click", function(e) {
+        if($(this).attr("status") == "expand") {
+            task_detail_cmt_collapse.apply(this, [e]);
+        } else {
+            task_detail_cmt_expand.apply(this, [e]);
+        }
+    });
     $(document.body).keydown(function(e) {
         if(27 == e.which)
             task_detail_on_close();
     });
+}
+
+/**
+ * 事件: 扩大注释编写区域
+ */
+function task_detail_cmt_expand() {
+    var jDetail = $(this).parents("#task_detail");
+    var jNewer = $(".task_cmt_newer", jDetail);
+    var jCmt = $(".task_cmt", jDetail);
+    var h = jCmt.innerHeight();
+    jNewer.css("height", h - 40);
+    $(this).attr("status", "expand").text(z.msg("ui.collapse"));
+}
+
+/**
+ * 事件: 缩小注释编写区域
+ */
+function task_detail_cmt_collapse() {
+    var jDetail = $(this).parents("#task_detail");
+    var jNewer = $(".task_cmt_newer", jDetail);
+    var jCmt = $(".task_cmt", jDetail);
+    jNewer.css("height", "");
+    $(this).attr("status", "collapse").text(z.msg("ui.expand"));
 }
 
 /**
@@ -41,7 +71,7 @@ function task_detail_cmt_on_add() {
     var tid = jDetail.attr("task-id");
     var txt = $.trim($(".task_cmt_newer textarea",jDetail).val());
     if(!txt || txt.length < 5) {
-        alert(z.msg("task.comment.short"));
+        alert(z.msg("task.cmt.short"));
         return;
     }
     ajax.post("/ajax/do/comment/add", {
@@ -49,6 +79,9 @@ function task_detail_cmt_on_add() {
         txt: txt
     }, function(re) {
         // 清空选择框
+        if($(".task_cmt_size", jDetail).attr("status") == "expand") {
+            $(".task_cmt_size", jDetail).click();
+        }
         $(".task_cmt_newer textarea",jDetail).val("");
         // 为数据对象加入文本
         t.comments.push(re.data);
@@ -194,9 +227,10 @@ function task_detail_show(t) {
     var jDetail = $("#task_detail").attr("task-id", t._id).data("task", t);
     var box = z.winsz();
 
+    var asc = z.local.get("ztask-comment-asc");
     // 确定一个排序方式
     if($(".task_cmt_sort .hlt", jDetail).size() == 0) {
-        if(z.local.get("ztask-comment-asc"))
+        if("false" != asc)
             $(".task_cmt_sort .asc", jDetail).addClass("hlt");
         else
             $(".task_cmt_sort .desc", jDetail).addClass("hlt");
@@ -209,7 +243,7 @@ function task_detail_show(t) {
     }, 200, function() {
         _adjust_layout();
         // 全局调整 layout
-        $(".task_cmt_newer textarea", this).toggleInput(z.msg("task.comment.add.tip"));
+        $(".task_cmt_newer textarea", this).toggleInput(z.msg("task.cmt.add.tip"));
     });
     // 显示左侧内容
     task_detail_redraw_info.apply(jDetail, [t]);

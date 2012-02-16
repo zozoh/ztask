@@ -19,8 +19,8 @@
 
 .task_favo {
     display: block;
-    position:absolute;
-    top:4px;
+    position: absolute;
+    top: 4px;
     width: 16px;
     height: 16px;
     background: url(pics/icons.png) no-repeat -16px -80px;
@@ -148,8 +148,7 @@
 }
 
 .task_content:hover {
-    background-color: #FFD;
-    color: #229;
+    color:#08F;
 }
 
 .task_content_hlt, .task_content_hlt:hover {
@@ -185,7 +184,6 @@
 }
 
 .task_uinfo .task_ID a:hover {
-    color: #08F;
     text-decoration: underline;
 }
 
@@ -197,6 +195,8 @@
     margin-left: 5px;
     border-left: 0;
     text-decoration: none;
+    font-weight: bold;
+    color: #444;
 }
 
 .task_btn {
@@ -330,8 +330,8 @@
 }
 
 /*--------------------------------------------------------- direction:left --*/
-.hierachy_left .task_favo{
-    right:12px;
+.hierachy_left .task_favo {
+    right: 12px;
 }
 
 .hierachy_left .task_nums {
@@ -353,7 +353,7 @@
 
 .hierachy_left .task_view_brief .task_btn {
     float: right;
-    margin-right:26px;
+    margin-right: 26px;
 }
 
 .hierachy_left .task_uinfo {
@@ -384,8 +384,8 @@
 }
 
 /*--------------------------------------------------------- direction:right --*/
-.hierachy_right .task_favo{
-    left:12px;
+.hierachy_right .task_favo {
+    left: 12px;
 }
 
 .hierachy_right .task_nums {
@@ -411,7 +411,7 @@
 
 .hierachy_right .task_view_brief .task_btn {
     float: left;
-    margin-left:26px;
+    margin-left: 26px;
 }
 
 .hierachy_right .task_uinfo {

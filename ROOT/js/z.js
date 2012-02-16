@@ -519,6 +519,7 @@ window.z = {
     // ele - 为任何可以有子元素的 DOM 或者 jq，本函数在该元素的位置绘制一个 input 框，让用户输入新值
     // opt - object | function
     // opt.multi - 是否是多行文本
+    // opt.text - 初始文字，如果没有给定，采用 ele 的文本
     // opt.width - 指定宽度
     // opt.height - 指定高度
     // opt.after - function(newval, oldval){...} 修改之后，
@@ -561,7 +562,7 @@ window.z = {
             me.unbind("keydown",onKeydown).remove();
         };
         // 准备显示输入框
-        var val = me.text();
+        var val = opt.text || me.text();
         var html = opt.multi ? '<textarea></textarea>' : '<input>';
         // 计算宽高
         var css = {

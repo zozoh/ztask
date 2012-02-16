@@ -28,7 +28,7 @@
  */
 function hierachy_init(opt, top, objs) {
     // 0. 得到选区
-    var hie = $(this);
+    var hie = $(this).attr("hie-top", top);
     var jq = $(".hierachy_scroller", hie);
 
     // 如果已经被设置了，那么清除
@@ -143,6 +143,17 @@ function hierachy_scrollback() {
  */
 function hierachy_clean_erratic() {
     $(".hierachy_erratic", hierachy_check_selection(this)).remove();
+}
+
+/**
+ * 清除所有的区块，并增加一个初始区块
+ *
+ * @ele 一个和当前 hierachy 相关的 DOM 元素
+ */
+function hierachy_clear(ele) {
+    var hie = hierachy_selection(ele);
+    $(".hierachy_crumb_item, .hierachy_block",hie).remove();
+    hierachy_add.apply(hie, [hie.attr("hie-top")]);
 }
 
 /**

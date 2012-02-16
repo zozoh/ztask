@@ -15,6 +15,7 @@
     <% /*==========================================顶部固定条=*/ %>
     <%@include file="/WEB-INF/jsp/include/_sky.jsp" %>
     <% /*==========================================主区域=*/ %>
+    <div id="btns"><button class="save">${msg['sys.save']}</button></div>
     <div id="arena">
         <textarea></textarea>
         <ul style="position:absolute;top:80px;left:0px;font-size:14px;line-height:28px;">

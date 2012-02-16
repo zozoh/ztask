@@ -4,13 +4,16 @@
  * 作为标识，它将会给选区增加一个 class(.task_events_opt)
  * <pre>
  * {
- *     reload : function(){...},     # 当需要重新载入数据时的回调。 this 为选区的 jq 对象
- *     reject : function(t){...},    # 当任务被 reject 后的回调，this 为 jTask 对象
- *     renew : function(t){...},    # 当任务被 renew 后的回调，this 为 jTask 对象
- *     restart : function(t){...},    # 当任务被 restart 后的回调，this 为 jTask 对象
- *     done : function(t){...},    # 当任务被 done 后的回调，this 为 jTask 对象
- *     gout : function(t){...},    # 当任务被 gout 后的回调，this 为 jTask 对象
- *     remove : function(t){...},    # 当任务被 remove 后的回调，this 为 jTask 对象
+ *     detail : false | function(ee){...} # 当点击 .task_content 的行为，false 表示什么都不做
+ *                                        #  - 如果为 true，调用 task_events_on_showDetail
+ *                                        #  - 如果为 func, ee 为 _task_obj 的结果 
+ *     reload : function(){...},        # 当需要重新载入数据时的回调。 this 为选区的 jq 对象
+ *     reject : function(t){...},       # 当任务被 reject 后的回调，this 为 jTask 对象
+ *     renew : function(t){...},        # 当任务被 renew 后的回调，this 为 jTask 对象
+ *     restart : function(t){...},      # 当任务被 restart 后的回调，this 为 jTask 对象
+ *     done : function(t){...},         # 当任务被 done 后的回调，this 为 jTask 对象
+ *     gout : function(t){...},         # 当任务被 gout 后的回调，this 为 jTask 对象
+ *     remove : function(t){...},       # 当任务被 remove 后的回调，this 为 jTask 对象
  * }
  * </pre>
  *
@@ -34,8 +37,19 @@ function task_events_bind(selection, opt) {
     selection.delegate(".task_done", "click", task_events_on_renew);
     selection.delegate(".task_ing", "click", task_events_on_done);
     selection.delegate(".task_labels *", "click", task_events_on_label);
-    selection.delegate(".task_content", "click", task_events_on_showDetail);
     selection.delegate(".task_favo", "click", task_events_on_watchOrNot);
+    
+    // 点击 .task_content
+    selection.delegate(".task_content", "click", function(e){
+        var ee = _task_obj(this);
+        if(false == ee.opt.detail)
+            return;
+        if(typeof ee.opt.detail == "function"){
+            ee.opt.detail.apply(ee);    
+            return;
+        }
+        task_events_on_showDetail.apply(this,[e]);   
+    });
 
     // 标签事件
     selection.delegate(".task_lbe", "click", cancel_bubble);
@@ -80,7 +94,7 @@ function task_events_on_label(e) {
     // 建立一个 html，插入到标签容器中
     var jq = $(task_html_lbe()).prependTo($(".task_labels_gasket",ee.jTask)).attr("old-value", lbs.join(","));
     jq.css({
-        width:   ee.jTask.innerWidth() - 30,
+        width:      ee.jTask.innerWidth() - 30,
         top: jLbs.outerHeight(),
     });
     // 设立 body 取消事件

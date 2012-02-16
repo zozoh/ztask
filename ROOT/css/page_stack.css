@@ -1,7 +1,7 @@
 #tasks, #stacks {
     float: left;
     width: 50%;
-    padding-top: 50px;
+    padding-top: 124px;
     position: relative;
 }
 
@@ -11,4 +11,17 @@
 
 #stacks .hierachy_block{
     overflow-y: scroll;
+}
+
+#filters{
+    position: fixed;
+    background:rgba(0,0,0,0.3);
+    top:50px;
+    left:0;
+    z-index: 80;
+}
+
+.flt_block{
+    width:50%;
+    float:left;
 }

@@ -1,0 +1,100 @@
+/*-------------------------------------------------Search 设置框--*/
+.srch {
+    padding: 10px 8px 8px 10px;
+    position: relative;
+}
+
+.srch_keyword {
+    padding:0 103px 0 32px;
+}
+
+.srch_keyword input {
+    font-size: 14px;
+    padding: 4px;
+    width: 100%;
+}
+
+.srch_toptask{
+    font-size:14px;
+    display: inline-block;
+    color:#AAA;
+    background-color:#EEE;
+    border-radius: 2px;
+    float: left;
+    margin:4px;
+    padding:4px;
+    cursor: pointer;
+    border:1px dashed #CCC;
+}
+
+.srch_toptask:hover{
+    border-color:#FFF;
+}
+
+.srch_toptask_on{
+    color:#FFF;
+    background-color:#08F;
+}
+
+
+.srch_do {
+    position: absolute;
+    display: block;
+    top: 11px;
+    right: 8px;
+    width: 100px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    border-radius: 0 4px 4px 0;
+    font-size: 20px;
+    display: inline-block;
+    background: #CCC;
+    cursor: pointer;
+    text-decoration: none;
+    color: #000;
+}
+
+.srch_do:hover {
+    color: #F80;
+    background: #C0C0C0;
+}
+
+.srch_sort {
+    font-size: 10px;
+    text-align: left;
+}
+
+.srch_sort_txt {
+    margin-left: 10px;
+}
+
+
+/*-------------------------------------------------重载droplist控件样式--*/
+.srch .drop {
+    background: none;
+    box-shadow: none;
+    display: inline-block;
+    color: #0041f0;
+    text-align: left;
+}
+
+.srch .drop:hover {
+    color: #0086f9;
+}
+
+.srch .drop_obj {
+    text-align: center;
+}
+
+.srch .drop_btn {
+    display: none;
+}
+
+.srch .srch_sort_by .drop_list {
+    width: 160px;
+}
+
+.srch .srch_sort_order .drop_list {
+    width: 120px;
+}

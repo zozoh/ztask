@@ -120,8 +120,8 @@ public class HookedTaskService implements TaskService {
 		return tasks.getChildTasks(taskId);
 	}
 
-	public Task loadTaskChildren(Task task) {
-		return tasks.loadTaskChildren(task);
+	public Task loadTaskChildren(Task task, boolean recur) {
+		return tasks.loadTaskChildren(task, recur);
 	}
 
 	public List<Task> getLeafTasks(Task task) {
@@ -219,12 +219,14 @@ public class HookedTaskService implements TaskService {
 		return tasks.getAllStacks();
 	}
 
-	public void eachStack(Each<TaskStack> callback) {
-		tasks.eachStack(callback);
+	@Override
+	public void eachStack(boolean onlyTop, String ownerName, Each<TaskStack> callback) {
+		tasks.eachStack(onlyTop, ownerName, callback);
 	}
 
-	public List<TaskStack> getTopStacks() {
-		return tasks.getTopStacks();
+	@Override
+	public List<TaskStack> getStacks(boolean onlyTop, String ownerName) {
+		return tasks.getStacks(onlyTop, ownerName);
 	}
 
 	public List<TaskStack> getMyFavoStacks(String ownerName) {

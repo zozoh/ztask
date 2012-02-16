@@ -1,6 +1,9 @@
+body{
+    background-color: #DDD;
+}
+
 #arena {
-    padding: 60px 20px 20px 140px;
-    background-color:#DDD;
+    padding: 10px 20px 20px 140px;
 }
 
 #arena textarea {
@@ -12,4 +15,13 @@
     border-radius: 8px;
     border: 0;
     box-shadow: 0 0 10px #888;
+}
+
+#btns {
+    text-align: right;
+    padding: 60px 20px 1px 20px;
+}
+
+.save {
+    font-size: 14px;
 }

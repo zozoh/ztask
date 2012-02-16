@@ -316,6 +316,8 @@ public class TaskQuery {
 
 	private String sortBy;
 
+	private boolean onlyTop;
+
 	/**
 	 * 小于等于0, 无视
 	 */
@@ -325,6 +327,15 @@ public class TaskQuery {
 	 * 小于等于0, 无视
 	 */
 	private int skip;
+
+	public TaskQuery setOnlyTop(boolean onlyTop) {
+		this.onlyTop = onlyTop;
+		return this;
+	}
+
+	public boolean isOnlyTop() {
+		return onlyTop;
+	}
 
 	public TaskQuery sortBy(String fieldName) {
 		sortBy = fieldName;

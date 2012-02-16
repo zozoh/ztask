@@ -205,9 +205,13 @@ public interface TaskService extends AbstractService {
 	 * 
 	 * @param task
 	 *            任务对象
+	 * 
+	 * @param recur
+	 *            是否递归
+	 * 
 	 * @return 给定的任务对象
 	 */
-	Task loadTaskChildren(Task task);
+	Task loadTaskChildren(Task task, boolean recur);
 
 	/**
 	 * 得到一个任务所有的叶子任务
@@ -437,17 +441,27 @@ public interface TaskService extends AbstractService {
 	/**
 	 * 迭代访问系统中所有的堆栈，适用于系统堆栈比较多的场景
 	 * 
+	 * @param onlyTop
+	 *            是否仅仅获取根堆栈
+	 * @param ownerName
+	 *            所有者名称，如果为 null，则获取全部堆栈
+	 * 
 	 * @param callback
 	 *            回调
 	 */
-	void eachStack(Each<TaskStack> callback);
+	void eachStack(boolean onlyTop, String ownerName, Each<TaskStack> callback);
 
 	/**
 	 * 获取按照堆栈升序排序的 stack 列表
 	 * 
+	 * @param onlyTop
+	 *            是否仅仅获取根堆栈
+	 * @param ownerName
+	 *            所有者名称，如果为 null，则获取全部堆栈
+	 * 
 	 * @return 堆栈列表
 	 */
-	List<TaskStack> getTopStacks();
+	List<TaskStack> getStacks(boolean onlyTop, String ownerName);
 
 	/**
 	 * 获得属于某个用户的Stack， 即所有该用户收藏的，或者 owner 是该用户的堆栈
