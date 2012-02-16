@@ -93,6 +93,8 @@ function task_parents_in_dom(taskId) {
  * @return 格式化后的字符串
  */
 function task_format_text(str) {
+    if(str)
+        str = str.replace("<", "&lt;").replace(">","&gt;");
     var formats = ginfo() ? ginfo().formats : null;
     if(!str || !$.isArray(formats) || formats.length <= 0)
         return str;
