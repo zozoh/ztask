@@ -1,7 +1,7 @@
 <%
 String url = request.getAttribute("page-url").toString();
 %>
-<div id="sky" rs="${re}" msg-inter="${msg_inter}">
+<div id="sky" rs="${re}" msg-inter="${msg_inter}" myname="${me.name}">
     <div id="logo"><img src="${rs}/img/loading.gif"></div>
     <div id="lnks" class="lnk_menu">
         <a href="${base}/page/stack" <%=url.endsWith("/stack")?"class=\"hlt\"":""%>>

@@ -14,7 +14,7 @@ function ginfo() {
  * @return 当前操作的帐号的名称
  */
 function myname() {
-    return "" + $("#myname").text();
+    return "" + $("#sky").attr("myname");
 }
 
 /**
@@ -111,7 +111,7 @@ function task_format_text(str) {
  * @return 格式化后的字符串
  */
 function task_wrap_comment(str) {
-    var isMine = str.match(new RegExp("^@" + myname() + ":"));
+    var isMine = z.startsWith(str, "@" + myname() + ":");
     var html = '<div class="task_cmt_item">';
     if(isMine) {
         html += '<ul class="task_cmt_item_menu">';
