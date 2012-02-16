@@ -204,7 +204,7 @@ function stack_do_reload() {
                 list.push(re.data.tasks[i]);
         }
         // 重绘堆栈内的 Tasks
-        stack_redraw_mytasks.apply(newJStack, [list, true]);
+        stack_redraw_mytasks.apply(newJStack, [list, false]);
     });
 }
 
