@@ -72,6 +72,7 @@ a.lnkb:hover {
 #sky {
     position: fixed;
     background-color: rgba(0,0,0,0.6);
+    width:1300px;
     height: 51px;
     line-height: 50px;
     padding:0;
