@@ -87,12 +87,12 @@ function task_draw_all_as_doc(selector, t, depth) {
         selection.addClass("task_doc");
     }
     // 标题
-    var jTitle = $('<h'+depth+'>'+t.text+'</h'+depth+'>').appendTo(selection);
+    var jTitle = $('<h'+depth+'>'+task_format_text(t.text)+'</h'+depth+'>').appendTo(selection);
 
     // 正文
     if(t.comments && t.comments.length > 0) {
         for(var i = 0; i < t.comments.length; i++) {
-            $('<pre class="task_doc_p_'+depth+'">' + t.comments[i] + '</pre>').appendTo(selection);
+            $('<pre class="task_doc_p_'+depth+'">' + task_format_text(t.comments[i]) + '</pre>').appendTo(selection);
         }
     } else {
         // 显示空
