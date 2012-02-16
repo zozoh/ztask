@@ -18,6 +18,10 @@
     <% /*===============================================左侧=*/ %>
     <div id="L"><div class="WP scro hierachy_right"><div id="tasks"></div></div></div>
     <% /*===============================================右侧=*/ %>
+    <ul id="label_btns">
+        <li><a class="lb_do_sync">${msg['lb.sync']}</a></li>
+        <li><a class="lb_do_reload">${msg['ui.reload']}</a></li>
+    </ul>
     <div id="R"><div class="WP scro"><div id="labels"></div></div></div>
     <% /*========================================Task Detail DOM=*/ %>
     <%@include file="/WEB-INF/jsp/include/_task_detail.jsp" %>

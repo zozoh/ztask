@@ -67,6 +67,7 @@ var ioc = {
 		fields : {
 			glock : { refer : "schedule" },
 			ioc : { refer : "$Ioc" },
+			users : { refer : "userService" },
 			tasks : { refer : 'taskService' },
 			hooks : { refer : 'hookService' } }
 	// ~ End bean

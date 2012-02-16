@@ -23,11 +23,13 @@ import org.nutz.mvc.annotation.Param;
 import org.nutz.mvc.filter.CheckSession;
 import org.nutz.web.Webs;
 import org.nutz.ztask.api.TaskReport;
-import org.nutz.ztask.api.ZTaskFactory;
 import org.nutz.ztask.api.User;
+import org.nutz.ztask.api.ZTaskFactory;
 import org.nutz.ztask.thread.AbstractAtom;
+import org.nutz.ztask.web.filter.AddCustomizedMenu;
 
-@Filters(@By(type = CheckSession.class, args = {Webs.ME, "/page/login"}))
+@Filters({	@By(type = CheckSession.class, args = {Webs.ME, "/page/login"}),
+			@By(type = AddCustomizedMenu.class)})
 @InjectName
 @IocBean
 @Fail(">>:/e500.html")
@@ -60,7 +62,7 @@ public class PageModule {
 	 * 
 	 * @return 重定向的 URL
 	 */
-	@Filters
+	@Filters(@By(type = AddCustomizedMenu.class))
 	@At("/")
 	@Ok(">>:${obj}")
 	public String autoDispatchRoot(HttpSession sess) {
@@ -182,6 +184,24 @@ public class PageModule {
 
 		req.setAttribute("cells", cells);
 
+	}
+
+	/**
+	 * 自定义菜单界面
+	 */
+	@At("/page/cus/?")
+	@Ok("jsp:jsp.task")
+	public void showMyCusPage(String pageName, ServletRequest req) {
+		String[] menus = factory.tasks().getGlobalInfo().getMenus();
+		if (null != menus) {
+			for (String menu : menus) {
+				if (menu.startsWith(pageName)) {
+					String lbs = menu.substring(pageName.length() + 1);
+					req.setAttribute("page_labels", lbs);
+					break;
+				}
+			}
+		}
 	}
 
 	/**

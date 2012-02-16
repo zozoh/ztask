@@ -71,6 +71,11 @@ public class MongoMessageService extends AbstractMongoService implements Message
 	}
 
 	@Override
+	public void clearMine(String ownerName) {
+		dao.remove(Message.class, Moo.NEW("owner", ownerName));
+	}
+
+	@Override
 	public void clearBefore(Date d, boolean force) {
 		Moo q = Moo.D_LT("createTime", d).ne("favorite", false);
 		// force 表示清除所有已读消息

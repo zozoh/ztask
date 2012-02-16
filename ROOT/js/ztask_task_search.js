@@ -62,8 +62,12 @@ function task_search_on_do_search() {
     var jsrch = task_search_selection(this);
     var opt = task_search_opt(jsrch);
     if(opt && typeof opt.after == "function") {
+        var kwd = $(".srch_keyword input", jsrch).val();
+        var pageLabels = $(document.body).attr("page-labels");
+        if(pageLabels)
+            kwd = "#(" + pageLabels + ") " + kwd;
         var form = {
-            keyword: $(".srch_keyword input", jsrch).val(),
+            keyword: kwd,
             order: $(".srch_sort_order", jsrch).droplist("get").value,
             sortBy: $(".srch_sort_by", jsrch).droplist("get").value,
             onlyTop: $(".srch_toptask",jsrch).hasClass("srch_toptask_on"),

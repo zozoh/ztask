@@ -26,6 +26,7 @@ import org.nutz.ztask.api.TaskQuery;
 import org.nutz.ztask.api.TaskService;
 import org.nutz.ztask.api.TaskStack;
 import org.nutz.ztask.api.TaskStatus;
+import org.nutz.ztask.api.UserService;
 import org.nutz.ztask.impl.mongo.MongoHook;
 import org.nutz.ztask.thread.ScheduleUpdateAtom;
 import org.nutz.ztask.util.Err;
@@ -39,6 +40,8 @@ public class HookedTaskService implements TaskService {
 	private TaskService tasks;
 
 	private HookService hooks;
+
+	private UserService users;
 
 	private Ioc ioc;
 
@@ -278,6 +281,19 @@ public class HookedTaskService implements TaskService {
 		GInfo oldInfo = tasks.getGlobalInfo();
 
 		info = tasks.setGlobalInfo(info);
+
+		// 检查用户分组
+		if (null != info.getUserGroups() && !info.getUserGroups().isEmpty()) {
+			for (String grp : info.getUserGroups().keySet()) {
+				// 组名不能为用户名
+				if (null != users.get(grp))
+					throw Err.H.GROUP_IS_USER(grp);
+				// 用户必须存在
+				for (String unm : info.getUserGroups().get(grp))
+					if (null == users.get(unm))
+						throw Err.U.NO_EXISTS(unm);
+			}
+		}
 
 		// 同步钩子数据
 		syncHooks(info);

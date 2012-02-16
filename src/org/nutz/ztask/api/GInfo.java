@@ -1,6 +1,9 @@
 package org.nutz.ztask.api;
 
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import org.nutz.ioc.Ioc;
 import org.nutz.lang.Strings;
@@ -24,6 +27,24 @@ public class GInfo {
 	 */
 	@CoField
 	private String name;
+
+	/**
+	 * 用户快速分组
+	 */
+	@CoField
+	private Map<String, List<String>> userGroups;
+
+	/**
+	 * 自定义菜单
+	 * <p>
+	 * 每个菜单项的格式为:
+	 * 
+	 * <pre>
+	 * 名称:标签A,标签B...
+	 * </pre>
+	 */
+	@CoField
+	private String[] menus;
 
 	/**
 	 * 周报的发送目的帐号
@@ -128,6 +149,28 @@ public class GInfo {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public Map<String, List<String>> getUserGroups() {
+		return userGroups;
+	}
+
+	public List<String> getUserByGroup(String grp) {
+		if (Strings.isBlank(grp) || null == userGroups)
+			return new LinkedList<String>();
+		return userGroups.get(grp);
+	}
+
+	public void setUserGroups(Map<String, List<String>> userGroups) {
+		this.userGroups = userGroups;
+	}
+
+	public String[] getMenus() {
+		return menus;
+	}
+
+	public void setMenus(String[] menus) {
+		this.menus = menus;
 	}
 
 	public GFormatInfo[] getFormats() {

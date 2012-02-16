@@ -37,19 +37,27 @@ body {
     transition: opacity 0.1s ease-in 0.1s;
 }
 
-.msg_readall{
+.msg_btns{
     position: absolute;
     top:0px;
     right:0px;
     padding:6px;
     color:#08F;
     cursor: pointer;
+    border-radius: 0 0 0 4px;
 }
 
-.msg_readall:hover{
-    text-decoration: underline;
+.msg_btns:hover{
     background: #EEE;
-    border-radius: 0 0 0 4px;
+}
+
+.msg_btns a{
+    border-left:1px dotted #AAA;
+    padding:0 6px;
+}
+
+.msg_btns a:hover{
+    text-decoration: underline;
 }
 
 .msg_st_unread {

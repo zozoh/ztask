@@ -14,7 +14,7 @@
 <script language="JavaScript" src="${rs}/js/page_task.js"></script>
 
 </head>
-<body>
+<body page-labels="${page_labels}">
     <% /*==========================================顶部固定条=*/ %>
     <%@include file="/WEB-INF/jsp/include/_sky.jsp" %>
     <% /*===============================================左侧=*/ %>

@@ -23,6 +23,17 @@ public class ZTasking extends SimpleContext {
 	 */
 	private Date endTime;
 
+	/**
+	 * 缓存 ginfo
+	 */
+	private GInfo ginfo;
+
+	public GInfo ginfo() {
+		if (null == ginfo)
+			ginfo = factory.tasks().getGlobalInfo();
+		return ginfo;
+	}
+
 	public ZTaskFactory factory() {
 		return factory;
 	}

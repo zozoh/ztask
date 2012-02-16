@@ -26,7 +26,10 @@
         <% /*===========================================列表=*/ %>
         <div class="msg_list scro">
             <div class="msg_more">${msg['msg.more']}</div>
-            <div class="msg_readall">${msg['msg.readall']}</div>
+            <div class="msg_btns">
+                <a class="msg_readall">${msg['msg.readall']}</a>
+                <a class="msg_clearall">${msg['msg.clear']}</a>
+            </div>
         </div>
     </div></div>
     

@@ -166,21 +166,19 @@ public class AddNotify implements HookHandler {
 		// 堆栈关注者
 		TaskStack stack = ing.factory().tasks().getStack(stackName);
 		if (null != stack && null != stack.getWatchers())
-			for (String nm : stack.getWatchers())
-				if (!me.getName().equals(nm)) {
-					User u = ing.factory().users().get(nm);
-					if (null != u)
-						accepterMap.put(nm, u);
-				}
+			for (String nm : stack.getWatchers()) {
+				User u = ing.factory().users().get(nm);
+				if (null != u)
+					accepterMap.put(nm, u);
+			}
 
 		// 任务关注者
 		if (null != ing.t().getWatchers())
-			for (String nm : ing.t().getWatchers())
-				if (!me.getName().equals(nm)) {
-					User u = ing.factory().users().get(nm);
-					if (null != u)
-						accepterMap.put(nm, u);
-				}
+			for (String nm : ing.t().getWatchers()) {
+				User u = ing.factory().users().get(nm);
+				if (null != u)
+					accepterMap.put(nm, u);
+			}
 
 		// 被提及的人
 		String[] unms;
@@ -189,15 +187,26 @@ public class AddNotify implements HookHandler {
 		} else {
 			unms = this.findUserName(ing.t().getText());
 		}
+
 		for (String unm : unms) {
 			User u = ing.factory().users().get(unm);
 			if (null != u)
 				accepterMap.put(unm, u);
+			// 看看是不是分组
+			List<String> userNames = ing.ginfo().getUserByGroup(unm);
+			for (String userName : userNames) {
+				u = ing.factory().users().get(userName);
+				if (null != u)
+					accepterMap.put(userName, u);
+			}
 		}
 
 		// 没有接受者，跳过
 		if (accepterMap.isEmpty())
 			return;
+
+		// 移除自己
+		accepterMap.remove(me.getName());
 
 		/*
 		 * 准备消息文本

@@ -73,6 +73,14 @@ public interface MessageService {
 	Message remove(Message msg);
 
 	/**
+	 * 清除某个所有者全部的消息
+	 * 
+	 * @param ownerName
+	 *            所有者名称
+	 */
+	void clearMine(String ownerName);
+
+	/**
 	 * 清除一个时间点之前的消息。（不包括收藏的消息）
 	 * 
 	 * @param d

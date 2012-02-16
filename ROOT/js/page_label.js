@@ -39,12 +39,14 @@ function redrawLables(lbs) {
 }
 
 function doReloadLabels() {
+    $("#labels").empty().text(z.msg("ui.reload") + " ... ");
     ajax.get("/ajax/label/tops", function(re) {
         redrawLables(re.data);
     });
 }
 
 function doSyncLabels() {
+    $("#labels").empty().text(z.msg("lb.sync") + " ... ");
     ajax.get("/ajax/do/sync/labels", function(re) {
         doReloadLabels();
     });
@@ -67,16 +69,9 @@ function onClickLabel() {
 }
 
 function initLayout() {
-    // init HTML
-    var html = '<ul>';
-    html += '<li><a class="lb_do_sync">' + z.msg("lb.sync") + '</a></li>';
-    html += '<li><a class="lb_do_reload">' + z.msg("ui.reload") + '</a></li>';
-    html += '</ul>';
-    // Add to DOM
-    $(html).appendTo(this);
     // 初始化事件
-    $("#menu").delegate(".lb_do_sync", "click", doSyncLabels);
-    $("#menu").delegate(".lb_do_reload", "click", doReloadLabels);
+    $("#label_btns").delegate(".lb_do_sync", "click", doSyncLabels);
+    $("#label_btns").delegate(".lb_do_reload", "click", doReloadLabels);
     // 绑定 Task Comment 事件
     task_detail_bind();
 }

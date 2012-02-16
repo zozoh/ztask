@@ -19,6 +19,7 @@ function msg_events_bind(opt) {
     this.delegate(".msg_do_read", "click", msg_events_on_do_read);
     this.delegate(".msg_del", "click", msg_events_on_del);
     this.delegate(".msg_readall", "click", msg_events_on_do_readall);
+    this.delegate(".msg_clearall", "click", msg_events_on_do_clearall);
 }
 
 function msg_events_on_del() {
@@ -37,6 +38,15 @@ function msg_events_on_do_readall() {
     }, function(re) {
         msg_do_reload(ee.selection, true);
     });
+}
+
+function msg_events_on_do_clearall() {
+    if(window.confirm(z.msg("msg.clear.confirm"))) {
+        var ee = _msg_obj(this);
+        ajax.get("/ajax/message/clear", function(re) {
+            msg_do_reload(ee.selection, true);
+        });
+    }
 }
 
 function msg_events_on_do_read() {
@@ -59,16 +69,17 @@ function msg_events_on_more() {
 
 function msg_do_reload(ele, clear) {
     var ee = _msg_obj(ele);
-    if(clear) {
-        $(".msg_list .msg",ee.selection).remove();
-        $(".msg_more", ee.selection).removeAttr("msg-last-id");
+    if(clear)
         ee.lastId = "";
-    }
     ajax.get("/ajax/message/list", {
         kwd: ee.kwd,
         lstId: ee.lastId,
         limit: 100
     }, function(re) {
+        if(clear) {
+            $(".msg_list .msg",ee.selection).remove();
+            $(".msg_more", ee.selection).removeAttr("msg-last-id");
+        }
         msg_append.apply(ee.selection, [re.data]);
     });
 }

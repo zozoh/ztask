@@ -51,6 +51,10 @@ public abstract class Err {
 	 * 钩子服务相关的错误
 	 */
 	public static class H {
+		
+		public static WebException GROUP_IS_USER(String groupName) {
+			return create("e.h.grp_is_user").reason(groupName);
+		}
 
 		public static WebException NO_HANDLER(String handler) {
 			return create("e.h.no_handler").reason(handler);

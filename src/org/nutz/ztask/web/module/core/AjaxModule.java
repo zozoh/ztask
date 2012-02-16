@@ -79,6 +79,11 @@ public class AjaxModule {
 		return factory.messages().remove(msgId);
 	}
 
+	@At("/message/clear")
+	public void doClearAllMyMessage(@Attr(scope = Scope.SESSION, value = Webs.ME) User me) {
+		factory.messages().clearMine(me.getName());
+	}
+
 	@At("/label/tops")
 	public List<Label> getTopLabels() {
 		return factory.labels().getTopLabels();
