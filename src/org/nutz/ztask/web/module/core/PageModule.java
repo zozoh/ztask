@@ -70,7 +70,7 @@ public class PageModule {
 		if (null == u) {
 			return "/page/login";
 		}
-		return "/page/mystack";
+		return "/page/stack";
 	}
 
 	/**
@@ -203,13 +203,6 @@ public class PageModule {
 			}
 		}
 	}
-
-	/**
-	 * 我的堆栈界面
-	 */
-	@At("/page/mystack")
-	@Ok("jsp:jsp.mystack")
-	public void showMyStackPage() {}
 
 	/**
 	 * 系统界面

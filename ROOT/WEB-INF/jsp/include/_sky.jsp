@@ -19,10 +19,14 @@ String url = request.getAttribute("page-url").toString();
     <div id="menu" class="lnk_menu">
         <%
         String[][] menus = (String[][])request.getAttribute("page-menu");
-        for(String[] menu : menus){
-        %><a href="${base}/page/cus/<%=menu[0]%>"
-           <%=url.endsWith("/cus/"+menu[0])?"class=\"hlt\"":""%>><%=menu[0]%>
-        </a><%
+        if(null!=menus){
+            for(String[] menu : menus){
+                if(null==menu)
+                    continue; 
+            %><a href="${base}/page/cus/<%=menu[0]%>"
+               <%=url.endsWith("/cus/"+menu[0])?"class=\"hlt\"":""%>><%=menu[0]%>
+            </a><%
+            }
         }
         %>
     </div>
