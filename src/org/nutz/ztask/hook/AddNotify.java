@@ -194,11 +194,12 @@ public class AddNotify implements HookHandler {
 				accepterMap.put(unm, u);
 			// 看看是不是分组
 			List<String> userNames = ing.ginfo().getUserByGroup(unm);
-			for (String userName : userNames) {
-				u = ing.factory().users().get(userName);
-				if (null != u)
-					accepterMap.put(userName, u);
-			}
+			if (null != userNames)
+				for (String userName : userNames) {
+					u = ing.factory().users().get(userName);
+					if (null != u)
+						accepterMap.put(userName, u);
+				}
 		}
 
 		// 没有接受者，跳过
