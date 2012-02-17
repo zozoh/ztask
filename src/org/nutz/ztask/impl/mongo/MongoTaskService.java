@@ -700,6 +700,8 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 			o.set("hungupAt", Times.now());
 			o.set("lastModified", Times.now());
 			dao.updateById(Task.class, t.get_id(), o);
+			if(!t.isTop())
+				this.syncDescendants(this.checkTopTask(t.get_id()));
 		}
 		return t;
 	}
@@ -713,6 +715,8 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 			o.set("lastModified", Times.now());
 			o.set("hungupAt", null);
 			dao.updateById(Task.class, t.get_id(), o);
+			if(!t.isTop())
+				this.syncDescendants(this.checkTopTask(t.get_id()));
 		}
 		return t;
 	}
