@@ -15,8 +15,15 @@ import com.mongodb.ReadPreference;
  * @author Wendal(wendal1985@gmail.com)
  */
 public class MongoConnector {
-
+	
 	private Mongo mongo;
+	
+	public MongoConnector(Mongo mongo) {
+		this.mongo = mongo;
+	}
+
+	private String user;
+	private String password;
 
 	/**
 	 * 创建一个单连接
@@ -59,6 +66,8 @@ public class MongoConnector {
 	 */
 	public MongoDao getDao(String dbname) {
 		DB db = mongo.getDB(dbname);
+		if (user != null)
+			db.authenticate(user, password.toCharArray());
 		return new MongoDao(db);
 	}
 
@@ -72,4 +81,14 @@ public class MongoConnector {
 	public Mongo getMongo() {
 		return mongo;
 	}
+
+	public void setUser(String user) {
+		this.user = user;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	
+	
 }
