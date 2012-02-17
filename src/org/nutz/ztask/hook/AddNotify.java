@@ -250,6 +250,9 @@ public class AddNotify implements HookHandler {
 		String text = seg.render(context).toString();
 
 		// 保存消息
+		if (log.isDebugEnabled())
+			log.debugf("  - msg to: %s", Lang.concat(", ", accepterMap.keySet()));
+		
 		for (String nm : accepterMap.keySet())
 			ing.factory().messages().add(text, nm);
 	}
