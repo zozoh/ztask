@@ -315,7 +315,7 @@ public class HookedTaskService implements TaskService {
 
 		String[] timers = info.getTimers();
 		if (log.isDebugEnabled())
-			log.debugf("Found %d timers in sys", timers.length);
+			log.debugf("Found %d timers in sys", null == timers ? 0 : timers.length);
 
 		// 逐个检查，并打印 ...
 		info.eachTimer(ioc, new Callback3<Integer, Quartz, String[]>() {
