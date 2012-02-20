@@ -140,7 +140,7 @@ function main() {
         $(".sflt_cus").addClass("sflt_li_on").removeClass("sflt_cus_undefined");
         $(".sflt_cus").attr("href", "#s:'" + $.trim(pgano.s) + "'").click();
     } else {
-        $(".sflt_favo").click();
+        $(".sflt_mine").click();
     }
 }
 
