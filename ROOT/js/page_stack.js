@@ -97,7 +97,11 @@ function main() {
     task_events_bind($("#tasks"), {
         reload: function() {
             doReloadTasks($("#tasks .hierachy_crumb_item_hlt").attr("task-id"));
-        }
+        },
+        reject: task_replace,
+        renew: task_replace,
+        restart: task_replace,
+        done: task_replace
     });
     // 事件 : 压入堆栈
     $("#tasks").delegate(".task_push", "click", function() {

@@ -16,6 +16,13 @@
  - ${name} @lina
  - ${name} @liuhe
  - ${name} @superman
+ - ${name} @zmi
+ - ${name} @yunh
+ - ${name} @yuhang
+ - ${name} @zqiang
+ - ${name} @yufei
+ - ${name} @llei
+ - ${name} @wyi
 市场 @stone
  - ${name} @cheny
  - ${name} @livia
