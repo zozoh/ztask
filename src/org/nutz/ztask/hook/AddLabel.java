@@ -1,11 +1,13 @@
 package org.nutz.ztask.hook;
 
+import java.util.HashSet;
+
 import org.nutz.ioc.loader.annotation.IocBean;
-import org.nutz.lang.Lang;
 import org.nutz.ztask.api.HookHandler;
 import org.nutz.ztask.api.HookType;
 import org.nutz.ztask.api.Hooking;
 import org.nutz.ztask.api.Task;
+import org.nutz.ztask.api.TaskStack;
 import org.nutz.ztask.api.TaskStatus;
 
 /**
@@ -24,8 +26,23 @@ public class AddLabel implements HookHandler {
 
 			String refer = ing.getReferString();
 
-			if (!Lang.contains(t.getLabels(), refer)) {
-				t.setLabels(Lang.arrayLast(t.getLabels(), refer));
+			HashSet<String> lbset = new HashSet<String>();
+			// 检查
+			TaskStack s = ing.factory().tasks().getStack(refer);
+			while (null != s) {
+				lbset.add(s.getName());
+				s = ing.factory().tasks().getStack(s.getParentName());
+			}
+
+			// 加入自身
+			if (null != t.getLabels()) {
+				for (String lb : t.getLabels()) {
+					lbset.add(lb);
+				}
+			}
+
+			if (null == t.getLabels() || lbset.size() != t.getLabels().length) {
+				t.setLabels(lbset.toArray(new String[lbset.size()]));
 				ing.factory().htasks().setLabels(ing.t(), t.getLabels());
 			}
 		}
