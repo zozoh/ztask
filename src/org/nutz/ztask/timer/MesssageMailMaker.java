@@ -59,23 +59,36 @@ public class MesssageMailMaker implements TimerHandler {
 		// 循环为每个用户发送通知邮件
 		for (String unm : map.keySet()) {
 
-			if (log.isDebugEnabled())
-				log.debugf(" - MailMaker: will send to '%s'", unm);
-
 			User u = factory.users().get(unm);
 			if (null == u || null == u.getEmail())
 				continue;
 
 			List<Message> list = map.get(unm);
+
+			if (null == list || list.isEmpty()) {
+				continue;
+			}
+
+			if (log.isDebugEnabled())
+				log.debugf(" - MailMaker: will send to '%s'", unm);
+
 			Date now = Times.now();
 
 			// 准备消息
-			String subject = String.format("[zTask] %d messages @ %s ", list.size(), Times.sDT(now));
 			StringBuilder sb = new StringBuilder();
-			sb.append("=== Send from zTask : \n\n");
-			for (Message msg : list)
+			sb.append("Message in zTask @ " + Times.sDT(now) + " : \n\n");
+			for (Message msg : list) {
 				sb.append("    ").append(msg.toString()).append('\n');
-			sb.append("\n\n---------------- The End -----------------------\n");
+				sb.append("   [").append(Times.sDT(msg.getCreateTime())).append("] - ");
+				sb.append(msg.getText());
+			}
+			sb.append("\n\n");
+
+			Message firstMsg = list.get(0);
+			String subject = String.format(	"[zTask:%d] %s ",
+											list.size(),
+											firstMsg.getText()
+													.replaceAll("[\\[]?[0-9a-f]{24}[\\]]?", ""));
 
 			if (log.isDebugEnabled())
 				log.debugf(" - MailMaker: mail is: '%s':\n%s", subject, sb);
