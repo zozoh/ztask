@@ -80,6 +80,7 @@ public class MesssageMailMaker implements TimerHandler {
 			for (Message msg : list) {
 				sb.append("   [").append(Times.sDT(msg.getCreateTime())).append("] - ");
 				sb.append(msg.getText());
+				sb.append("\n");
 			}
 			sb.append("\n\n");
 
