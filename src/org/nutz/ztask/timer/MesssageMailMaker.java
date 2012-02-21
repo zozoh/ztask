@@ -78,7 +78,6 @@ public class MesssageMailMaker implements TimerHandler {
 			StringBuilder sb = new StringBuilder();
 			sb.append("Message in zTask @ " + Times.sDT(now) + " : \n\n");
 			for (Message msg : list) {
-				sb.append("    ").append(msg.toString()).append('\n');
 				sb.append("   [").append(Times.sDT(msg.getCreateTime())).append("] - ");
 				sb.append(msg.getText());
 			}
