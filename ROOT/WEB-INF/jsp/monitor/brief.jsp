@@ -30,10 +30,20 @@
                 top: 5px;
                 color: #080;
             }
+            .notify{
+                text-align: center;
+                background-color:#CCC;
+                padding:6px;
+            }
         </style>
     </head>
     <body>
         <h1>${title}</h1><b>${now}</b>
         <pre>${obj}</pre>
+        <div class="notify">
+            <c:forEach var="atom" items="${$atoms}">
+                - <a href="/monitor/notify?tnm=${atom.name}">${atom.name}</a>
+            </c:forEach>
+        </div>
     </body>
 </html>

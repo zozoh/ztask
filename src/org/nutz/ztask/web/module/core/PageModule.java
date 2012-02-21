@@ -114,6 +114,22 @@ public class PageModule {
 	}
 
 	/**
+	 * 界面上主动 Notify 一个后台线程，最后返回后台查看界面
+	 */
+	@At("/monitor/notify")
+	@Ok(">>:/monitor/threads")
+	public void notifyThreads(	@Param("tnm") String tname,
+								@Attr(scope = Scope.APP, value = "$atoms") AbstractAtom[] atoms) {
+		for (AbstractAtom atom : atoms) {
+			if (Strings.isBlank(tname) || Strings.equals(tname, atom.getName())) {
+				synchronized (atom.getMyLock()) {
+					atom.getMyLock().notifyAll();
+				}
+			}
+		}
+	}
+
+	/**
 	 * 生成报告界面
 	 * 
 	 * @param ds

@@ -38,7 +38,7 @@ public class ZTaskSetup implements Setup {
 
 		for (int i = 0; i < atoms.length; i++) {
 			if (null != atoms[i]) {
-				Thread t = new Thread(atoms[i], atoms[i].name());
+				Thread t = new Thread(atoms[i], atoms[i].getName());
 				t.start();
 			}
 		}

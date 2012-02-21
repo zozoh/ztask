@@ -149,15 +149,12 @@ public abstract class ZTasks {
 	 *            邮件正文
 	 * @param usrs
 	 *            收信人
-	 * @return 发送结果，null 表失败
+	 * @return 发送结果，"OK:" 开头为成功，否则为失败
 	 */
 	public static String sendTextMail(SmtpInfo smtp, String subject, String text, List<User> usrs) {
 
 		if (!smtp.isAvaliable())
 			return null;
-
-		// 准备返回
-		String re = null;
 
 		try {
 			SimpleEmail email = new SimpleEmail();
@@ -189,13 +186,15 @@ public abstract class ZTasks {
 			if (count > 0) {
 				email.setSubject(subject);
 				email.setMsg(text);
-				re = email.send();
+				return "OK:" + email.send();
 			}
 		}
-		catch (Throwable e) {}
+		catch (Throwable e) {
+			return "FAIL: " + e.toString();
+		}
 
 		// 返回发送结果
-		return re;
+		return "OK:0";
 	}
 
 	/**

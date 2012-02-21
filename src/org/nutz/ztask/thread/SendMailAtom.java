@@ -89,11 +89,13 @@ public class SendMailAtom extends AbstractAtom {
 								Lang.concat(",", mailAddresses));
 				}
 				String re = ZTasks.sendTextMail(smtp, mo.getSubject(), mo.getMailBody(), usrs);
+				if (re == null)
+					re = "OK:";
 
 				if (log.isDebugEnabled())
-					log.debug(re == null ? "fail" : "OK:" + re);
+					log.debug(re);
 
-				return re == null ? AfterEach.RETRY : AfterEach.REMOVE;
+				return re.startsWith("OK:") ? AfterEach.REMOVE : AfterEach.RETRY;
 			}
 		});
 
@@ -113,7 +115,7 @@ public class SendMailAtom extends AbstractAtom {
 	public static final String NAME = "SEND.MAIL";
 
 	@Override
-	public String name() {
+	public String getName() {
 		return NAME;
 	}
 

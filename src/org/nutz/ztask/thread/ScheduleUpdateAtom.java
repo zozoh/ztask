@@ -1,6 +1,9 @@
 package org.nutz.ztask.thread;
 
+import java.util.Date;
+
 import org.nutz.lang.Lang;
+import org.nutz.lang.Times;
 import org.nutz.lang.util.Callback3;
 import org.nutz.quartz.Quartz;
 import org.nutz.ztask.api.GInfo;
@@ -47,8 +50,9 @@ public class ScheduleUpdateAtom extends AbstractAtom {
 			factory.schedule().notifyAll();
 		}
 
-		// 然后无限等待
-		return 0;
+		// 然后等待到今天最后一秒
+		Date lastSec = Times.D(Times.sD(Times.now()) + " 23:59:59");
+		return lastSec.getTime() - System.currentTimeMillis() + 10000;
 	}
 
 	public static final String NAME = "SCHD.update";
@@ -62,7 +66,7 @@ public class ScheduleUpdateAtom extends AbstractAtom {
 	}
 
 	@Override
-	public String name() {
+	public String getName() {
 		return NAME;
 	}
 

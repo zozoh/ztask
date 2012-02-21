@@ -43,7 +43,7 @@ public abstract class AbstractAtom implements Atom {
 																						+ sleepTime)));
 		long du = null == sleepAt ? -1 : sleepAt.getTime() - upAt.getTime();
 		return String.format(	"[%s:%d] wait: %d ms, will up @ (%s), last-du:%dms (%s - %s)",
-								name(),
+								getName(),
 								runCount,
 								sleepTime,
 								willUpAt,
@@ -125,7 +125,7 @@ public abstract class AbstractAtom implements Atom {
 		return null == this.sleepAt;
 	}
 
-	public abstract String name();
+	public abstract String getName();
 
 	/**
 	 * @return 要等待的时间(秒)，小于等于0 表示无限等待

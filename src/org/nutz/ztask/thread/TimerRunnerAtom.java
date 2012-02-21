@@ -40,7 +40,7 @@ public class TimerRunnerAtom extends AbstractAtom {
 	public static final String NAME = "SCHD.run";
 
 	@Override
-	public String name() {
+	public String getName() {
 		return NAME;
 	}
 }
