@@ -11,6 +11,7 @@ import java.util.Set;
 import org.nutz.doc.meta.ZBlock;
 import org.nutz.doc.meta.ZD;
 import org.nutz.doc.meta.ZType;
+import org.nutz.lang.Lang;
 import org.nutz.lang.Mirror;
 import org.nutz.lang.eject.Ejecting;
 import org.nutz.ztask.api.Task;
@@ -29,7 +30,7 @@ public class ReportMap {
 	 *            父块
 	 */
 	public void joinTo(ZBlock block) {
-		if(isEmpty()){
+		if (isEmpty()) {
 			block.add(ZD.p(" - NOTHING - "));
 			return;
 		}
@@ -101,6 +102,23 @@ public class ReportMap {
 	public void add(List<Task> list, KeyGetter<Task> keyGetter) {
 		for (Task t : list) {
 			String key = keyGetter.getKey(t);
+			/*
+			 * 不记入统计的任务
+			 */
+			if (null != ignoreLabels && null != t.getLabels()) {
+				boolean ignore = false;
+				for (String ilb : ignoreLabels) {
+					if (Lang.contains(t.getLabels(), ilb)) {
+						ignore = true;
+						break;
+					}
+				}
+				if (ignore)
+					continue;
+			}
+			/*
+			 * 记入归纳表
+			 */
 			List<Task> ts = map.get(key);
 			if (null == ts) {
 				ts = new LinkedList<Task>();
@@ -109,17 +127,18 @@ public class ReportMap {
 			ts.add(t);
 		}
 	}
-	
-	public boolean isEmpty(){
+
+	public boolean isEmpty() {
 		return map.isEmpty();
 	}
-	
-	public int size(){
+
+	public int size() {
 		return map.size();
 	}
 
-	public ReportMap() {
+	public ReportMap(String[] ignoreLabels) {
 		this.map = new HashMap<String, List<Task>>();
+		this.ignoreLabels = ignoreLabels;
 	}
 
 	/**
@@ -127,4 +146,8 @@ public class ReportMap {
 	 */
 	private Map<String, List<Task>> map;
 
+	/**
+	 * 不记入统计的任务标签
+	 */
+	private String[] ignoreLabels;
 }

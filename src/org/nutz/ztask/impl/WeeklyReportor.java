@@ -58,6 +58,11 @@ public class WeeklyReportor implements ZTaskReportor {
 	 */
 	private DocRender<? extends Object> render;
 
+	/**
+	 * 注入: 具备这些标签的任务，不记入周报
+	 */
+	private String[] ignoreLabels;
+
 	public WeeklyReportor() {
 		reportDay = Calendar.MONDAY;
 	}
@@ -148,13 +153,13 @@ public class WeeklyReportor implements ZTaskReportor {
 		};
 
 		// 汇总统计
-		ReportMap ok = new ReportMap();
+		ReportMap ok = new ReportMap(ignoreLabels);
 		ok.add(dones, keyg);
 
-		ReportMap ingOrHungup = new ReportMap();
+		ReportMap ingOrHungup = new ReportMap(ignoreLabels);
 		ingOrHungup.add(pushs, keyg);
 
-		ReportMap newOrReject = new ReportMap();
+		ReportMap newOrReject = new ReportMap(ignoreLabels);
 		newOrReject.add(news, keyg);
 
 		// 没有任务
