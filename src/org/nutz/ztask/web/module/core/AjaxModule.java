@@ -195,10 +195,11 @@ public class AjaxModule {
 	@At("/task/gout")
 	public Task doGoutTask(@Param("tid") String taskId) {
 		Task t = factory.htasks().checkTask(taskId);
-		if (Strings.isBlank(t.getParentId()))
+		if (t.isTop())
 			return t;
 		Task p = factory.htasks().checkTask(t.getParentId());
-		factory.htasks().setParentTask(p, t);
+		Task pp = factory.tasks().getTask(p.getParentId());
+		factory.htasks().setParentTask(pp, t);
 		return t;
 	}
 

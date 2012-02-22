@@ -159,8 +159,8 @@ var _TASK_MENU_ = {
     "task_push": "edit,join,del,gout,check",
     "task_ing": "edit,reject,hungup",
     "task_pause": "edit,reject",
-    "task_done": "del,edit,join,check",
-    "task_wait": "edit"
+    "task_done": "del,edit,join,gout,check",
+    "task_wait": "edit,join,gout,check"
 };
 
 /**
