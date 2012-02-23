@@ -216,7 +216,6 @@ function hierachy_redraw(objs) {
         for(var i = 0; i < objs.length; i++) {
             opt.append.apply(jBlock, [objs[i]]);
         }
-    hierachy_layout.apply(this);
 }
 
 /**
@@ -228,15 +227,32 @@ function hierachy_redraw(objs) {
  * @param this : .hierachy 的 DOM 元素
  */
 function hierachy_layout() {
-    var jq = $(".hierachy_arena", this);
+    var hie = hierachy_check_selection(this);
+    var opt = hierachy_opt(hie);
+    if(!opt)
+        return;
+    var jq = $(".hierachy_arena", hie);
+
     // 设置 viewport 高度
     var H = jq.innerHeight();
     var crumbHeight = $(".hierachy_crumb", jq).outerHeight();
+    var index = $(".hierachy_block_hlt", jq).prevAll().size();
     var height = H - crumbHeight;
     var vp = $(".hierachy_viewport", jq).css("height", height);
-    $(".hierachy_scroller", vp).css("height", height);
+    var width = vp.innerWidth();
+
+    var scrollerCss = {
+        "height": height
+    };
+    if(opt.direction == "right") {
+        scrollerCss.left = width * index * -1;
+    } else {
+        scrollerCss.right = width * index * -1;
+    }
+
+    $(".hierachy_scroller", vp).css(scrollerCss);
     $(".hierachy_block",vp).css({
-        "width": vp.innerWidth(),
+        "width": width,
         "height": height
     });
 }

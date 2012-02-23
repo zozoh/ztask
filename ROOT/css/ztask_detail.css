@@ -81,12 +81,14 @@
     color: #88F;
 }
 
-#task_detail .task_cmt_item pre {
+#task_detail .task_cmt_content {
+    width:96%;
+    word-wrap:break-word;
     font-family: Courier;
     font-size: 14px;
     line-height: 22px;
     padding: 4px;
-    margin: 4px;
+    margin: 4px auto;
 }
 
 #task_detail .task_cmt_list {

@@ -17,55 +17,58 @@
 
 #tsubs {
     overflow: auto;
-    padding:10px 10px 40px 10px;
-}
-/*------------------------------------------.task_doc 相关--------------*/
-.task_doc h1{
-    font-size:20px;
-    font-weight: bold;
-    margin:6px;
-    background-color:#F80;
-    color:#FFF;
-    border-radius: 4px;
-    line-height:30px;
-    padding-left:12px;
+    padding: 10px 10px 40px 10px;
 }
 
-.task_doc h2{
-    font-size:16px;
+/*------------------------------------------.task_doc 相关--------------*/
+.task_doc h1 {
+    font-size: 20px;
     font-weight: bold;
-    margin:6px 6px 12px 20px;
-    padding:4px 4px 4px 8px;
-    background-color:#DDD;
+    margin: 6px;
+    background-color: #F80;
+    color: #FFF;
+    border-radius: 4px;
+    line-height: 30px;
+    padding-left: 12px;
+}
+
+.task_doc h2 {
+    font-size: 16px;
+    font-weight: bold;
+    margin: 6px 6px 12px 20px;
+    padding: 4px 4px 4px 8px;
+    background-color: #DDD;
     border-radius: 2px;
 }
 
 .task_doc_p_1, .task_doc_p_2 {
-    margin:0 6px 0 30px;
+    margin: 0 6px 0 30px;
+    width: 92%;
+    word-wrap: break-word;
 }
 
-.task_doc h3, .task_doc h4, .task_doc h5, .task_doc h6{
-    font-size:14px;
+.task_doc h3, .task_doc h4, .task_doc h5, .task_doc h6 {
+    font-size: 14px;
     font-weight: bold;
-    margin:6px 6px 12px 40px;
-    padding:4px;
+    margin: 6px 6px 12px 40px;
+    padding: 4px;
 }
 
 .task_doc_p_3, .task_doc_p_4, .task_doc p_5, .task_doc_p_6 {
-    margin:0 6px 0 50px;
+    margin: 0 6px 0 50px;
 }
 
 .task_doc pre {
-    padding:10px;
-    border-left:3px solid #EEE;
-    line-height:20px;
-    font-size:14px;
+    padding: 10px;
+    border-left: 3px solid #EEE;
+    line-height: 20px;
+    font-size: 14px;
 }
 
-.task_doc_empty{
-    color:#AAA;
-    padding:40px;
-    font-size:18px;
+.task_doc_empty {
+    color: #AAA;
+    padding: 40px;
+    font-size: 18px;
     text-align: center;
 }
 

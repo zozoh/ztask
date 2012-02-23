@@ -38,6 +38,10 @@ body {
     overflow: hidden;
 }
 
+.z_editit{
+   font-size:14px; 
+}
+
 /*---------------------------------------------------------- 通用的A ------*/
 a.lnk {
     text-decoration: none;

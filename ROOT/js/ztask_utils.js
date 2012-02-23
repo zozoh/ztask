@@ -87,14 +87,14 @@ function task_parents_in_dom(taskId) {
 }
 
 /**
- * 根据 ginfo().formats 属性，将字符串格式化
+ * 根据 ginfo().formats 属性，将字符串格按照 ginfo 的正则式式化
  *
  * @param str : 需要被格式化的字符串
  * @return 格式化后的字符串
  */
 function task_format_text(str) {
     if(str)
-        str = str.replace("<", "&lt;").replace(">","&gt;");
+        str = str.replace("<", "&lt;").replace(">", "&gt;");
     var formats = ginfo() ? ginfo().formats : null;
     if(!str || !$.isArray(formats) || formats.length <= 0)
         return str;
@@ -113,6 +113,7 @@ function task_format_text(str) {
  * @return 格式化后的字符串
  */
 function task_wrap_comment(str) {
+    var cmtHtml = task_format_text(str);
     var isMine = z.startsWith(str, "@" + myname() + ":");
     var html = '<div class="task_cmt_item">';
     if(isMine) {
@@ -121,7 +122,7 @@ function task_wrap_comment(str) {
         html += '    <li class="task_cmt_edit">' + z.msg("ui.edit") + '</li>';
         html += '</ul>';
     }
-    html += '<pre>' + task_format_text(str) + '</pre>';
+    html += '<pre class="task_cmt_content">' + cmtHtml + '</pre>';
     html += '</div>';
     return html;
 }
