@@ -84,6 +84,7 @@
 #task_detail .task_cmt_content {
     width:96%;
     word-wrap:break-word;
+    white-space:pre-wrap;
     font-family: Courier;
     font-size: 14px;
     line-height: 22px;
