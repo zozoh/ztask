@@ -197,6 +197,26 @@ public class TaskQueryTest {
 		AD(tq.qTimeScope());
 		AS(tq.qStatus());
 
+		tq = NEW("#()");
+		assertNull(tq.qText());
+		assertNull(tq.qRegex());
+		assertNull(tq.qID());
+		ASTR(tq.qCreaters());
+		ASTR(tq.qOwners());
+		assertEquals(0, tq.qLabels().length);
+		AD(tq.qTimeScope());
+		AS(tq.qStatus());
+		
+		tq = NEW("#( )");
+		assertNull(tq.qText());
+		assertNull(tq.qRegex());
+		assertNull(tq.qID());
+		ASTR(tq.qCreaters());
+		ASTR(tq.qOwners());
+		assertEquals(0, tq.qLabels().length);
+		AD(tq.qTimeScope());
+		AS(tq.qStatus());
+
 		tq = NEW("&W(-1, 4)");
 		assertNull(tq.qText());
 		assertNull(tq.qRegex());

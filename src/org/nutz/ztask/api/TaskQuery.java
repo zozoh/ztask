@@ -20,7 +20,8 @@ import org.nutz.ztask.util.ZTasks;
  *    如果字符串内容符合 MongoDB 的 ID 格式
  * 
  * = 按标签查询 ===============
- *    '#(标签,标签,标签...)'
+ *    '#(A,B,C)'     // 同时具备 A,B,C 三个标签的任务
+ *    '#()'          // 没有任何标签
  * 
  * = 按周查询 ================
  *    '&W(-1)'    // 上一周
@@ -198,7 +199,7 @@ public class TaskQuery {
 
 			// 统计: labels
 			if (text.length() > 0) {
-				re = find("(#[(])([^)]+)([)])");
+				re = find("(#[(])([^)]*)([)])");
 				if (null != re) {
 					labels = Strings.splitIgnoreBlank(re[2], "[ \t\n\r,]");
 				}
