@@ -79,6 +79,11 @@ public class HookedTaskService implements TaskService {
 	}
 
 	@Override
+	public Task setWatchers(Task t, String[] watchers) {
+		return tasks.setWatchers(t, watchers);
+	}
+
+	@Override
 	public Task removeWatchers(Task t, String... watchers) {
 		return tasks.removeWatchers(t, watchers);
 	}

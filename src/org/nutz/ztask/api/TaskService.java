@@ -80,6 +80,17 @@ public interface TaskService extends AbstractService {
 	Task addWatchers(Task t, String... watchers);
 
 	/**
+	 * 为任务重设关注者，本函数会自动判断重复
+	 * 
+	 * @param t
+	 *            任务
+	 * @param watchers
+	 *            关注者名列表，将会取代老的关注者
+	 * @return 重新取回的 Task 对象
+	 */
+	Task setWatchers(Task t, String[] watchers);
+
+	/**
 	 * 为任务取消关注者
 	 * 
 	 * @param t

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -69,21 +70,30 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 		if (null == watchers || 0 == watchers.length)
 			return t;
 
-		if (null == t.getWatchers() || 0 == t.getWatchers().length) {
-			t.setWatchers(watchers);
-		} else {
-			List<String> list = new ArrayList<String>(t.getWatchers().length + watchers.length);
-			for (String w : watchers) {
-				if (!Lang.contains(t.getWatchers(), w))
-					list.add(w);
-			}
+		// 取消 watcher 的重复
+		if (null != t.getWatchers() && t.getWatchers().length > 0) {
+			HashSet<String> list = new HashSet<String>();
+			// 新的 ...
+			for (String w : watchers)
+				list.add(w);
+			// 旧的
 			for (String w : t.getWatchers())
 				list.add(w);
-			t.setWatchers(list.toArray(new String[list.size()]));
+
+			watchers = list.toArray(new String[list.size()]);
 		}
 
-		dao.updateById(Task.class, t.get_id(), Moo.SET("watchers", t.getWatchers()));
+		// 保存
+		setWatchers(t, watchers);
 
+		// 返回
+		return t;
+	}
+
+	@Override
+	public Task setWatchers(Task t, String[] watchers) {
+		t.setWatchers(watchers);
+		dao.updateById(Task.class, t.get_id(), Moo.SET("watchers", t.getWatchers()));
 		return t;
 	}
 

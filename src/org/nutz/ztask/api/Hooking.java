@@ -1,6 +1,12 @@
 package org.nutz.ztask.api;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.nutz.castor.Castors;
+import org.nutz.lang.Strings;
+import org.nutz.ztask.util.ZTasks;
 
 /**
  * 钩子处理器处理时的上下文对象
@@ -113,6 +119,44 @@ public class Hooking extends ZTasking {
 
 	public void setUser(String user) {
 		this.user = user;
+	}
+
+	/**
+	 * 从一段文本中查找一组被提及的用户
+	 * <ul>
+	 * <li>用 '@xxx' 声明得有可能是用户
+	 * <li>这个用户必须存在
+	 * <li>或者他可能是一个用户组
+	 * </ul>
+	 * 
+	 * @param str
+	 *            文本
+	 * @return 用户列表
+	 */
+	public Map<String, User> extractUsers(String str) {
+		// 准备返回
+		Map<String, User> map = new HashMap<String, User>();
+		if (Strings.isBlank(str))
+			return map;
+
+		// 得到用户的名称串
+		String[] unms = ZTasks.findUserName(str);
+		// 归纳...
+		for (String unm : unms) {
+			User u = factory().users().get(unm);
+			if (null != u)
+				map.put(unm, u);
+			// 看看是不是分组
+			List<String> userNames = ginfo().getUserByGroup(unm);
+			if (null != userNames)
+				for (String userName : userNames) {
+					u = factory().users().get(userName);
+					if (null != u)
+						map.put(userName, u);
+				}
+		}
+		// 返回
+		return map;
 	}
 
 	public String toString() {

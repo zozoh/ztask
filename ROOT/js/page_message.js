@@ -45,6 +45,7 @@ function msg_events_on_do_clearall() {
         var ee = _msg_obj(this);
         ajax.get("/ajax/message/clear", function(re) {
             msg_do_reload(ee.selection, true);
+            $("#msg_count").text(0);
         });
     }
 }
@@ -56,6 +57,7 @@ function msg_events_on_do_read() {
         read: true
     }, function(re) {
         msg_html.apply(ee.jMsg, [re.data]);
+        $("#msg_count").text(0);
     });
 }
 

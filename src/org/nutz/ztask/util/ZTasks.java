@@ -1,7 +1,10 @@
 package org.nutz.ztask.util;
 
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.mail.SimpleEmail;
 import org.nutz.lang.Lang;
@@ -268,6 +271,29 @@ public abstract class ZTasks {
 	 */
 	public static boolean isBlankStack(String stackName) {
 		return Strings.isBlank(stackName) || ZTasks.NULL_STACK.equals(stackName);
+	}
+
+	public final static Pattern REG_USER = Pattern.compile("(@)([^ \r\n\t@:#?]+)("
+															+ REG_NOWORD
+															+ ")");
+
+	/**
+	 * 从一段字符串中提取用户名称数组
+	 * 
+	 * @param str
+	 *            字符串
+	 * @return 用户名称数组
+	 */
+	public static String[] findUserName(String str) {
+		if (Strings.isBlank(str))
+			return new String[0];
+
+		List<String> list = new LinkedList<String>();
+		Matcher m = REG_USER.matcher(str);
+		while (m.find()) {
+			list.add(Strings.trim(m.group(2)));
+		}
+		return list.toArray(new String[list.size()]);
 	}
 
 }

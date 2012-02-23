@@ -1,11 +1,7 @@
 package org.nutz.ztask.hook;
 
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Lang;
@@ -181,26 +177,7 @@ public class AddNotify implements HookHandler {
 			}
 
 		// 被提及的人
-		String[] unms;
-		if (!Strings.isBlank(str)) {
-			unms = this.findUserName(str);
-		} else {
-			unms = this.findUserName(ing.t().getText());
-		}
-
-		for (String unm : unms) {
-			User u = ing.factory().users().get(unm);
-			if (null != u)
-				accepterMap.put(unm, u);
-			// 看看是不是分组
-			List<String> userNames = ing.ginfo().getUserByGroup(unm);
-			if (null != userNames)
-				for (String userName : userNames) {
-					u = ing.factory().users().get(userName);
-					if (null != u)
-						accepterMap.put(userName, u);
-				}
-		}
+		accepterMap.putAll(ing.extractUsers(!Strings.isBlank(str) ? str : ing.t().getText()));
 
 		// 没有接受者，跳过
 		if (accepterMap.isEmpty())
@@ -252,32 +229,9 @@ public class AddNotify implements HookHandler {
 		// 保存消息
 		if (log.isDebugEnabled())
 			log.debugf("  - msg to: %s", Lang.concat(", ", accepterMap.keySet()));
-		
+
 		for (String nm : accepterMap.keySet())
 			ing.factory().messages().add(text, nm);
-	}
-
-	private final static Pattern REG_USER = Pattern.compile("(@)([^ \r\n\t@:#?]+)("
-															+ ZTasks.REG_NOWORD
-															+ ")");
-
-	/**
-	 * 从一段字符串中提取用户名称数组
-	 * 
-	 * @param str
-	 *            字符串
-	 * @return 用户名称数组
-	 */
-	private String[] findUserName(String str) {
-		if (Strings.isBlank(str))
-			return new String[0];
-
-		List<String> list = new LinkedList<String>();
-		Matcher m = REG_USER.matcher(str);
-		while (m.find()) {
-			list.add(Strings.trim(m.group(2)));
-		}
-		return list.toArray(new String[list.size()]);
 	}
 
 	/*
