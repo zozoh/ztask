@@ -35,7 +35,7 @@ public class AutoWatch implements HookHandler {
 			catch (Exception e) {}
 		}
 		// 内容修改
-		else if (HookType.UPDATE == htp) {
+		else if (HookType.UPDATE == htp || HookType.CREATE == htp) {
 			text = ing.t().getText();
 		}
 
