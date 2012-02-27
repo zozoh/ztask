@@ -74,6 +74,7 @@ function main() {
             });
         },
         restart: task_replace,
+        hungup: task_replace,
         done: function(t) {
             var ee = _task_obj(this);
             stack_inc(ee.jTask, -1);
