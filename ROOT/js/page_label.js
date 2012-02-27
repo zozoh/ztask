@@ -4,6 +4,7 @@ function main() {
     task_events_bind($("#tasks"), {
         reject: task_replace,
         renew: task_replace,
+        restart: task_replace,
         done: task_replace
     });
 }
