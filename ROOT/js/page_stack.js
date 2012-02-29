@@ -89,6 +89,7 @@ function main() {
         reject: task_replace,
         renew: task_replace,
         restart: task_replace,
+        hungup: task_replace,
         done: task_replace
     });
     // 事件 : 压入堆栈

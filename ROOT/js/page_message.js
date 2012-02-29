@@ -17,6 +17,7 @@ function msg_events_bind(opt) {
     this.delegate(".msg_more", "click", msg_events_on_more);
     this.delegate(".msg_kwd", "change", msg_events_on_reload);
     this.delegate(".msg_do_read", "click", msg_events_on_do_read);
+    this.delegate(".msg_do_unread", "click", msg_events_on_do_unread);
     this.delegate(".msg_del", "click", msg_events_on_del);
     this.delegate(".msg_readall", "click", msg_events_on_do_readall);
     this.delegate(".msg_clearall", "click", msg_events_on_do_clearall);
@@ -51,13 +52,22 @@ function msg_events_on_do_clearall() {
 }
 
 function msg_events_on_do_read() {
-    var ee = _msg_obj(this);
+    msg_do_set_read(this, true);
+}
+
+function msg_events_on_do_unread() {
+    msg_do_set_read(this, false);
+}
+
+function msg_do_set_read(ele, read) {
+    var ee = _msg_obj(ele);
     ajax.get("/ajax/message/set/read", {
         mid: ee.msgId,
-        read: true
+        read: read
     }, function(re) {
         msg_html.apply(ee.jMsg, [re.data]);
-        $("#msg_count").text(0);
+        var num = $(".msg_st_unread",ee.selection).size();
+        $("#msg_count").text(num);
     });
 }
 
@@ -97,14 +107,17 @@ function msg_append(msgs) {
 }
 
 function msg_html(msg) {
-    var cssRead = msg.read ? "" : " msg_st_unread";
+    var cssRead = msg.read ? "msg_st_read" : " msg_st_unread";
     var cssNotify = msg.notified ? " msg_st_notify" : "";
     var cssFavo = msg.favorite ? " msg_st_favo" : "";
     var html = '<div class="msg ' + cssRead + cssNotify + cssFavo + '" msg-id="' + msg._id + '">';
     html += '    <span class="msg_text">' + task_format_text(msg.text) + '</span>';
-    html += '    <a class="msg_do_read">' + z.msg("msg.do.read") + '</a>';
-    html += '<a class="msg_del"></a>';
-    html += '<a class="msg_notify"></a>';
+    if(msg.read)
+        html += '<a class="msg_do_unread">' + z.msg("msg.do.unread") + '</a>';
+    else
+        html += '<a class="msg_do_read">' + z.msg("msg.do.read") + '</a>';
+    html += '    <a class="msg_del"></a>';
+    html += '    <a class="msg_notify"></a>';
     html += '</div>';
     var jq;
     if(this.hasClass("msg_more")) {

@@ -26,15 +26,6 @@ body {
     font-family: Monaco, Courier, Arial;
     color: #000;
     position: relative;
-    opacity: 0.3;
-}
-
-.msg:hover{
-    opacity: 1.0;
-    -webkit-transition: opacity 0.1s ease-in 0.1s;
-    -moz-transition: opacity 0.1s ease-in 0.1s;
-    -o-transition: opacity 0.1s ease-in 0.1s;
-    transition: opacity 0.1s ease-in 0.1s;
 }
 
 .msg_btns{
@@ -60,15 +51,17 @@ body {
     text-decoration: underline;
 }
 
+.msg_st_read {
+    color:#888;
+    background-color:#F0F0F0;
+}
+
 .msg_st_unread {
-    font-size: 14px;
     font-weight: bolder;
     text-decoration: none;
-    opacity: 1.0;
 }
 
 .msg_do_read {
-    display:none;
     font-size: 11px;
     font-weight: normal;
     padding: 2px 8px;
@@ -76,13 +69,30 @@ body {
     border-radius: 4px;
     background-color: #080;
     color: #FFF;
-    vertical-align: middle;
+    vertical-align: top;
     cursor:pointer;
 }
 
 .msg_do_read:hover{
     color:#FF0;
     background-color:#6C6;
+}
+
+.msg_do_unread {
+    font-size: 11px;
+    font-weight: normal;
+    padding: 2px 8px;
+    margin: 0 10px;
+    border-radius: 4px;
+    background-color: #AAA;
+    color: #FFF;
+    vertical-align: top;
+    cursor:pointer;
+}
+
+.msg_do_unread:hover{
+    color:#FFF;
+    background-color:#08F;
 }
 
 .msg_st_unread .msg_do_read{
@@ -109,7 +119,7 @@ body {
     display:none;
     position:absolute;
     top:6px;
-    left:-3px;
+    left:2px;
     width:24px;
     height:24px;
     background: url(pics/icons.png) no-repeat -24px -120px;
