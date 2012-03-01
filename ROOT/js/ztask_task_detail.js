@@ -168,14 +168,40 @@ var _TFS = "parentId,_id,stack,owner,creater,status,pushAt,popAt,startAt,hungupA
  */
 function task_detail_redraw_info(t) {
     var jq = $(".task_brief", this).empty();
-    $('<div class="task_text">' + task_format_text(t.text) + '</div>').appendTo(jq);
-    var html = '<table border="0" cellspacing="2" cellpadding="4"><tbody>';
+    // 内容
+    var html = '<div class="task_text">' + task_format_text(t.text) + '</div>';
+    // 摘要
+    html += '<table border="0" cellspacing="1" cellpadding="2"><tbody>';
     for(var i = 0; i < _TFS.length; i++) {
         html += '<tr><td class="task_brief_fnm">' + z.msg("task.f." + _TFS[i]) + '</td>';
         html += '<td class="task_brief_fval">' + z.sNull(t[_TFS[i]], "--") + '</td></tr>';
     }
     html += '</tbody></table>';
-    $(html).appendTo(jq);
+    // 历史
+    html += '<div class="task_hiss">';
+    if(!t.history || t.history.length == 0) {
+        html += '<div class="task_hiss_empty">' + z.msg("task.his.empty") + '</div>';
+    } else {
+        html += '<h6>' + z.msg("task.his.title") + '</h6>';
+        for(var i = 0; i < t.history.length; i++) {
+            var his = t.history[i];
+            html += '<div class="task_hiss_item">';
+            html += '<em>' + his.at + '</em>';
+            html += '<b>@' + his.user + '</b>';
+            html += '<em>' + z.msg("task.his." + his.type) + '</em>'
+            html += '<em>' + z.msg("ui.stack") + '</em>'
+            html += '<a target="_blank" href="/page/stack#s:\'' + his.stack + '\'">[' + his.stack + ']</a>';
+            html += '<em>' + z.msg("task.his.status") + '</em>';
+            html += '<a target="_blank" href="/page/task#%(' + his.status + ')">"';
+            html += z.msg("task.st." + his.status);
+            html += '"</a>';
+            html += '</div>';
+        }
+    }
+    html += '</div>';
+
+    // 加入 DOM
+    jq.html(html);
 }
 
 /**

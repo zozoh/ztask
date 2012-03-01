@@ -678,6 +678,11 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 		o.set("owner", stack.getOwner());
 		dao.updateById(Task.class, t.get_id(), o);
 
+		// 记录历史
+		dao.updateById(	Task.class,
+						t.get_id(),
+						Moo.NEW().push("history", ZTasks.his_push(t.getStatus(), t.getStack())));
+
 		// 重新计算一下堆栈的数量
 		_recountStackTaskNumber(stack.getName());
 
@@ -694,11 +699,22 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 	}
 
 	@Override
-	public Task popFromStack(Task task, boolean done) {
-		if (null != task) {
-			_pop_from_stack(task, done, true);
+	public Task popFromStack(Task t, boolean done) {
+		if (null != t) {
+			// 准备记录历史
+			String stack = t.getStack();
+
+			// 执行弹出
+			_pop_from_stack(t, done, true);
+
+			// 记录历史
+			if (!ZTasks.isBlankStack(stack)) {
+				dao.updateById(	Task.class,
+								t.get_id(),
+								Moo.NEW().push("history", ZTasks.his_pop(t.getStatus(), stack)));
+			}
 		}
-		return null == task ? null : this.getTask(task.get_id());
+		return null == t ? null : this.getTask(t.get_id());
 	}
 
 	@Override

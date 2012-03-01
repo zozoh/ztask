@@ -127,6 +127,12 @@ public class Task {
 	private String[] watchers;
 
 	/**
+	 * 记录任务堆栈操作历史
+	 */
+	@CoField("hiss")
+	private TaskHistory[] history;
+
+	/**
 	 * 保存任务数量的统计
 	 * <ul>
 	 * <li>0 - ALL: 总的子任务数量
@@ -154,6 +160,14 @@ public class Task {
 	 * 缓存自身的所有的 parent 节点，第一个元素一定是根节点
 	 */
 	private List<Task> parents;
+
+	public TaskHistory[] getHistory() {
+		return history;
+	}
+
+	public void setHistory(TaskHistory[] history) {
+		this.history = history;
+	}
 
 	public List<Task> getChildren() {
 		return children;

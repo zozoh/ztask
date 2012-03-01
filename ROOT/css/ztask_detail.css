@@ -25,8 +25,8 @@
 #task_detail .task_text {
     padding: 10px;
     background-color: #FFF;
-    border-radius: 10px;
-    box-shadow: 2px 2px 6px #888;
+    border-radius: 2px;
+    box-shadow: 0 0 4px #888;
     font-size: 14px;
     min-height: 60px;
     margin-bottom: 15px;
@@ -35,11 +35,44 @@
 #task_detail .task_brief_fnm {
     text-align: right;
     color: #888;
+    font-size:11px;
 }
 
 #task_detail .task_brief_fval {
-    font-size: 14px;
+    font-size: 11px;
     font-family: Courier;
+}
+
+#task_detail .task_hiss{
+    padding:10px;
+    margin:8px;
+    border:1px dashed #CCC;
+}
+
+#task_detail .task_hiss h6{
+    margin:0;
+    padding:0 6px;
+    text-align:right;
+    font-size:11px;
+    font-weight: bold;
+    font-style: normal;
+    color:#888;
+}
+
+#task_detail .task_hiss_item{
+    padding:0 8px;
+    line-height: 24px;
+}
+
+#task_detail .task_hiss_item em{
+    font-style: normal;
+    margin:0 4px;
+    color:#666;
+}
+
+#task_detail .task_hiss_empty{
+    font-style: italic;
+    color:#686;
 }
 
 #task_detail .task_cmt {

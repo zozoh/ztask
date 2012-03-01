@@ -1,39 +1,8 @@
 # 这里存放系统中所有的堆栈
 #
-服务器 @zozoh
+Nutz问答 @nutzam
+提交者们  @zozoh
+ - ${name} @juqkai
  - ${name} @pangwu
  - ${name} @wendal
  - ${name} @zozoh
-客户端 @zft
- - ${name} @dxni
- - ${name} @sjie
- - ${name} @xlei
- - ${name} @ybin
- - ${name} @yyang
- - ${name} @zft
-运维 @amber
- - ${name} @amber
- - ${name} @lina
- - ${name} @liuhe
- - ${name} @superman
- - ${name} @zmi
- - ${name} @yunh
- - ${name} @yuhang
- - ${name} @zqiang
- - ${name} @yufei
- - ${name} @llei
- - ${name} @wyi
-市场 @stone
- - ${name} @cheny
- - ${name} @livia
- - ${name} @nwang
- - ${name} @stone
- - ${name} @wangq
-公司级经验积累    @amber
- - 团队协作      @zozoh
- - 服务器搭建    @wendal
- - 用户体验      @pangwu
- - 播放器调试    @yyang
- - 系统剪裁      @sjie
- - 设备测试与安装 @liuhe
-暂存栈   @amber

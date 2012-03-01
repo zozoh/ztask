@@ -13,6 +13,16 @@ public class SInner {
 
 	private int y;
 
+	private SInnerType type;
+
+	public SInnerType getType() {
+		return type;
+	}
+
+	public void setType(SInnerType type) {
+		this.type = type;
+	}
+
 	public int getX() {
 		return x;
 	}

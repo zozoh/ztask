@@ -135,9 +135,8 @@ public class WeeklyReportor implements ZTaskReportor {
 																.asc()
 																.sortBy("popAt"));
 
-		// 开始分配的任务
-		List<Task> pushs = factory.htasks().queryTasks(TaskQuery.NEWf(	"&W(%s) %%(ING,HUNGUP)",
-																		wwOffset)
+		// 要进行的任务
+		List<Task> pushs = factory.htasks().queryTasks(TaskQuery.NEWf("&W(%s) %%(ING)", wwOffset)
 																.asc()
 																.sortBy("pushAt"));
 

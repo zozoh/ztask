@@ -64,20 +64,20 @@ public abstract class MoChain {
 	 * @return Map 对象
 	 */
 	public NutMap toMap() {
-		final NutMap root = new NutMap();
+		final NutMap rootMap = new NutMap();
 		each(new Each<MoChain>() {
 			@SuppressWarnings("unchecked")
 			public void invoke(int index, MoChain c, int length) {
 				Object o = c.value;
 				// null val,直接添加
 				if (null == o) {
-					root.put(c.key, o);
+					rootMap.put(c.key, o);
 					return;
 				}
 				/*
 				 * 格式化 val
 				 */
-				Object val = root.get(c.key);
+				Object val = rootMap.get(c.key);
 				// 如果是 MoChain，则变 Map
 				if (o instanceof MoChain) {
 					// 如果是 $not，那么就修改这个 Map，并且将其加入顶层 map
@@ -88,7 +88,7 @@ public abstract class MoChain {
 							notMap.put(en.getKey(), Mongos.map("$not", en.getValue()));
 						}
 						// 加入顶层
-						root.putAll(notMap);
+						rootMap.putAll(notMap);
 						return;
 					}
 					// 否则，直接变 Map
@@ -115,11 +115,11 @@ public abstract class MoChain {
 				}
 				// 否则替换值
 				else {
-					root.put(c.key, o);
+					rootMap.put(c.key, o);
 				}
 			}
 		});
-		return root;
+		return rootMap;
 	}
 
 	/**

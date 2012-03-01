@@ -1,33 +1,12 @@
 # 这里存放所有可支持的用户
 # 每个用户一行
 # 
-# Pvg : Login     : Password : Email          : 描述
+# Pvg : Login     : Password : Email                       : 描述
 #-------------------------------------------------------------------------
-   -  : amber     : 123456   : amber.lan@danoonetworks.com       : Amber.Lan
-   -  : cheny     : 123456   : wei.chen@danoonetworks.com        : Wei.Chen
-   -  : dxni      : 123456   : xiaoni.dong@danoonetworks.com     : XiaoNi.Dong
-   -  : pangwu    : 123456   : peiwen.wu@danoonetworks.com       : PeiWen.Wu
-   -  : stone     : 123456   : jing.shi@danoonetworks.com        : Jing.Stone
-   -  : lina      : 123456   : na.li@danoonetworks.com           : Na.Li
-   -  : liuhe     : 123456   : he.liu@danoonetworks.com          : LiuHe
-   -  : livia     : 123456   : livia.zhang@danoonetworks.com     : Livia.Zhang
-   -  : llei      : 123456   : lei.liu@danoonetworks.com         : Lei.Liu
-   -  : nwang     : 123456   : ning.wang@danoonetworks.com       : Ning.Wang
-   -  : strato    : 123456   : strato@danoonetworks.com          : Project Strato
-   -  : superman  : 123456   : manchao.wang@danoonetworks.com    : ManChao.Wang
-   S  : wendal    : 123456   : zhencheng.chen@danoonetworks.com  : Wendal.Chen
-   -  : wangq     : 123456   : qi.wang@danoonetworks.com         : Qi.Wang
-   -  : sjie      : 123456   : sijie.wang@danoonetworks.com      : Sijie.Wang
-   -  : wyi       : 123456   : yi.wang@danoonetworks.com         : Yi.Wang
-   -  : xlei      : 123456   : xiaolei.chang@danoonetworks.com   : XiaoLei.Zhang
-   -  : ybin      : 123456   : zhibin.yao@danoonetworks.com      : ZhiBin.Yao
-   -  : yufei     : 123456   : yufei.song@danoonetworks.com      : YuFei.Song
-   -  : yuhang    : 123456   : yuhang.zhan@danoonetworks.com     : YuHang.Zhan
-   -  : yunh      : 123456   : yunhao.li@danoonetworks.com       : YunHao.Li
-   -  : yyang     : 123456   : yanguang.yang@danoonetworks.com   : YanGuang.Yang
-   -  : zft       : 123456   : futao.zhang@danoonetworks.com     : Futao.Zhang
-   -  : zqiang    : 123456   : qiang.zhang@danoonetworks.com     : Qiang.Zhang
-   -  : zmi       : 123456   : mi.zhang@danoonetworks.com        : Mi.Zhang
-   S  : zozoh     : 123456   : zhihao.zhang@danoonetworks.com    : Peter.Zhang
+   -  : juqkai    : 123456   : juqkai@gmail.com            : Juqkai
+   -  : pangwu    : 123456   : pangwu86@gmail.com          : PangWu
+   -  : nutzam    : 123456   : nutzam@googlegroups.com     : Nutzam
+   -  : wendal    : 123456   : wendal1985@gmail.com        : Wendal
+   S  : zozoh     : 123456   : zozohtnt@gmail.com          : Peter.Zhang
    
     

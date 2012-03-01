@@ -14,6 +14,7 @@ import org.nutz.mongo.MongoCase;
 import org.nutz.mongo.dao.pojo.CappedPet;
 import org.nutz.mongo.dao.pojo.Pet;
 import org.nutz.mongo.dao.pojo.Pet2;
+import org.nutz.mongo.dao.pojo.PetFood;
 import org.nutz.mongo.dao.pojo.PetType;
 import org.nutz.mongo.dao.pojo.SInner;
 import org.nutz.mongo.dao.pojo.SObj;
@@ -25,6 +26,34 @@ import com.mongodb.DB;
 import com.mongodb.WriteResult;
 
 public class MongoDaoPojoTest extends MongoCase {
+
+	@Test
+	public void test_push_obj_array() {
+		dao.create(Pet.class, true);
+		Pet pet = dao.save(Pet.NEW("A"));
+
+		PetFood food = new PetFood();
+		food.setName("fish");
+		food.setPrice(48);
+
+		dao.updateById(Pet.class, pet.getId(), Moo.NEW().push("foods", food));
+
+		pet = dao.findById(Pet.class, pet.getId());
+		assertEquals(1, pet.getFoods().length);
+		assertEquals("fish", pet.getFoods()[0].getName());
+		assertEquals(48, pet.getFoods()[0].getPrice());
+	}
+
+	@Test
+	public void test_push_pojo_array() {
+		dao.create(Pet.class, true);
+		Pet pet = dao.save(Pet.NEW("A"));
+		dao.updateById(Pet.class, pet.getId(), Moo.NEW().push("friends", Pet.NEW("B")));
+
+		pet = dao.findById(Pet.class, pet.getId());
+		assertEquals(1, pet.getFriends().length);
+		assertEquals("B", pet.getFriends()[0].getName());
+	}
 
 	@Test
 	public void test_find_by_date_null() {

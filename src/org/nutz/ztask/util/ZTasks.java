@@ -13,6 +13,9 @@ import org.nutz.lang.Times;
 import org.nutz.mail.MailObj;
 import org.nutz.mvc.impl.NutMessageMap;
 import org.nutz.ztask.api.SmtpInfo;
+import org.nutz.ztask.api.TaskHistory;
+import org.nutz.ztask.api.TaskHistoryType;
+import org.nutz.ztask.api.TaskStatus;
 import org.nutz.ztask.api.User;
 import org.nutz.ztask.impl.mongo.MongoMailObj;
 
@@ -107,6 +110,43 @@ public abstract class ZTasks {
 	 * TASK 的 stack 字段，什么值表示 null
 	 */
 	public static final String NULL_STACK = "--";
+
+	/**
+	 * 创建一个任务操作历史
+	 * 
+	 * @param type
+	 *            类型
+	 * @param st
+	 *            操作后任务状态
+	 * @param at
+	 *            时间
+	 * @param user
+	 *            用户
+	 * @param stack
+	 *            堆栈
+	 * @return 历史对象
+	 */
+	public static TaskHistory his(	TaskHistoryType type,
+									TaskStatus st,
+									Date at,
+									String user,
+									String stack) {
+		TaskHistory his = new TaskHistory();
+		his.setStatus(st);
+		his.setType(type);
+		his.setAt(at);
+		his.setUser(user);
+		his.setStack(stack);
+		return his;
+	}
+
+	public static TaskHistory his_pop(TaskStatus st, String stack) {
+		return his(TaskHistoryType.POP, st, Times.now(), ZTasks.getMyName(), stack);
+	}
+
+	public static TaskHistory his_push(TaskStatus st, String stack) {
+		return his(TaskHistoryType.PUSH, st, Times.now(), ZTasks.getMyName(), stack);
+	}
 
 	/**
 	 * 生成一个邮件对象

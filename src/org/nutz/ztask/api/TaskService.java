@@ -15,20 +15,20 @@ public interface TaskService extends AbstractService {
 	/**
 	 * 根据一个 TASK ID 得到一个 TASK 对象
 	 * 
-	 * @param taskId
+	 * @param tid
 	 *            任务ID
 	 * @return 任务对象
 	 */
-	Task getTask(String taskId);
+	Task getTask(String tid);
 
 	/**
 	 * 根据一个 TASK ID 得到当前任务的根任务，如果当前的任务就是根，那么就返回
 	 * 
-	 * @param taskId
+	 * @param tid
 	 *            任务 ID
 	 * @return 任务对象, null 表示 top 不存在，即某个 Task 的 parentId 不正确
 	 */
-	Task getTopTask(String taskId);
+	Task getTopTask(String tid);
 
 	/**
 	 * 为任务增加一个注释
@@ -106,26 +106,26 @@ public interface TaskService extends AbstractService {
 	 * <p>
 	 * 本函数会保证给定的 Task 的所有 Parent 都存在，如果不存在，则抛错
 	 * 
-	 * @param taskId
+	 * @param tid
 	 *            任务 ID
 	 * @return 任务对象
 	 * @throws org.nutz.ztask.util.Err.T
 	 *             #NO_EXISTS
 	 */
-	Task checkTopTask(String taskId);
+	Task checkTopTask(String tid);
 
 	/**
 	 * 验证一个 Task ID 是否在数据库中存在
 	 * <p>
 	 * 如果对象不存在抛错
 	 * 
-	 * @param taskId
+	 * @param tid
 	 *            任务ID
 	 * @return 验证后的任务对象
 	 * @throws org.nutz.ztask.util.Err.T
 	 *             #NO_EXISTS
 	 */
-	Task checkTask(String taskId);
+	Task checkTask(String tid);
 
 	/**
 	 * 验证一组 Task ID 是否在数据库中存在
@@ -182,39 +182,39 @@ public interface TaskService extends AbstractService {
 	/**
 	 * 查询一个堆栈下面有哪些任务
 	 * 
-	 * @param stack
+	 * @param s
 	 *            堆栈对象, 不能为 null
 	 * @param st
 	 *            任务状态, null 表示不关心任务的状态
 	 * @return 一个任务列表
 	 */
-	List<Task> getTasksInStack(TaskStack stack, TaskStatus st);
+	List<Task> getTasksInStack(TaskStack s, TaskStatus st);
 
 	/**
 	 * 查询一个 Stack 下面到底有哪些任务，这里仅仅返回根任务
 	 * <p>
 	 * 注，这里的 stack 必须存在，如果不存在，将抛错
 	 * 
-	 * @param stackName
+	 * @param snm
 	 *            任务堆栈的名称，对应的 stack 必须存在
 	 * 
 	 * @return 按照顺序返回任务对象列表，顺序按照 title 字段排序
 	 */
-	List<Task> getTasksInStack(String stackName);
+	List<Task> getTasksInStack(String snm);
 
 	/**
 	 * 得到一个任务所有的子任务
 	 * 
-	 * @param taskId
+	 * @param tid
 	 *            任务 ID
 	 * @return 按照顺序返回任务对象列表，顺序按照 title 字段排序
 	 */
-	List<Task> getChildTasks(String taskId);
+	List<Task> getChildTasks(String tid);
 
 	/**
 	 * 得到一个任务所有的子任务，并装入给定的 Task 对象中
 	 * 
-	 * @param task
+	 * @param t
 	 *            任务对象
 	 * 
 	 * @param recur
@@ -222,62 +222,62 @@ public interface TaskService extends AbstractService {
 	 * 
 	 * @return 给定的任务对象
 	 */
-	Task loadTaskChildren(Task task, boolean recur);
+	Task loadTaskChildren(Task t, boolean recur);
 
 	/**
 	 * 得到一个任务所有的叶子任务
 	 * 
-	 * @param task
+	 * @param t
 	 *            任务对象
 	 * @return 叶子任务列表
 	 */
-	List<Task> getLeafTasks(Task task);
+	List<Task> getLeafTasks(Task t);
 
 	/**
 	 * 得到一个任务所有某种类型的叶子任务
 	 * 
-	 * @param task
+	 * @param t
 	 *            任务对象
 	 * @param st
 	 *            任务状态，如果为 null，则为全部任务
 	 * @return 叶子任务列表
 	 */
-	List<Task> getLeafTasks(Task task, TaskStatus st);
+	List<Task> getLeafTasks(Task t, TaskStatus st);
 
 	/**
 	 * 迭代某任务所有
 	 * 
-	 * @param task
+	 * @param t
 	 *            任务对象
 	 * @param filter
 	 *            过滤器
 	 * @return 叶子任务列表
 	 */
-	List<Task> getLeafTasksBy(Task task, ObjFilter<Task> filter);
+	List<Task> getLeafTasksBy(Task t, ObjFilter<Task> filter);
 
 	/**
 	 * 创建一个新的任务
 	 * <p>
 	 * 这个函数会自动标识 Task 的时间，以及将状态设置成 NEW
 	 * 
-	 * @param task
+	 * @param t
 	 *            任务对象
 	 * @return 创建后的任务对象
 	 * 
 	 * @see org.nutz.ztask.api.TaskStatus
 	 */
-	Task createTask(Task task);
+	Task createTask(Task t);
 
 	/**
 	 * 根据一个 TASK ID 删除一个 TASK 对象
 	 * 
-	 * @param taskId
+	 * @param tid
 	 *            任务ID
 	 * @param recur
 	 *            是否递归删除
 	 * @return 被移除的任务对象
 	 */
-	Task removeTask(String taskId, boolean recur);
+	Task removeTask(String tid, boolean recur);
 
 	/**
 	 * 修改一个任务对象的所有者
@@ -373,28 +373,28 @@ public interface TaskService extends AbstractService {
 	 * 
 	 * @param t
 	 *            任务
-	 * @param stackName
+	 * @param snm
 	 *            堆栈名
 	 * @return 修改后的任务对象，null 表示该任务不存在
 	 * @throws org.nutz.ztask.util.Err.S
 	 *             #NO_EXISTS
 	 */
-	Task pushToStack(Task t, String stackName);
+	Task pushToStack(Task t, String snm);
 
 	/**
 	 * 将一个任务压入某一个堆栈，即，记录这个任务所属的堆栈。
 	 * <p>
 	 * 并且，它会设置本任务的状态为 ING, 并重新计算该栈的任务数量
 	 * 
-	 * @param task
+	 * @param t
 	 *            任务
-	 * @param stack
+	 * @param s
 	 *            堆栈
 	 * @return 修改后的任务对象，null 表示该任务不存在
 	 * @throws org.nutz.ztask.util.Err.S
 	 *             #NO_EXISTS
 	 */
-	Task pushToStack(Task task, TaskStack stack);
+	Task pushToStack(Task t, TaskStack s);
 
 	/**
 	 * 将一个任务从一个堆栈弹出，
@@ -403,13 +403,13 @@ public interface TaskService extends AbstractService {
 	 * <p>
 	 * 如果这个任务的确属于某个堆栈，该栈的任务数量将被重新计算
 	 * 
-	 * @param taskId
+	 * @param tid
 	 *            任务ID
 	 * @param stackName
 	 *            堆栈名
 	 * @return 修改后的任务对象，null 表示该任务不存在
 	 */
-	Task popFromStack(String taskId, boolean done);
+	Task popFromStack(String tid, boolean done);
 
 	/**
 	 * 将一个任务从一个堆栈弹出，
@@ -418,13 +418,13 @@ public interface TaskService extends AbstractService {
 	 * <p>
 	 * 如果这个任务的确属于某个堆栈，该栈的任务数量将被重新计算
 	 * 
-	 * @param task
+	 * @param t
 	 *            任务
 	 * @param stackName
 	 *            堆栈名
 	 * @return 修改后的任务对象，null 表示该任务不存在
 	 */
-	Task popFromStack(Task task, boolean done);
+	Task popFromStack(Task t, boolean done);
 
 	/**
 	 * 将一个任务置成挂起状态
@@ -486,53 +486,53 @@ public interface TaskService extends AbstractService {
 	/**
 	 * 获取一个堆栈下所有的子 stack
 	 * 
-	 * @param stackName
+	 * @param snm
 	 *            堆栈名称
 	 * @return 堆栈列表
 	 */
-	List<TaskStack> getChildStacks(String stackName);
+	List<TaskStack> getChildStacks(String snm);
 
 	/**
 	 * 根据堆栈的名称，得到一个任务堆栈
 	 * 
-	 * @param stackName
+	 * @param snm
 	 *            任务堆栈的名字
 	 * @return 堆栈对象, null 表示不存在
 	 */
-	TaskStack getStack(String stackName);
+	TaskStack getStack(String snm);
 
 	/**
 	 * 根据堆栈的名称，得到一个任务堆栈
 	 * <p>
 	 * 如果对象不存在抛错
 	 * 
-	 * @param stackName
+	 * @param snm
 	 *            任务堆栈的名字
 	 * @return 堆栈对象
 	 * @throws org.nutz.ztask.util.Err.S
 	 *             #NO_EXISTS
 	 */
-	TaskStack checkStack(String stackName);
+	TaskStack checkStack(String snm);
 
 	/**
 	 * 创建一个新的任务堆栈，如果堆栈已经存在，则更新
 	 * 
-	 * @param stack
+	 * @param s
 	 *            任务堆栈对象
 	 * @return 创建后的任务堆栈对象
 	 */
-	TaskStack saveStack(TaskStack stack);
+	TaskStack saveStack(TaskStack s);
 
 	/**
 	 * 创建一个新的任务堆栈，如果堆栈已经存在，则将其获取
 	 * 
-	 * @param stackName
+	 * @param snm
 	 *            任务堆栈名称
 	 * @param ownerName
 	 *            堆栈的所有者
 	 * @return 创建后的任务堆栈对象
 	 */
-	TaskStack createStackIfNoExistis(String stackName, String ownerName);
+	TaskStack createStackIfNoExistis(String snm, String ownerName);
 
 	/**
 	 * 更新堆栈得父堆栈，如果不存在则抛错
@@ -576,11 +576,11 @@ public interface TaskService extends AbstractService {
 	/**
 	 * 移除一个任务堆栈
 	 * 
-	 * @param stackName
+	 * @param snm
 	 *            堆栈名
 	 * @return 移除后的任务对象, null 表示堆栈不存在
 	 */
-	TaskStack removeStack(String stackName);
+	TaskStack removeStack(String snm);
 
 	/**
 	 * 取得整个数据库的全局配置参数，这个函数绝地不能返回 null，如果没有信息，也要 new 一个默认的回去

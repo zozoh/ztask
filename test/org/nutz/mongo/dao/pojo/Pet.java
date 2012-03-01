@@ -64,6 +64,28 @@ public class Pet {
 	@CoField("bth")
 	private Date birthday;
 
+	@CoField("frds")
+	private Pet[] friends;
+
+	@CoField("my_foods")
+	private PetFood[] foods;
+
+	public PetFood[] getFoods() {
+		return foods;
+	}
+
+	public void setFoods(PetFood[] foods) {
+		this.foods = foods;
+	}
+
+	public Pet[] getFriends() {
+		return friends;
+	}
+
+	public void setFriends(Pet[] friends) {
+		this.friends = friends;
+	}
+
 	public String getId() {
 		return id;
 	}

@@ -13,14 +13,13 @@ import org.nutz.mongo.entity.MongoEntity;
 import org.nutz.mongo.entity.StaticMongoEntity;
 
 import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.DBRef;
 
 public class ArrayAdaptor extends FieldAdaptor {
 
 	private static final Log log = Logs.get();
-	
+
 	@Override
 	public Object adaptForGet(Object val, boolean check) {
 		// 容忍 null
@@ -28,6 +27,18 @@ public class ArrayAdaptor extends FieldAdaptor {
 			return null;
 		// val 必然是个 array
 		if (!val.getClass().isArray()) {
+			// 那么看看给定的 val 是不是自己数组的元素，如果是，则试图转换它
+			Class<?> eleType = this.field.getType().getComponentType();
+			if (!Mirror.me(eleType).isPojo()) {
+				return val;
+			}
+			if (eleType.isAssignableFrom(val.getClass())) {
+				MongoEntity en = Mongos.entity(eleType);
+				if (en instanceof StaticMongoEntity)
+					return en.toDBObject(val);
+				return Mongos.obj2dbo(val);
+			}
+			// 否则 ...
 			if (!check)
 				return val;
 			throw Lang.makeThrow(	"ArrayAdaptor can only adaptForGet array, but is is '%s'",
@@ -95,16 +106,15 @@ public class ArrayAdaptor extends FieldAdaptor {
 				if (v instanceof DBObject) {
 					MongoEntity en = Mongos.entity(eleType);
 					if (en instanceof StaticMongoEntity) {
-						o = en.toObject(new BasicDBObject(((DBObject)v).toMap()));
-					}
-					else
+						o = en.toObject((DBObject) v);
+					} else
 						o = Lang.map2Object(((DBObject) v).toMap(), eleType);
 				}
 				// 否则就强制转换一下
 				else {
-					//TODO
+					// TODO
 					if (v instanceof DBRef && field.isRef()) {
-						o = unpackRef((DBRef)v, eleType);
+						o = unpackRef((DBRef) v, eleType);
 					} else
 						o = Castors.me().castTo(v, eleType);
 				}
@@ -115,5 +125,4 @@ public class ArrayAdaptor extends FieldAdaptor {
 		// 返回新数组，以便设置给 POJO
 		return array;
 	}
-
 }
