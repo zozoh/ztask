@@ -73,7 +73,7 @@ public interface MessageService {
 	Message remove(Message msg);
 
 	/**
-	 * 清除某个所有者全部的消息
+	 * 清除某个所有者全部的已读且未收藏的消息
 	 * 
 	 * @param ownerName
 	 *            所有者名称

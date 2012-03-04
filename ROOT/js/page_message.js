@@ -45,8 +45,9 @@ function msg_events_on_do_clearall() {
     if(window.confirm(z.msg("msg.clear.confirm"))) {
         var ee = _msg_obj(this);
         ajax.get("/ajax/message/clear", function(re) {
-            msg_do_reload(ee.selection, true);
-            $("#msg_count").text(0);
+            msg_do_reload(ee.selection, true, function(msgs) {
+                $("#msg_count").text(msgs.length);
+            });
         });
     }
 }
@@ -79,7 +80,7 @@ function msg_events_on_more() {
     msg_do_reload(this, false);
 }
 
-function msg_do_reload(ele, clear) {
+function msg_do_reload(ele, clear, callback) {
     var ee = _msg_obj(ele);
     if(clear)
         ee.lastId = "";
@@ -93,6 +94,9 @@ function msg_do_reload(ele, clear) {
             $(".msg_more", ee.selection).removeAttr("msg-last-id");
         }
         msg_append.apply(ee.selection, [re.data]);
+        if( typeof callback == "function") {
+            callback.apply(ee.selection, [re.data]);
+        }
     });
 }
 

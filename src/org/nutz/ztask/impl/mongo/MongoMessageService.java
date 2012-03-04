@@ -72,7 +72,12 @@ public class MongoMessageService extends AbstractMongoService implements Message
 
 	@Override
 	public void clearMine(String ownerName) {
-		dao.remove(Message.class, Moo.NEW("owner", ownerName));
+		Moo q = Moo.NEW("owner", ownerName);
+
+		// 已读且未收藏
+		q.eq("read", true).eq("favorite", false);
+
+		dao.remove(Message.class, q);
 	}
 
 	@Override
