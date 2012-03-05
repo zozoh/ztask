@@ -16,7 +16,7 @@ function msg_events_bind(opt) {
     this.delegate(".msg_reload", "click", msg_events_on_reload);
     this.delegate(".msg_more", "click", msg_events_on_more);
     this.delegate(".msg_kwd", "change", msg_events_on_reload);
-    this.delegate("a", "click", msg_events_on_set_read);
+    this.delegate(".msg a", "click", msg_events_on_set_read);
     this.delegate(".msg_del", "click", msg_events_on_del);
     this.delegate(".msg_readall", "click", msg_events_on_do_readall);
     this.delegate(".msg_clearall", "click", msg_events_on_do_clearall);
