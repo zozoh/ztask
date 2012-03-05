@@ -32,18 +32,21 @@ public class LoginModule {
 		User u = factory.users().verify(name, password);
 		if (null == u)
 			throw Err.U.INVALID_LOGIN();
-		// 通过 ...
-		sess.setAttribute(Webs.ME, u);
 
 		// 记录一些配置数据
 		sess.setAttribute("msg_inter", conf.getInt("sys-msg-update-interval", 200) * 1000);
 		sess.setAttribute("rs", conf.get("app-rs", ""));
+		
+		// 通过 ...
+		sess.setAttribute(Webs.ME, u);
+		sess.setMaxInactiveInterval(30 * 24 * 60 * 60); //已经登录的会话,设置为1个月
 	}
 
 	@At("/logout")
 	@Ok(">>:/page/login")
 	public void doLogout(HttpSession sess) {
 		sess.removeAttribute(Webs.ME);
+		sess.setMaxInactiveInterval(30 * 60); //已经登出的会话,设置为30分钟
 	}
 
 }

@@ -820,4 +820,8 @@ public class MongoDao {
 			}
 		}
 	}
+	
+	public DB getDB() {
+		return db;
+	}
 }
