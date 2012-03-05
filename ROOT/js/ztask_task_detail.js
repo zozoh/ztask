@@ -70,7 +70,7 @@ function task_detail_cmt_on_add() {
     var t = jDetail.data("task");
     var tid = jDetail.attr("task-id");
     var txt = $.trim($(".task_cmt_newer textarea",jDetail).val());
-    if(!txt || txt.length < 5) {
+    if(!txt || txt.length < 2) {
         alert(z.msg("task.cmt.short"));
         return;
     }

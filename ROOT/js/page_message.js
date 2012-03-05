@@ -16,8 +16,7 @@ function msg_events_bind(opt) {
     this.delegate(".msg_reload", "click", msg_events_on_reload);
     this.delegate(".msg_more", "click", msg_events_on_more);
     this.delegate(".msg_kwd", "change", msg_events_on_reload);
-    this.delegate(".msg_do_read", "click", msg_events_on_do_read);
-    this.delegate(".msg_do_unread", "click", msg_events_on_do_unread);
+    this.delegate("a", "click", msg_events_on_set_read);
     this.delegate(".msg_del", "click", msg_events_on_del);
     this.delegate(".msg_readall", "click", msg_events_on_do_readall);
     this.delegate(".msg_clearall", "click", msg_events_on_do_clearall);
@@ -52,19 +51,12 @@ function msg_events_on_do_clearall() {
     }
 }
 
-function msg_events_on_do_read() {
-    msg_do_set_read(this, true);
-}
-
-function msg_events_on_do_unread() {
-    msg_do_set_read(this, false);
-}
-
-function msg_do_set_read(ele, read) {
-    var ee = _msg_obj(ele);
+function msg_events_on_set_read() {
+    var unread = $(this).hasClass("msg_do_unread");
+    var ee = _msg_obj(this);
     ajax.get("/ajax/message/set/read", {
         mid: ee.msgId,
-        read: read
+        read: !unread
     }, function(re) {
         msg_html.apply(ee.jMsg, [re.data]);
         var num = $(".msg_st_unread",ee.selection).size();
