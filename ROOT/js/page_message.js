@@ -123,7 +123,7 @@ function msg_html(msg) {
     var cssNotify = msg.notified ? " msg_st_notify" : "";
     var cssFavo = msg.favorite ? " msg_st_favo" : "";
     var html = '<div class="msg ' + cssRead + cssNotify + cssFavo + '" msg-id="' + msg._id + '">';
-    html += '    <div class="msg_ct">' + msg.createTime + '</div>';
+    html += '    <div class="msg_ct"><em></em><span>' + msg.createTime + '</span></div>';
     html += '    <span class="msg_text">' + task_format_text(msg.text) + '</span>';
     if(msg.read)
         html += '<a class="msg_do_unread">' + z.msg("msg.do.unread") + '</a>';
@@ -132,6 +132,7 @@ function msg_html(msg) {
     html += '    <a class="msg_del"></a>';
     html += '    <a class="msg_notify"></a>';
     html += '</div>';
+    // 加入 DOM
     var jq;
     if(this.hasClass("msg_more")) {
         jq = $(html).insertBefore(this);
@@ -140,7 +141,11 @@ function msg_html(msg) {
     } else {
         throw "Unsupport selector '" + this.selector + "'";
     }
-    z.blinkIt(jq);
+    // 增加序列号
+    var prev = jq.prev();
+    $(".msg_ct em", jq).text(prev.size() > 0 ? prev.find(".msg_ct em").text() * 1 + 1 : 1);
+    // 闪烁
+    z.blinkIt(jq, 500);
 }
 
 /**
