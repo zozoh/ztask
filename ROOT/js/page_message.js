@@ -22,7 +22,7 @@ function msg_events_bind(opt) {
     this.delegate(".msg_clearall", "click", msg_events_on_do_clearall);
 }
 
-function msg_events_on_del() {
+function msg_events_on_del(e) {
     var ee = _msg_obj(this);
     ajax.get("/ajax/message/del", {
         mid: ee.msgId
@@ -121,7 +121,7 @@ function msg_html(msg) {
         html += '<a class="msg_do_unread">' + z.msg("msg.do.unread") + '</a>';
     else
         html += '<a class="msg_do_read">' + z.msg("msg.do.read") + '</a>';
-    html += '    <a class="msg_del"></a>';
+    html += '    <u class="msg_del"></u>';
     html += '    <a class="msg_notify"></a>';
     html += '</div>';
     // 加入 DOM

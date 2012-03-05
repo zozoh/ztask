@@ -18,6 +18,8 @@ $(document.body).ready(function() {
     var jMsg = $("#msg_count");
     if(jMsg.size() > 0) {
         var msgInter = $("#sky").attr("msg-inter") * 1;
+        if(!msgInter || msgInter < 3000)
+            msgInter = 10000;
         var _MSG_ID_;
         var onMessageOK = function(re) {
             var re = eval("(" + re + ")");
