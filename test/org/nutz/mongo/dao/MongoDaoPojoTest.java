@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.util.Date;
 import java.util.List;
 
+import org.bson.types.ObjectId;
 import org.junit.Test;
 import org.nutz.castor.Castors;
 import org.nutz.lang.Lang;
@@ -26,6 +27,23 @@ import com.mongodb.DB;
 import com.mongodb.WriteResult;
 
 public class MongoDaoPojoTest extends MongoCase {
+
+	@Test
+	public void test_lt_obj_default_id() {
+		dao.create(SObj.class, true);
+		dao.save(SObj.NEW("A"));
+		dao.save(SObj.NEW("B"));
+		dao.save(SObj.NEW("C"));
+
+		String bId = dao.findOne(SObj.class, Moo.NEW("name", "B")).getId();
+
+		Moo q = Moo.LTE(new ObjectId(bId));
+		List<SObj> objs = dao.find(SObj.class, q, null);
+
+		assertEquals(2, objs.size());
+		assertEquals("A", objs.get(0).getName());
+		assertEquals("B", objs.get(1).getName());
+	}
 
 	@Test
 	public void test_push_obj_array() {

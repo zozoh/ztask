@@ -15,6 +15,7 @@ import org.nutz.mongo.Mongos;
 import org.nutz.mongo.annotation.CoIdType;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import com.mongodb.DBRef;
 
 /**
@@ -54,7 +55,10 @@ public class FieldAdaptor {
 	public Object adaptForFormatQuery(Object val) {
 		if (null == val)
 			return null;
-		//
+		// 如果是 DBObject，则表示调用者手动准备好了 QueryObject
+		if (val instanceof DBObject)
+			return val;
+		
 		Mirror<?> vMirror = Mirror.me(val.getClass());
 		// 如果值为 Map，且自己的类型不是 Map，那么就是深入修改 Map 的各个修改器的键 ...
 		if (vMirror.isMap() && !field.getMirror().isMap()) {
@@ -149,11 +153,11 @@ public class FieldAdaptor {
 	public String toString() {
 		return String.format("%s:%s", this.getClass().getName(), field);
 	}
-	
-//	public DBRef packRef(Object val) {
-//		
-//	}
-	
+
+	// public DBRef packRef(Object val) {
+	//
+	// }
+
 	public Object unpackRef(DBRef ref, Class<?> eleType) {
 		MongoEntity en = Mongos.entity(eleType);
 		if (field.isLazy()) {

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.bson.types.ObjectId;
 import org.nutz.lang.Each;
 import org.nutz.lang.Strings;
 import org.nutz.lang.Times;
@@ -138,8 +139,9 @@ public class MongoMessageService extends AbstractMongoService implements Message
 		// 准备条件 & 设置 lastMsgId
 		Moo q = Moo.NEW();
 
-		if (!Strings.isBlank(lastMsgId))
-			q.append("_id", Mongos.dbo("$lt", Mongos.dboId(lastMsgId)));
+		if (!Strings.isBlank(lastMsgId)) {
+			q.lt(new ObjectId(lastMsgId));
+		}
 
 		if (!Strings.isBlank(owner))
 			q.eq("owner", owner);
@@ -187,9 +189,9 @@ public class MongoMessageService extends AbstractMongoService implements Message
 		}
 
 		// 设置 Limit， 固定的是倒序
-		MCur mcur = MCur.DESC("createTime");
+		MCur mcur = MCur.DESC("_id");
 		if (limit > 0)
-			MCur.LIMIT(limit);
+			mcur.limit(limit);
 
 		// 开始迭代
 		dao.each(callback, Message.class, q, mcur);

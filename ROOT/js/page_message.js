@@ -84,10 +84,13 @@ function msg_do_reload(ele, clear, callback) {
     var ee = _msg_obj(ele);
     if(clear)
         ee.lastId = "";
+
+    var limit = Math.max($(".msg", ee.selection).size(), 25);
+
     ajax.get("/ajax/message/list", {
         kwd: ee.kwd,
         lstId: ee.lastId,
-        limit: 100
+        lmt: limit
     }, function(re) {
         if(clear) {
             $(".msg_list .msg",ee.selection).remove();
@@ -97,6 +100,11 @@ function msg_do_reload(ele, clear, callback) {
         if( typeof callback == "function") {
             callback.apply(ee.selection, [re.data]);
         }
+        // 如果没有更多记录，清除 .msg_more
+        if(re.data.length == 0) {
+            $(".msg_more", ee.selection).hide();
+        }
+
     });
 }
 
@@ -115,6 +123,7 @@ function msg_html(msg) {
     var cssNotify = msg.notified ? " msg_st_notify" : "";
     var cssFavo = msg.favorite ? " msg_st_favo" : "";
     var html = '<div class="msg ' + cssRead + cssNotify + cssFavo + '" msg-id="' + msg._id + '">';
+    html += '    <div class="msg_ct">' + msg.createTime + '</div>';
     html += '    <span class="msg_text">' + task_format_text(msg.text) + '</span>';
     if(msg.read)
         html += '<a class="msg_do_unread">' + z.msg("msg.do.unread") + '</a>';

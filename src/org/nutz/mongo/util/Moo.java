@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.bson.types.ObjectId;
 import org.nutz.lang.Lang;
 import org.nutz.mongo.Mongos;
 
@@ -169,6 +170,28 @@ public class Moo extends MoChain {
 	}
 
 	/**
+	 * 判断ID字段是否大于等于给定值
+	 * 
+	 * @param id
+	 *            对象ID
+	 * @return 新节点
+	 */
+	public Moo gte(ObjectId id) {
+		return append("_id", Mongos.dbo("$gte", id));
+	}
+
+	/**
+	 * 判断ID字段是否大于给定值
+	 * 
+	 * @param id
+	 *            对象ID
+	 * @return 新节点
+	 */
+	public Moo gt(ObjectId id) {
+		return append("_id", Mongos.dbo("$gt", id));
+	}
+
+	/**
 	 * 判断一个字段是否小于等于给定值
 	 * 
 	 * @param field
@@ -192,6 +215,28 @@ public class Moo extends MoChain {
 	 */
 	public Moo lt(String field, long n) {
 		return append(field, Mongos.dbo("$lt", n));
+	}
+
+	/**
+	 * 判断一个字段是否小于等于给定值
+	 * 
+	 * @param id
+	 *            对象ID
+	 * @return 新节点
+	 */
+	public Moo lte(ObjectId id) {
+		return append("_id", Mongos.dbo("$lte", id));
+	}
+
+	/**
+	 * 判断一个ID字段是否小于给定值
+	 * 
+	 * @param id
+	 *            对象ID
+	 * @return 新节点
+	 */
+	public Moo lt(ObjectId id) {
+		return append("_id", Mongos.dbo("$lt", id));
 	}
 
 	/**
@@ -618,6 +663,50 @@ public class Moo extends MoChain {
 	 */
 	public static Moo LT(String field, long n) {
 		return NEW().lt(field, n);
+	}
+
+	/**
+	 * 创建链表，同时增加一个 gte 节点
+	 * 
+	 * @param id
+	 *            对象ID
+	 * @return 链表对象
+	 */
+	public static Moo GTE(ObjectId id) {
+		return NEW().gte(id);
+	}
+
+	/**
+	 * 创建链表，同时增加一个 gt 节点
+	 * 
+	 * @param id
+	 *            对象ID
+	 * @return 链表对象
+	 */
+	public static Moo GT(ObjectId id) {
+		return NEW().gt(id);
+	}
+
+	/**
+	 * 创建链表，同时增加一个 lte 节点
+	 * 
+	 * @param id
+	 *            对象ID
+	 * @return 链表对象
+	 */
+	public static Moo LTE(ObjectId id) {
+		return NEW().lte(id);
+	}
+
+	/**
+	 * 创建链表，同时增加一个 lt 节点
+	 * 
+	 * @param id
+	 *            对象ID
+	 * @return 链表对象
+	 */
+	public static Moo LT(ObjectId id) {
+		return NEW().lt(id);
 	}
 
 	/**

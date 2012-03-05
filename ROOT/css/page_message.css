@@ -28,6 +28,14 @@ body {
     position: relative;
 }
 
+.msg_ct{
+    font-size:10px;
+    font-weight: normal;
+    color:#AAA;
+    font-family: Arial, Helvetica, sans-serif;
+    margin:-8px 0 4px 0;
+}
+
 .msg_btns{
     position: absolute;
     top:0px;
@@ -144,9 +152,8 @@ body {
 }
 
 .msg_more:hover {
-    color: #6CF;
-    text-decoration: underline;
-    background-color: #EEE;
+    color: #FFF;
+    background-color: #08F;
 }
 
 .msg_form {
