@@ -15,10 +15,10 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
-import org.nutz.mvc.Mvcs;
 
 /**
  * 替换原本的HttpServletRequest,改写其getSession方法为获取MongoSession
@@ -29,7 +29,7 @@ public class MongoSessionFilter implements Filter {
 
 	private ServletContext servletContext;
 	private String managerAttrName;
-	private static final Log log = Logs.get();
+	private MongoSessionManager manager;
 
 	public void doFilter(final ServletRequest req, final ServletResponse resp,
 			FilterChain chain) throws IOException, ServletException {
@@ -38,22 +38,21 @@ public class MongoSessionFilter implements Filter {
 			public Object invoke(Object obj, Method method, Object[] args)
 					throws Throwable {
 				if ("getSession".equals(method.getName())) {
-					MongoSessionManager manager = (MongoSessionManager) servletContext.getAttribute(managerAttrName);
+					if (manager == null)
+						manager = (MongoSessionManager) servletContext.getAttribute(managerAttrName);
 					if (manager == null) {
-						if (log.isWarnEnabled())
-							log.warn("MongoSessionManager not found!! Failback to normal session!!");
+						throw Lang.impossible();
 					} else {
-						if (args.length == 0)
-							return manager.getHttpSession((HttpServletRequest) req);
+						if (args == null || args.length == 0)
+							return manager.getHttpSession((HttpServletRequest) req, (HttpServletResponse)resp, servletContext, true);
 						else
-							return manager.getHttpSession((HttpServletRequest)req, (Boolean)args[0]);
+							return manager.getHttpSession((HttpServletRequest) req, (HttpServletResponse)resp, servletContext, (Boolean)args[0]);
 					}
 				}
 				return method.invoke(req, args);
 			}
 		});
-		Mvcs.set(Mvcs.getName(), request, (HttpServletResponse) resp);
-		doFilter(request, resp, chain);
+		chain.doFilter(request, resp);
 	}
 
 	public void init(FilterConfig config) throws ServletException {
@@ -66,5 +65,7 @@ public class MongoSessionFilter implements Filter {
 	}
 
 	public void destroy() {
+		if (manager != null)
+			manager.notifyStop();
 	}
 }

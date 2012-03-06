@@ -4,7 +4,6 @@ import org.nutz.ioc.Ioc;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
 import org.nutz.mongo.session.MongoSessionManager;
-import org.nutz.mvc.Mvcs;
 import org.nutz.mvc.NutConfig;
 import org.nutz.mvc.Setup;
 import org.nutz.ztask.ZTask;
@@ -49,8 +48,8 @@ public class ZTaskSetup implements Setup {
 		// 最后将 atoms 数组存入应用上下文环境，以便界面的JSP端读取其状态
 		config.setAttribute("$atoms", atoms);
 
-		// 设置成MongoSession机制
-		Mvcs.sessionProvider = new MongoSessionManager(ioc.get(MongoTaskService.class, "taskService").dao());
+		// 设置成MongoSession机制,配合MongoSessionFilter
+		new MongoSessionManager(ioc.get(MongoTaskService.class, "taskService").dao()).register(config.getServletContext(), null);
 		
 		// 初始化结束
 		if (log.isInfoEnabled())

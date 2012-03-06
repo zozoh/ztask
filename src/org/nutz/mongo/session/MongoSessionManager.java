@@ -6,7 +6,7 @@ import java.util.Map;
 import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServletResponse;
 
 import org.bson.types.Code;
 import org.bson.types.ObjectId;
@@ -16,7 +16,6 @@ import org.nutz.log.Log;
 import org.nutz.log.Logs;
 import org.nutz.mongo.MongoDao;
 import org.nutz.mvc.Mvcs;
-import org.nutz.mvc.SessionProvider;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
@@ -28,7 +27,7 @@ import com.mongodb.DBObject;
  * @author wendal(wendal1985@gmail.com)
  * 
  */
-public class MongoSessionManager implements SessionProvider {
+public class MongoSessionManager {
 
 	private static final Log log = Logs.get();
 
@@ -79,7 +78,6 @@ public class MongoSessionManager implements SessionProvider {
 		cleaner.start();
 	}
 
-	@Override
 	public void notifyStop() {
 		stop = true;
 		synchronized (lock) {
@@ -99,26 +97,28 @@ public class MongoSessionManager implements SessionProvider {
 			return null;
 		return new MongoSession(context, (ObjectId) dbo.get("_id"));
 	}
-
-	public MongoSession getSession(HttpServletRequest req) {
-		return getSession(req, true);
+//-----------------------------------------------------------------------------------------------
+	public MongoHttpSession getSession(HttpServletRequest req) {
+		return getHttpSession(req, Mvcs.getResp(), Mvcs.getServletContext(), true);
 	}
 
-	public MongoSession getSession(HttpServletRequest req, boolean createNew) {
+	public MongoHttpSession getHttpSession(	HttpServletRequest req,
+											HttpServletResponse resp,
+											ServletContext servletContext,
+											boolean createNew) {
 		String key = null;
 		if (req.getCookies() != null)
 			for (Cookie cookie : req.getCookies()) {
 				if ("MongoSessionKey".equalsIgnoreCase(cookie.getName()))
 					key = cookie.getValue();
 			}
-		MongoSession session = null;
 		if (!Strings.isBlank(key)) {
-			session = getSession(key);
+			MongoSession session = getSession(key);
 			if (session != null
 				&& req.getRemoteAddr().equals(session.getValue("remoteAddr"))
 				&& req.getHeader("User-Agent").equals(session.getValue("userAgent"))) {
 				session.touch();
-				return session;
+				return new MongoHttpSession(context, new ObjectId(session.getId()));
 			}
 		}
 		if (!createNew)
@@ -126,50 +126,19 @@ public class MongoSessionManager implements SessionProvider {
 		Map<String, String> info = new HashMap<String, String>();
 		info.put("remoteAddr", req.getRemoteAddr());
 		info.put("userAgent", req.getHeader("User-Agent"));
-		session = MongoSession.create(context, info);
-		session.setNewCreate(true);
-		return session;
+		MongoSession session = MongoSession.create(context, info);
+		MongoHttpSession httpSession = new MongoHttpSession(context,new ObjectId(session.getId()));
+		httpSession.setServletContext(servletContext);
+		httpSession.setNewCreate(true);
+		Cookie cookie = new Cookie("MongoSessionKey", session.getId());
+		cookie.setMaxAge(30 * 60);
+		resp.addCookie(cookie);
+		return httpSession;
 	}
-
-	public MongoHttpSession getHttpSession(	HttpServletRequest req,
-											ServletContext servletContext,
-											boolean createNew) {
-		MongoSession session = getSession(req, createNew);
-		if (session != null) {
-			MongoHttpSession httpSession = new MongoHttpSession(context,
-																new ObjectId(session.getId()));
-			if (servletContext == null)
-				servletContext = req.getSession().getServletContext();
-			httpSession.setServletContext(servletContext);
-			httpSession.setNewCreate(session.isNew());
-			return httpSession;
-		}
-		return null;
-	}
-
-	public HttpSession getHttpSession(HttpServletRequest req) {
-		return getHttpSession(req, true);
-	}
-
-	public HttpSession getHttpSession(HttpServletRequest req, boolean createNew) {
-		MongoHttpSession session = getHttpSession(req, Mvcs.getServletContext(), createNew);
-		if (session != null && session.isNew()) {
-			boolean flag = true;
-			if (((HttpServletRequest) req).getCookies() != null)
-				for (Cookie cookie : ((HttpServletRequest) req).getCookies()) {
-					if ("MongoSessionKey".equalsIgnoreCase(cookie.getName())) {
-						if (session.getId().equals(cookie.getValue())) {
-							flag = false;
-							break;
-						}
-					}
-				}
-			if (flag) {
-				Cookie cookie = new Cookie("MongoSessionKey", session.getId());
-				cookie.setMaxAge(30 * 60);
-				Mvcs.getResp().addCookie(cookie);
-			}
-		}
-		return session;
+	
+	public void register(ServletContext servletContext, String attrName) {
+		if (Strings.isBlank(attrName))
+			attrName = "MongoSessionManager";
+		servletContext.setAttribute(attrName, this);
 	}
 }
