@@ -20,8 +20,9 @@ import org.nutz.lang.Strings;
 
 /**
  * 替换原本的HttpServletRequest,改写其getSession方法为获取MongoSession
+ * 
  * @author wendal(wendal1985@gmail.com)
- *
+ * 
  */
 public class MongoSessionFilter implements Filter {
 
@@ -29,12 +30,10 @@ public class MongoSessionFilter implements Filter {
 	private String managerAttrName;
 	private MongoSessionManager manager;
 
-	public void doFilter(final ServletRequest req, final ServletResponse resp,
-			FilterChain chain) throws IOException, ServletException {
-		HttpServletRequest request = (HttpServletRequest) Proxy.newProxyInstance(getClass().getClassLoader(), new Class<?>[]{HttpServletRequest.class}, new InvocationHandler() {
-			
-			public Object invoke(Object obj, Method method, Object[] args)
-					throws Throwable {
+	public void doFilter(final ServletRequest req, final ServletResponse resp, FilterChain chain)
+			throws IOException, ServletException {
+		InvocationHandler ih = new InvocationHandler() {
+			public Object invoke(Object obj, Method method, Object[] args) throws Throwable {
 				if ("getSession".equals(method.getName())) {
 					if (manager == null)
 						manager = (MongoSessionManager) servletContext.getAttribute(managerAttrName);
@@ -42,14 +41,23 @@ public class MongoSessionFilter implements Filter {
 						throw Lang.impossible();
 					} else {
 						if (args == null || args.length == 0)
-							return manager.getHttpSession((HttpServletRequest) req, (HttpServletResponse)resp, servletContext, true);
+							return manager.getHttpSession(	(HttpServletRequest) req,
+															(HttpServletResponse) resp,
+															servletContext,
+															true);
 						else
-							return manager.getHttpSession((HttpServletRequest) req, (HttpServletResponse)resp, servletContext, (Boolean)args[0]);
+							return manager.getHttpSession(	(HttpServletRequest) req,
+															(HttpServletResponse) resp,
+															servletContext,
+															(Boolean) args[0]);
 					}
 				}
 				return method.invoke(req, args);
 			}
-		});
+		};
+		HttpServletRequest request = (HttpServletRequest) Proxy.newProxyInstance(	getClass().getClassLoader(),
+																					new Class<?>[]{HttpServletRequest.class},
+																					ih);
 		chain.doFilter(request, resp);
 	}
 
