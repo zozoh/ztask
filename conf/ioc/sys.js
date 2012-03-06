@@ -63,7 +63,14 @@ var ioc = {
 	 */
 	atom : { fields : {
 		ioc : { refer : '$Ioc' },
-		factory : { refer : 'serviceFactory' } } }
-
+		factory : { refer : 'serviceFactory' } } },
+	
+	/*
+	 * 分布式MongoSession
+	 */
+	sessionManager : {
+		type : "org.nutz.mongo.session.MongoSessionManager",
+		args : [ { refer : 'connector' }, { java : '$conf.getDB("db-name")' } ]
+	}
 // ~ End Ioc
 }

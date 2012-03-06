@@ -2,17 +2,6 @@
 <web-app id="WebApp_ID" version="2.5"
 xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
-    <filter>
-        <filter-name>mongoSession</filter-name>
-        <filter-class>org.nutz.mongo.session.MongoSessionFilter</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>mongoSession</filter-name>
-        <url-pattern>/*</url-pattern>
-		<dispatcher>REQUEST</dispatcher>
-		<dispatcher>FORWARD</dispatcher>
-		<dispatcher>INCLUDE</dispatcher>
-    </filter-mapping>
     
     <filter>
         <filter-name>nutz</filter-name>
