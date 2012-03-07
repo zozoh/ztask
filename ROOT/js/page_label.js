@@ -34,7 +34,11 @@ function resizeLabelFont(selection, maxFontSize, minFontSize) {
 }
 
 function groupLabels(selection) {
-    selection.children(".label_node").each(function() {
+    // 准备按名字排序
+    var nms = [];
+    var jq = selection.children(".label_node").each(function() {
+        var nm = $(this).attr("data-name");
+        nms.push(nm);
         var children = $(this).attr("data-children").split(",");
         var jSub = $(this).children(".label_node_children");
         for(var i = 0; i < children.length; i++) {
@@ -44,8 +48,15 @@ function groupLabels(selection) {
             var jq = selection.children(selector);
             jq.appendTo(jSub);
         }
-        resizeLabelFont(jSub, 32, 10);
+        resizeLabelFont(jSub, 32, 12);
     });
+    // 排序
+    nms.sort();
+    // 重新输出结果
+    for(var i=0;i<nms.length;i++){
+        var nm = nms[i];
+        jq.filter('[data-name="'+nm+'"]').appendTo(jq.parent());
+    }
 }
 
 function redrawLables(selection, lbs) {
@@ -103,14 +114,15 @@ function redrawLables(selection, lbs) {
             }
             $(html).appendTo(selection);
         }
-        // 重新计算字体大小
-        resizeLabelFont(selection, 60);
 
         // 绑定事件
         // $(".lb_name", selection).mouseover(on_lb_name_over).mouseout(on_lb_name_out);
 
         // 进行分组
         groupLabels(selection);
+
+        // 重新计算字体大小
+        resizeLabelFont(selection, 60);
 
         // 启用拖动和放置
         var onDragStop = function(event, ui) {
