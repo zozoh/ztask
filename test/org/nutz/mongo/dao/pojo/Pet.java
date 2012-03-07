@@ -24,6 +24,10 @@ public class Pet {
 		return NEW(null, name);
 	}
 
+	public static Pet NEW(String name, int age) {
+		return NEW(null, name, age, 0);
+	}
+
 	public static Pet LBS(String name, String... lbs) {
 		Pet pet = NEW(null, name);
 		pet.labels = lbs;

@@ -211,7 +211,7 @@ a.lnkb:hover {
 }
 
 /*---------------------------------------------------------- 禁止选择 ------*/
-#sky, .menu .task_menu, .task_labels {
+#sky, .menu .task_menu, .task_labels, .disselect {
     -moz-user-select: none;
     -khtml-user-select: none;
     -webkit-user-select: none;

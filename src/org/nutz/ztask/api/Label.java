@@ -21,6 +21,13 @@ public class Label {
 	@CoField("cnt")
 	private int count;
 
+	@CoField("chdn")
+	private String[] children;
+
+	public String toString() {
+		return String.format("%s%s:%d", null == parent ? "" : parent + "/", name, count);
+	}
+
 	public String get_id() {
 		return _id;
 	}
@@ -53,8 +60,16 @@ public class Label {
 		this.count = count;
 	}
 
-	public String toString() {
-		return String.format("%s%s:%d", name, null == parent ? "" : "/" + parent, count);
+	public boolean isNode() {
+		return null != children;
+	}
+
+	public String[] getChildren() {
+		return children;
+	}
+
+	public void setChildren(String[] children) {
+		this.children = children;
 	}
 
 }

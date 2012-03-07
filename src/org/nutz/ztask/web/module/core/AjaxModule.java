@@ -84,19 +84,44 @@ public class AjaxModule {
 		factory.messages().clearMine(me.getName());
 	}
 
-	@At("/label/tops")
-	public List<Label> getTopLabels() {
-		return factory.labels().getTopLabels();
+	@At("/label/all")
+	public List<Label> getAllLabels() {
+		return factory.labels().all();
 	}
 
 	@At("/label/children")
 	public List<Label> getChildrenLabels(@Param("lbnm") String labelName) {
-		return factory.labels().getChildren(labelName);
+		return factory.labels().list(labelName);
 	}
 
 	@At("/do/sync/labels")
 	public List<Label> doSyncLabels() {
 		return factory.labels().syncLables();
+	}
+
+	@At("/label/group")
+	public void doGroupLabels(	@Param("grpas") String grpas,
+								@Param("mynm") String mynm,
+								@Param("tanm") String tanm) {
+		LabelService lbs = factory.labels();
+		// 拖动到我里面
+		if (Strings.isBlank(grpas)) {
+			lbs.joinTo(Strings.sBlank(mynm, null), tanm);
+		}
+		// 我和它都加入新组
+		else {
+			lbs.joinTo(grpas, mynm, tanm);
+		}
+	}
+
+	@At("/label/ungroup")
+	public void doUngroupLabel(@Param("lbnm") String lbnm) {
+		factory.labels().joinTo(null, lbnm);
+	}
+
+	@At("/label/rename")
+	public Label doRenameLabel(@Param("lbnm") String lbnm, @Param("new_lbnm") String newName) {
+		return factory.labels().rename(lbnm, newName);
 	}
 
 	@At("/do/push")

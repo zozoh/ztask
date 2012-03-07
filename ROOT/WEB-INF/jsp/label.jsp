@@ -18,11 +18,11 @@
     <% /*===============================================左侧=*/ %>
     <div id="L"><div class="WP scro hierachy_right"><div id="tasks"></div></div></div>
     <% /*===============================================右侧=*/ %>
-    <ul id="label_btns">
+    <ul id="label_btns" class="disselect">
         <li><a class="lb_do_sync">${msg['lb.sync']}</a></li>
         <li><a class="lb_do_reload">${msg['ui.reload']}</a></li>
     </ul>
-    <div id="R"><div class="WP scro"><div id="labels"></div></div></div>
+    <div id="R" class="disselect"><div class="WP"><div id="labels" class="scro"></div></div></div>
     <% /*========================================Task Detail DOM=*/ %>
     <%@include file="/WEB-INF/jsp/include/_task_detail.jsp" %>
     <% /*==========================================本地化字符串支持=*/ %>   

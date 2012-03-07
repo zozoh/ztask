@@ -19,82 +19,107 @@ public interface LabelService extends AbstractService {
 	/**
 	 * 根据标签名称得到一个标签
 	 * 
-	 * @param labelName
+	 * @param lbnm
 	 *            标签名称
 	 * @return 标签对象
 	 */
-	Label get(String labelName);
-
-	/**
-	 * 根据显示文字获取一组标签
-	 * 
-	 * @param labelText
-	 *            显示文字
-	 * @return 标签列表
-	 */
-	List<Label> getByText(String labelText);
+	Label get(String lbnm);
 
 	/**
 	 * @return 所有顶级标签列表
 	 */
-	List<Label> getTopLabels();
+	List<Label> tops();
 
 	/**
-	 * 得到某标签所有的子标签
+	 * 列出一组标签，
 	 * 
-	 * @param labelName
-	 *            标签名
+	 * @param lbnm
+	 *            父标签，如果为 null，则表示列出所有顶级标签
 	 * @return 某标签的子标签
 	 */
-	List<Label> getChildren(String labelName);
+	List<Label> list(String lbnm);
 
 	/**
-	 * 增加一组标签，如果已存在的，则更新
-	 * <p>
-	 * 支持特殊格式的字符串
+	 * @return 所有标签
+	 */
+	List<Label> all();
+
+	/**
+	 * 将一个标签改名， 同时，所有使用这个标签的 task 也会被修改
+	 * 
+	 * @param lbnm
+	 *            旧标签名
+	 * @param newName
+	 *            新标签名
+	 * @return 修改后的标签
+	 */
+	Label rename(String lbnm, String newName);
+
+	/**
+	 * 保存一组标签，如果已存在的，则获取
+	 * 
+	 * @param lbstrs
+	 *            标签字符串列表，格式为 "名称[?计数]"
+	 * @return 标签对象列表
+	 * @see #save(String)
+	 */
+	List<Label> saveList(String... lbstrs);
+
+	/**
+	 * 保存一个标签，如果存在，则获取
+	 * 
+	 * 下面的这些标签名称都是合法的
 	 * 
 	 * <pre>
-	 *    标签名[:颜色][?计数]
-	 * 比如:
-	 *    save("A", "B?3","C#FF0" "D#F80?45");
+	 * A     # 表示名称为 A 且计数为 0
+	 * A?2   # 表示名称为 A 且计数为 2
 	 * </pre>
 	 * 
-	 * @param lbs
-	 *            标签列表
-	 * @return 新增的标签对象列表
+	 * @param lbstr
+	 *            标签字符串，格式为 "名称[?计数]"
+	 * @return 标签对象
 	 */
-	List<Label> save(String... lbs);
+	Label save(String lbstr);
 
 	/**
 	 * 移除一个标签
 	 * 
-	 * @param labelName
+	 * @param lbnm
 	 *            标签名
 	 * @return 标签，null 表示不存在
 	 */
-	Label remove(String labelName);
+	Label removeByName(String lbnm);
+
+	/**
+	 * 移除一个标签对象
+	 * 
+	 * @param lb
+	 *            标签对象
+	 */
+	void remove(Label lb);
 
 	/**
 	 * 是否存在某标签
 	 * 
-	 * @param labelName
+	 * @param lbnm
 	 *            标签名
 	 * @return 是否存在
 	 */
-	boolean hasLabel(String labelName);
+	boolean hasLabel(String lbnm);
 
 	/**
 	 * 将一组标签移动成某一个标签的子
 	 * <p>
-	 * 如果父标签不存在，则将所有的标签设置成根标签，如果标签不需要设置 parentName，则忽略
+	 * 如果父标签名称为 null ，则将所有的标签设置成根标签<br>
+	 * 否则如果不存在，则创建父标签
 	 * 
 	 * @param parentName
 	 *            父标签名称
-	 * @param labelNames
+	 * @param lbnms
 	 *            自标签名称
 	 * @return 移动的标签对象列表
 	 */
-	List<Label> moveTo(String parentName, String... labelNames);
+	List<Label> joinTo(String parentName, String... lbnms);
 
 	/**
 	 * @return 标签的数量

@@ -6,6 +6,7 @@ function main() {
 
 function onMessageUpdate() {
     var jArena = $(".msg_arena");
+    // TODO 这里获取更新的消息
     msg_do_reload(jArena, true);
 }
 

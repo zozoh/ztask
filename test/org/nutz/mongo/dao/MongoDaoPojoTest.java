@@ -29,6 +29,20 @@ import com.mongodb.WriteResult;
 public class MongoDaoPojoTest extends MongoCase {
 
 	@Test
+	public void test_sum() {
+		dao.create(Pet.class, true);
+		dao.save(Pet.NEW("A", 6));
+		dao.save(Pet.NEW("B", 3));
+		dao.save(Pet.NEW("C", 1));
+
+		long sum = dao.sum(Pet.class, null, "age");
+		assertEquals(10, sum);
+
+		sum = dao.sum(Pet.class, Moo.LT("age", 5), "age");
+		assertEquals(4, sum);
+	}
+
+	@Test
 	public void test_lt_obj_default_id() {
 		dao.create(SObj.class, true);
 		dao.save(SObj.NEW("A"));

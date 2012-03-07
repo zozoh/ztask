@@ -16,12 +16,14 @@ import org.nutz.mongo.entity.MongoEntityIndex;
 import org.nutz.mongo.util.MCur;
 import org.nutz.mongo.util.MKeys;
 
+import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.CommandResult;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
+import com.mongodb.GroupCommand;
 import com.mongodb.MongoException;
 import com.mongodb.WriteResult;
 
@@ -519,6 +521,45 @@ public class MongoDao {
 		return -1;
 	}
 
+	/**
+	 * 计算一个字段数值的和
+	 * 
+	 * @param enref
+	 *            参考对象，根据这个对象获得集合名称
+	 * @param q
+	 *            条件，为 null 表示整个集合
+	 * @param field
+	 *            要计算的字段名
+	 * @return 数量
+	 */
+	public long sum(Object enref, Object q, String field) {
+		MongoEntity moe = Mongos.entity(enref);
+		String fieldName = moe.getFieldDbName(field);
+		String collName = moe.getCollectionName(q);
+		if (db.collectionExists(collName)) {
+			DBCollection coll = db.getCollection(collName);
+			DBObject dbq = moe.formatObject(q);
+
+			String reduce = "function(obj,prev){prev.csum+=obj." + fieldName + ";}";
+
+			GroupCommand gcmd = new GroupCommand(	coll,
+													Mongos.dbo(),
+													dbq,
+													Mongos.dbo("csum", 0),
+													reduce,
+													null);
+			DBObject re = coll.group(gcmd);
+			if (re instanceof BasicDBList) {
+				BasicDBList lst = (BasicDBList) re;
+				if (lst.size() > 0) {
+					Double csum = (Double) ((DBObject) lst.get(0)).get("csum");
+					return csum.longValue();
+				}
+			}
+		}
+		return -1;
+	}
+
 	// ======================================================== 私有
 
 	private DB db;
@@ -820,7 +861,7 @@ public class MongoDao {
 			}
 		}
 	}
-	
+
 	public DB getDB() {
 		return db;
 	}

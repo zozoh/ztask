@@ -1,55 +1,203 @@
 .label {
-    display:inline-block;
-    margin: 4px 8px;
-    color:#08F;
+    display: inline-block;
+    margin: 0 2px;
+    padding: 0;
+    border: 3px solid #F0F0F0;
+    border-radius: 4px;
+    color: #08F;
     cursor: pointer;
+    position: relative;
 }
 
-.label:hover {
+.label .lb_name {
+    display: inline-block;
+    padding: 4px;
+}
+
+.label .lb_name i {
+    font-style: normal;
+}
+
+.label_leaf:hover .lb_name {
     background-color: #FF0;
+}
+
+.label u {
+    font-size: 11px;
+    position: absolute;
+    z-index: 1000;
+    left: 0;
+    top: -14px;
+    min-width: 100%;
+    height: 0px;
+    text-decoration: none;
+    overflow: hidden;
+    cursor: pointer;
+    display: inline-block;
+    opacity: 0;
+    white-space: nowrap;
+    padding: 0 8px;
+    border-radius: 2px;
+    color: #CEF;
+    background-color: #08F;
+    box-shadow: 2px 2px 6px #888;
+}
+
+.label u  b {
+    font-size: 13px;
+    color: #FF0;
+    font-weight: bold;
+}
+
+.label u:hover {
+    color: #FFF;
     text-decoration: underline;
 }
 
+.label_hover > .lb_name > u {
+    top: -28px;
+    height: 24px;
+    line-height: 24px;
+    opacity: 0.9;
+    overflow: inherit;
+    -webkit-transition: all 0.1s ease-in 0.1s;
+    -moz-transition: all 0.1s ease-in 0.1s;
+    -o-transition: all 0.1s ease-in 0.1s;
+    transition: all 0.1s ease-in 0.1s;
+}
+
+div.label_hover > .lb_name > u {
+    top: -30px;
+    line-height: 24px;
+}
+
+.label u:after {
+    content: "";
+    display: block;
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-width: 6px;
+    border-style: solid;
+    border-color: #08F transparent transparent transparent;
+}
+
+.label_node, .label_node:hover {
+    display: block;
+    padding: 0px;
+    margin: 10px 0;
+    box-shadow: 0 0 4px #888;
+    text-decoration: none;
+}
+
+.label_node > .lb_name {
+    display: block;
+    margin: 0px;
+    color: #FFF;
+    background-color: #AAA;
+    padding: 0 6px;
+    line-height: 28px;
+    text-align: left;
+    font-size: 12px;
+    border-radius: 3px 3px 0 0;
+}
+
+.label_node > .lb_name i {
+    text-shadow: 1px 1px 0 #000;
+}
+
+.label_node_children {
+    display: block;
+    padding: 4px 6px 4px 10px;
+    margin: 0px;
+    width: 100%;
+    font-size: 9px;
+    color: #CCC;
+}
+
+.label_droppable {
+    border-color: #08F;
+    background-color: #8CF;
+    box-shadow: 0 0 10px #08F;
+}
+
 .label em {
-    display:inline-block;
-    height:14px;
-    line-height:14px;
-    padding:0 4px;
-    border-radius:8px;
+    display: inline-block;
+    height: 14px;
+    line-height: 14px;
+    padding: 0 4px;
+    border-radius: 8px;
     font-style: normal;
     margin-left: 2px;
     font-size: 10px;
-    color:#FFF;
-    background-color:#08F;
+    color: #FFF;
+    background-color: #08F;
     text-decoration: none;
 }
-/*-------------------------------------------------动作相关--------------*/
-#label_btns{
-    list-style: none;
-    padding:6px;
-    margin:0;
-    position: fixed;
-    top:50px;
-    right:0;
-    text-align: right;
-    line-height:24px;
-    font-size:12px;
+
+.label_node > em {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    background-color: #999;
 }
 
-#label_btns a{
+.label_dragout {
+    border: 3px dashed #AAA;
+    font-size: 12px;
+    color: #888;
+    background-color: rgba(255,255,255,0.8);
+    border-radius: 8px;
+    text-align: center;
+}
+
+.label_dragout_hover {
+    border-color: #08F;
+    font-size: 16px;
+    color: #08F;
+    background-color: #8CF;
+}
+
+/*-------------------------------------------------动作相关--------------*/
+#label_btns {
+    list-style: none;
+    padding: 2px;
+    margin: 0;
+    position: fixed;
+    top: 50px;
+    right: 0;
+    text-align: right;
+    line-height: 24px;
+    font-size: 12px;
+}
+
+#label_btns li {
+    float: left;
+    margin: 0 8px;
+}
+
+#label_btns a {
     display: inline-block;
-    padding:0 8px;
-    color:#08F;
+    padding: 0 8px;
+    color: #08F;
     cursor: pointer;
     border-radius: 4px;
 }
 
-#label_btns a:hover{
-    background-color:#CCC;
-    color:#F00;
+#label_btns a:hover {
+    background-color: #CCC;
+    color: #F00;
 }
 
 /*-------------------------------------------------布局相关--------------*/
+#labels {
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 30px 8px 20px 8px;
+}
+
 .WP {
     width: 100%;
     height: 100%;
@@ -65,8 +213,9 @@
     padding-top: 20px;
 }
 
-#R .WP{
-    padding:20px;
+#R .WP {
+    padding: 24px 0 6px 0;
+    overflow: hidden;
 }
 
 #R {

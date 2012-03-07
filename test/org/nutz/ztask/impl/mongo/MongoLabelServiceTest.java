@@ -15,6 +15,74 @@ import org.nutz.ztask.api.TaskService;
 public class MongoLabelServiceTest extends ZTaskCase {
 
 	@Test
+	public void test_jointo_and_sync() {
+		// 准备 Task
+		TaskService tasks = this.getService(TaskService.class);
+		dao.create(Task.class, true);
+		Label a, b, c, d, e, x, y;
+
+		tasks.createTask(t_l("Task0", "A", "B", "C"));
+		tasks.createTask(t_l("Task1", "D", "E"));
+		tasks.createTask(t_l("Task2", "A", "E"));
+
+		lbls.syncLables();
+
+		lbls.joinTo("X", "A", "B", "C");
+		lbls.joinTo("Y", "D", "E");
+
+		a = lbls.get("A");
+		b = lbls.get("B");
+		c = lbls.get("C");
+		d = lbls.get("D");
+		e = lbls.get("E");
+		x = lbls.get("X");
+		y = lbls.get("Y");
+		assertTrue(x.isNode());
+		assertTrue(y.isNode());
+		assertEquals(a.getCount() + b.getCount() + c.getCount(), x.getCount());
+		assertEquals(d.getCount() + e.getCount(), y.getCount());
+
+		lbls.joinTo("Y", "A");
+		a = lbls.get("A");
+		b = lbls.get("B");
+		c = lbls.get("C");
+		d = lbls.get("D");
+		e = lbls.get("E");
+		x = lbls.get("X");
+		y = lbls.get("Y");
+		assertTrue(x.isNode());
+		assertTrue(y.isNode());
+		assertEquals(b.getCount() + c.getCount(), x.getCount());
+		assertEquals(a.getCount() + d.getCount() + e.getCount(), y.getCount());
+
+		lbls.joinTo(null, "B", "C");
+		a = lbls.get("A");
+		b = lbls.get("B");
+		c = lbls.get("C");
+		d = lbls.get("D");
+		e = lbls.get("E");
+		x = lbls.get("X");
+		y = lbls.get("Y");
+		assertTrue(x.isNode());
+		assertTrue(y.isNode());
+		assertEquals(0, x.getCount());
+		assertEquals(a.getCount() + d.getCount() + e.getCount(), y.getCount());
+
+		lbls.syncLables();
+		a = lbls.get("A");
+		b = lbls.get("B");
+		c = lbls.get("C");
+		d = lbls.get("D");
+		e = lbls.get("E");
+		x = lbls.get("X");
+		y = lbls.get("Y");
+		assertNull(x);
+		assertTrue(y.isNode());
+		assertEquals(a.getCount() + d.getCount() + e.getCount(), y.getCount());
+
+	}
+
+	@Test
 	public void test_sync_task_label() {
 		// 准备 Task
 		TaskService tasks = this.getService(TaskService.class);
@@ -32,7 +100,7 @@ public class MongoLabelServiceTest extends ZTaskCase {
 
 		// 检查一下
 		assertEquals(7, lbs.size());
-		lbs = lbls.getTopLabels();
+		lbs = lbls.tops();
 		assertEquals(7, lbs.size());
 		assertEquals("A:2", lbs.get(0).toString());
 		assertEquals("B:2", lbs.get(1).toString());
@@ -51,7 +119,7 @@ public class MongoLabelServiceTest extends ZTaskCase {
 
 		// 检查一下
 		assertEquals(8, lbs.size());
-		lbs = lbls.getTopLabels();
+		lbs = lbls.tops();
 		assertEquals(8, lbs.size());
 		assertEquals("A:3", lbs.get(0).toString());
 		assertEquals("B:3", lbs.get(1).toString());
@@ -66,19 +134,19 @@ public class MongoLabelServiceTest extends ZTaskCase {
 
 	@Test
 	public void test_simple_add_and_remove() {
-		lbls.save("A", "B", "C");
+		lbls.saveList("A", "B", "C");
 		assertEquals(3, lbls.count());
 
-		lbls.save("A", "B", "C", "E", "D");
+		lbls.saveList("A", "B", "C", "E", "D");
 		assertEquals(5, lbls.count());
 
-		lbls.save("F", "G", "H");
+		lbls.saveList("F", "G", "H");
 		assertEquals(8, lbls.count());
 
-		lbls.remove("H");
+		lbls.removeByName("H");
 		assertEquals(7, lbls.count());
 
-		List<Label> ls = lbls.getTopLabels();
+		List<Label> ls = lbls.tops();
 		assertEquals(7, ls.size());
 		assertEquals("A", ls.get(0).getName());
 		assertEquals("B", ls.get(1).getName());
@@ -88,27 +156,27 @@ public class MongoLabelServiceTest extends ZTaskCase {
 		assertEquals("F", ls.get(5).getName());
 		assertEquals("G", ls.get(6).getName());
 
-		lbls.moveTo("A", "B", "C");
-		lbls.moveTo("C", "D");
-		lbls.moveTo("C", "E", "F");
+		lbls.joinTo("A", "B", "C");
+		lbls.joinTo("C", "D");
+		lbls.joinTo("C", "E", "F");
 
-		ls = lbls.getTopLabels();
+		ls = lbls.tops();
 		assertEquals(2, ls.size());
 		assertEquals("A", ls.get(0).getName());
 		assertEquals("G", ls.get(1).getName());
 
-		ls = lbls.getChildren("A");
+		ls = lbls.list("A");
 		assertEquals(2, ls.size());
 		assertEquals("B", ls.get(0).getName());
 		assertEquals("C", ls.get(1).getName());
 
-		ls = lbls.getChildren("C");
+		ls = lbls.list("C");
 		assertEquals(3, ls.size());
 		assertEquals("D", ls.get(0).getName());
 		assertEquals("E", ls.get(1).getName());
 		assertEquals("F", ls.get(2).getName());
 
-		ls = lbls.getChildren("G");
+		ls = lbls.list("G");
 		assertEquals(0, ls.size());
 	}
 
