@@ -14,7 +14,6 @@ var ioc = {
 		fields : {
 			factory : { refer : 'serviceFactory' },
 			render : { refer : 'reportRender' },
-			ignoreLabels : [ 'FAQ' ],
 			dbName : { java : '$conf.getDB("db-name")' },
 			home : { java : '$conf.get("sys-report-home")' },
 			reportDay : { java : '$conf.get("sys-report-day", 2)' }

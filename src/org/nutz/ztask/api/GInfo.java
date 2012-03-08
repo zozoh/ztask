@@ -50,7 +50,13 @@ public class GInfo {
 	 * 周报的发送目的帐号
 	 */
 	@CoField
-	private String weeklyTo;
+	private String reportTo;
+
+	/**
+	 * 具备这些标签的任务，不记入周报
+	 */
+	@CoField
+	private String[] reportIgnoreLabels;
 
 	/**
 	 * 如何格式化站内文本
@@ -197,6 +203,14 @@ public class GInfo {
 		this.lastModified = lastModified;
 	}
 
+	public String[] getReportIgnoreLabels() {
+		return reportIgnoreLabels;
+	}
+
+	public void setReportIgnoreLabels(String[] reportIgnoreLabels) {
+		this.reportIgnoreLabels = reportIgnoreLabels;
+	}
+
 	public String[] getHooks() {
 		return hooks;
 	}
@@ -213,12 +227,12 @@ public class GInfo {
 		this.timers = timers;
 	}
 
-	public String getWeeklyTo() {
-		return weeklyTo;
+	public String getReportTo() {
+		return reportTo;
 	}
 
-	public void setWeeklyTo(String weeklyTo) {
-		this.weeklyTo = weeklyTo;
+	public void setReportTo(String weeklyTo) {
+		this.reportTo = weeklyTo;
 	}
 
 }

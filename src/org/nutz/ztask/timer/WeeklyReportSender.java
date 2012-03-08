@@ -29,9 +29,9 @@ public class WeeklyReportSender implements TimerHandler {
 	@Override
 	public String doHandle(String name, Timering ing) {
 		GInfo info = factory.htasks().getGlobalInfo();
-		User u = factory.users().get(info.getWeeklyTo());
+		User u = factory.users().get(info.getReportTo());
 		if (null == u) {
-			return "Fail to find user " + info.getWeeklyTo();
+			return "Fail to find user " + info.getReportTo();
 		}
 
 		StringBuilder sb = new StringBuilder();

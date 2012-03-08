@@ -58,11 +58,6 @@ public class WeeklyReportor implements ZTaskReportor {
 	 */
 	private DocRender<? extends Object> render;
 
-	/**
-	 * 注入: 具备这些标签的任务，不记入周报
-	 */
-	private String[] ignoreLabels;
-
 	public WeeklyReportor() {
 		reportDay = Calendar.MONDAY;
 	}
@@ -150,6 +145,9 @@ public class WeeklyReportor implements ZTaskReportor {
 				return "@" + task.getOwner();
 			}
 		};
+
+		// 得到应该忽略的标签列表
+		String[] ignoreLabels = factory.tasks().getGlobalInfo().getReportIgnoreLabels();
 
 		// 汇总统计
 		ReportMap ok = new ReportMap(ignoreLabels);
