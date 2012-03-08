@@ -47,7 +47,7 @@ function _setup_message() {
         var onMessageOK = function(re) {
             var re = eval("(" + re + ")");
             var oldCount = jMsg.text() * 1;
-            var num = re.data || "-";
+            var num = re.data || "0";
 
             // 更新信息
             if(document.title)
