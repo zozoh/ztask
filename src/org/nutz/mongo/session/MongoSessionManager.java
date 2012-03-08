@@ -62,15 +62,12 @@ public class MongoSessionManager implements SessionProvider {
 		systemJs.remove(new BasicDBObject("_id", "mongoSessionClean"));
 		systemJs.insert(new BasicDBObject("_id", "mongoSessionClean").append(
 				"value",
-				new Code(
-						Files.read(Files
-								.findFile("org/nutz/mongo/session/mongoSessionClean.js")))));
+				new Code(Files.read(Files.findFile("org/nutz/mongo/session/mongoSessionClean.js")))));
 		cleaner = new Thread("MongoSessionCleaner") {
 			public void run() {
 				while (!stop) {
 					try {
-						context.getMongoDao().getDB()
-								.eval("mongoSessionClean()");
+						context.getMongoDao().getDB().eval("mongoSessionClean()");
 					} catch (Throwable e) {
 						if (log.isWarnEnabled())
 							log.warn("Clean case some error", e);
@@ -147,7 +144,7 @@ public class MongoSessionManager implements SessionProvider {
 		httpSession.setServletContext(servletContext);
 		httpSession.setNewCreate(true);
 		Cookie cookie = new Cookie("MongoSessionKey", session.getId());
-		cookie.setMaxAge(30 * 60);
+		cookie.setMaxAge(30 * 24 * 60 * 60);
 		resp.addCookie(cookie);
 		return httpSession;
 	}
