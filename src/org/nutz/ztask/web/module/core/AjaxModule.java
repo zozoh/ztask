@@ -55,22 +55,34 @@ public class AjaxModule {
 	@At("/message/list")
 	public List<Message> getMessageList(@Param("kwd") String keyword,
 										@Param("lstId") String lastMsgId,
+										@Param("asc") boolean asc,
 										@Param("lmt") int limit,
 										@Attr(scope = Scope.SESSION, value = Webs.ME) User me) {
-		return factory.messages().list(me.getName(), keyword, lastMsgId, limit);
+		return factory.messages().list(me.getName(), keyword, lastMsgId, asc, limit);
 	}
 
 	@At("/message/set/read")
 	public Message doSetMessageRead(@Param("mid") String msgId,
 									@Param("read") boolean read,
 									@Attr(scope = Scope.SESSION, value = Webs.ME) User me) {
-		Message msg = factory.messages().get(msgId);
+		MessageService msgs = factory.messages();
+		Message msg = msgs.get(msgId);
 		if (null == msg) {
-			factory.messages().setAllRead(me.getName(), read);
+			msgs.setAllRead(me.getName(), read);
 		} else {
-			factory.messages().setRead(msg, read);
+			msgs.setRead(msg, read);
 		}
-		return null == msg ? null : factory.messages().get(msg.get_id());
+		return null == msg ? null : msgs.get(msg.get_id());
+	}
+
+	@At("/message/set/favo")
+	public Message doSetMessageRavo(@Param("mid") String msgId, @Param("favo") boolean favo) {
+		MessageService msgs = factory.messages();
+		Message msg = msgs.get(msgId);
+		if (null != msg) {
+			msgs.setFavorite(msg, favo);
+		}
+		return null == msg ? null : msgs.get(msg.get_id());
 	}
 
 	@At("/message/del")

@@ -42,7 +42,7 @@ public class MesssageMailMaker implements TimerHandler {
 	public String doHandle(String name, Timering ing) {
 		final Map<String, List<Message>> map = new HashMap<String, List<Message>>();
 		// 分组
-		factory.messages().each(null, "!R!N:", null, 0, new Each<Message>() {
+		factory.messages().each(null, "!R!N:", null, false, 0, new Each<Message>() {
 			public void invoke(int index, Message msg, int length) {
 				List<Message> list = map.get(msg.getOwner());
 				if (null == list) {

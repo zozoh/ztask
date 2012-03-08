@@ -1,13 +1,25 @@
+var MSG_SKIP_AUTO_SETUP = true;
+
 function main() {
     var jArena = $(".msg_arena");
     msg_events_bind.apply(jArena);
-    msg_do_reload(jArena, true);
+    msg_do_reload(jArena, true, function() {
+        _setup_message();
+    });
 }
 
 function onMessageUpdate() {
     var jArena = $(".msg_arena");
-    // TODO 这里获取更新的消息
-    msg_do_reload(jArena, true);
+    var lastId = $(".msg",jArena).first().attr("msg-id");
+
+    // 这里获取更新的消息
+    ajax.get("/ajax/message/list", {
+        lstId: lastId,
+        kwd: '!R:',
+        asc: true
+    }, function(re) {
+        msg_append.apply(jArena, [re.data, true]);
+    });
 }
 
 function msg_events_bind(opt) {
@@ -18,9 +30,15 @@ function msg_events_bind(opt) {
     this.delegate(".msg_more", "click", msg_events_on_more);
     this.delegate(".msg_kwd", "change", msg_events_on_reload);
     this.delegate(".msg a", "click", msg_events_on_set_read);
+    this.delegate(".msg .msg_favo", "click", msg_events_on_set_favo);
     this.delegate(".msg_del", "click", msg_events_on_del);
     this.delegate(".msg_readall", "click", msg_events_on_do_readall);
     this.delegate(".msg_clearall", "click", msg_events_on_do_clearall);
+    this.delegate(".msg_q li", "click", function() {
+        var ee = _msg_obj(this);
+        $(".msg_kwd",ee.selection).val($(this).attr("kwd"));
+        $(".msg_reload",ee.selection).click();
+    });
 }
 
 function msg_events_on_del(e) {
@@ -65,6 +83,17 @@ function msg_events_on_set_read() {
     });
 }
 
+function msg_events_on_set_favo() {
+    var favo = $(this).hasClass("msg_favo_on");
+    var ee = _msg_obj(this);
+    ajax.get("/ajax/message/set/favo", {
+        mid: ee.msgId,
+        favo: !favo
+    }, function(re) {
+        msg_html.apply(ee.jMsg, [re.data]);
+    });
+}
+
 function msg_events_on_reload() {
     msg_do_reload(this, true);
 }
@@ -101,14 +130,15 @@ function msg_do_reload(ele, clear, callback) {
     });
 }
 
-function msg_append(msgs) {
+function msg_append(msgs, isPrepend) {
     var selection = msg_selection(this);
     var jList = $(".msg_list", selection);
     var jMore = $(".msg_more", jList);
     for(var i = 0; i < msgs.length; i++) {
-        msg_html.apply(jMore, [msgs[i]]);
+        msg_html.apply( isPrepend ? jList : jMore, [msgs[i]]);
     }
-    jMore.attr("msg-last-id", jList.find(".msg").last().attr("msg-id"));
+    if(!isPrepend)
+        jMore.attr("msg-last-id", jList.find(".msg").last().attr("msg-id"));
 }
 
 function msg_html(msg) {
@@ -123,20 +153,31 @@ function msg_html(msg) {
     else
         html += '<a class="msg_do_read">' + z.msg("msg.do.read") + '</a>';
     html += '    <u class="msg_del"></u>';
+    html += '    <span class="msg_favo ' + (msg.favorite ? "msg_favo_on" : "") + '"';
+    html += '          title="' + z.msg("msg.favo.tip") + '"></span>';
     html += '    <a class="msg_notify"></a>';
     html += '</div>';
     // 加入 DOM
     var jq;
-    if(this.hasClass("msg_more")) {
-        jq = $(html).insertBefore(this);
-    } else if(this.hasClass("msg")) {
-        jq = $(html).replaceAll(this);
-    } else {
-        throw "Unsupport selector '" + this.selector + "'";
+
+    // 加入最前面
+    if(this.hasClass("msg_list")) {
+        jq = $(html).prependTo(this);
+        $(".msg_ct em", jq).text("--").addClass("msg_new");
     }
-    // 增加序列号
-    var prev = jq.prev();
-    $(".msg_ct em", jq).text(prev.size() > 0 ? prev.find(".msg_ct em").text() * 1 + 1 : 1);
+    // 插入队尾
+    else {
+        if(this.hasClass("msg_more")) {
+            jq = $(html).insertBefore(this);
+        } else if(this.hasClass("msg")) {
+            jq = $(html).replaceAll(this);
+        } else {
+            throw "Unsupport selector '" + this.selector + "'";
+        }
+        // 增加序列号
+        var prev = jq.prev();
+        $(".msg_ct em", jq).text(prev.size() > 0 ? prev.find(".msg_ct em").text() * 1 + 1 : 1);
+    }
     // 闪烁
     z.blinkIt(jq, 500);
 }

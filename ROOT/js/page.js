@@ -15,6 +15,29 @@ $(document.body).ready(function() {
     z.watchKeyboard();
 
     // 设置消息的自动更新机制
+    if( typeof MSG_SKIP_AUTO_SETUP == "undefined" || !MSG_SKIP_AUTO_SETUP)
+        _setup_message();
+
+    // 注册 ajax 事件
+    $("#logo img").ajaxStart(function() {
+    this.style.visibility = "visible";
+    }).ajaxStop(function() {
+        this.style.visibility = "hidden";
+    });
+    // 调整界面布局
+    _adjust_layout();
+    // 随着窗口变化调整
+    window.onresize = _adjust_layout;
+
+    // 调用界面主函数
+    if( typeof window.main == "function") {
+        window.main();
+    }
+
+});
+})(window.jQuery);
+
+function _setup_message() {
     var jMsg = $("#msg_count");
     if(jMsg.size() > 0) {
         var msgInter = $("#sky").attr("msg-inter") * 1;
@@ -24,12 +47,13 @@ $(document.body).ready(function() {
         var onMessageOK = function(re) {
             var re = eval("(" + re + ")");
             var oldCount = jMsg.text() * 1;
+            var num = re.data || "-";
 
             // 更新信息
             if(document.title)
-                document.title = document.title.replace(/([(])([0-9]+)([)])(.*)/, "(" + re.data + ")$4");
+                document.title = document.title.replace(/([(])([0-9]+)([)])(.*)/, "(" + num + ")$4");
             else if(window.title)
-                window.title = window.title.replace(/([(])([0-9]+)([)])(.*)/, "(" + re.data + ")$4");
+                window.title = window.title.replace(/([(])([0-9]+)([)])(.*)/, "(" + num + ")$4");
             jMsg.text(re.data);
 
             // 更新 #sky 样式
@@ -58,25 +82,7 @@ $(document.body).ready(function() {
         }
         messagerHandler();
     }
-
-    // 注册 ajax 事件
-    $("#logo img").ajaxStart(function() {
-    this.style.visibility = "visible";
-    }).ajaxStop(function() {
-        this.style.visibility = "hidden";
-    });
-    // 调整界面布局
-    _adjust_layout();
-    // 随着窗口变化调整
-    window.onresize = _adjust_layout;
-
-    // 调用界面主函数
-    if( typeof window.main == "function") {
-        window.main();
-    }
-
-});
-})(window.jQuery);
+}
 
 function _adjust_layout() {
     var box = z.winsz();

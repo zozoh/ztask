@@ -186,10 +186,17 @@ public interface MessageService {
 	 *            关键字，可为 null
 	 * @param String
 	 *            lastMsgId 从那条消息开始向后读取，null 为从头读取
+	 * @param asc
+	 *            true : 从较早到较晚的消息迭代，false : 从较晚向较早的消息迭代
 	 * @param limit
 	 *            读取多少条，小于等于 0 表示读取全部
 	 */
-	void each(String owner, String keyword, String lastMsgId, int limit, Each<Message> callback);
+	void each(	String owner,
+				String keyword,
+				String lastMsgId,
+				boolean asc,
+				int limit,
+				Each<Message> callback);
 
 	/**
 	 * 列出某用户下，相关的消息
@@ -199,26 +206,15 @@ public interface MessageService {
 	 * @param keyword
 	 *            关键字，可为 null
 	 * @param String
-	 *            lastMsgId 从那条消息开始向后读取，null 为从头读取
+	 *            lastMsgId 从那条消息开始向后读取(更早的)，null 为从头读取
+	 * @param asc
+	 *            true : 从较早到较晚的消息迭代，false : 从较晚向较早的消息迭代
 	 * @param limit
 	 *            读取多少条，小于等于 0 表示读取全部
 	 * @return 一个按创建时间从最新到最早的消息列表
 	 * @see #each(String, String, String, int, Each)
 	 */
-	List<Message> list(String owner, String keyword, String lastMsgId, int limit);
-
-	/**
-	 * 列出某用户下，相关的消息
-	 * 
-	 * @param owner
-	 *            用户名
-	 * @param String
-	 *            lastMsgId 从那条消息开始向后读取，null 为从头读取
-	 * @param limit
-	 *            读取多少条，小于等于 0 表示读取全部
-	 * @return 一个按创建时间从最新到最早的消息列表
-	 */
-	List<Message> list(String owner, String lastMsgId, int limit);
+	List<Message> list(String owner, String keyword, String lastMsgId, boolean asc, int limit);
 
 	/**
 	 * 列出某用户下，相关的消息

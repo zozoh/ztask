@@ -131,6 +131,7 @@ public class MongoMessageService extends AbstractMongoService implements Message
 	public void each(	String owner,
 						String keyword,
 						String lastMsgId,
+						boolean asc,
 						int limit,
 						Each<Message> callback) {
 		if (null == callback)
@@ -140,7 +141,11 @@ public class MongoMessageService extends AbstractMongoService implements Message
 		Moo q = Moo.NEW();
 
 		if (!Strings.isBlank(lastMsgId)) {
-			q.lt(new ObjectId(lastMsgId));
+			if (asc) {
+				q.gt(new ObjectId(lastMsgId));
+			} else {
+				q.lt(new ObjectId(lastMsgId));
+			}
 		}
 
 		if (!Strings.isBlank(owner))
@@ -189,7 +194,7 @@ public class MongoMessageService extends AbstractMongoService implements Message
 		}
 
 		// 设置 Limit， 固定的是倒序
-		MCur mcur = MCur.DESC("_id");
+		MCur mcur = asc ? MCur.ASC("_id") : MCur.DESC("_id");
 		if (limit > 0)
 			mcur.limit(limit);
 
@@ -198,9 +203,9 @@ public class MongoMessageService extends AbstractMongoService implements Message
 	}
 
 	@Override
-	public List<Message> list(String owner, String keyword, String lastMsgId, int limit) {
+	public List<Message> list(String owner, String keyword, String lastMsgId, boolean asc, int limit) {
 		final List<Message> msgs = new LinkedList<Message>();
-		each(owner, keyword, lastMsgId, limit, new Each<Message>() {
+		each(owner, keyword, lastMsgId, asc, limit, new Each<Message>() {
 			public void invoke(int index, Message msg, int length) {
 				msgs.add(msg);
 			}
@@ -209,18 +214,13 @@ public class MongoMessageService extends AbstractMongoService implements Message
 	}
 
 	@Override
-	public List<Message> list(String owner, String lastMsgId, int limit) {
-		return list(owner, null, lastMsgId, limit);
-	}
-
-	@Override
 	public List<Message> all(String owner) {
-		return list(owner, null, 0);
+		return list(owner, null, null, false, 0);
 	}
 
 	@Override
 	public List<Message> all(String owner, String keyword) {
-		return list(owner, keyword, null, 0);
+		return list(owner, keyword, null, false, 0);
 	}
 
 	/*

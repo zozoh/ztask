@@ -19,9 +19,18 @@
     <div class="msg_arena"><div class="msg_arena_wrapper">
         <% /*===========================================搜索=*/ %>
         <div class="msg_form">
-            <input class="msg_kwd" placeholder="${msg['msg.input.tip']}">
+            <input class="msg_kwd" placeholder="${msg['msg.input.tip']}" value="!R:">
             <a class="msg_reload">${msg['msg.reload']}</a>
-            <pre class="msg_tip">${msg['msg.form.tip']}</pre>
+            <ul class="msg_q disselect">
+                <li kwd="">${msg['msg.q.all']}</li>
+                <li kwd="@${me.name}">${msg['msg.q.me']}</li>
+                <li kwd="!R:">${msg['msg.q.unread']}</li>
+                <li kwd="F:" >${msg['msg.q.favo']}</li>
+                <li kwd="R:" >${msg['msg.q.read']}</li>
+                <li kwd="N:" >${msg['msg.q.noti']}</li>
+                <li kwd="!F:">${msg['msg.q.unfavo']}</li>
+                <li kwd="!N:">${msg['msg.q.unnoti']}</li>
+            </ul>
         </div>
         <% /*===========================================列表=*/ %>
         <div class="msg_list scro">
