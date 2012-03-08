@@ -8,5 +8,5 @@ function() {
 			}
         }
 	);
-	print('Session Clean complete!');
+	//print('Session Clean complete!');
 }
