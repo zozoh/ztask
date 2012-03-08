@@ -25,7 +25,7 @@
                 <li kwd="">${msg['msg.q.all']}</li>
                 <li kwd="@${me.name}">${msg['msg.q.me']}</li>
                 <li kwd="!R:@${me.name}">${msg['msg.q.unreadme']}</li>
-                <li kwd="!R:">${msg['msg.q.unread']}</li>
+                <li kwd="!R:" class="msg_q_li_hlt">${msg['msg.q.unread']}</li>
                 <li kwd="F:" >${msg['msg.q.favo']}</li>
                 <li kwd="R:" >${msg['msg.q.read']}</li>
                 <li kwd="N:" >${msg['msg.q.noti']}</li>

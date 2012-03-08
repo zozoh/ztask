@@ -126,7 +126,7 @@ body {
 .msg_del {
     display: block;
     position: absolute;
-    top:20px;
+    top: 20px;
     right: 5px;
     width: 16px;
     height: 16px;
@@ -197,10 +197,18 @@ body {
 
 .msg_q li {
     cursor: pointer;
+    padding: 0 6px;
+    border-radius: 4px;
 }
 
 .msg_q li:hover {
     text-decoration: underline;
+}
+
+.msg_q_li_hlt {
+    background-color: #FF0;
+    color: #000;
+    font-weight: bold;
 }
 
 .msg_q li:before {

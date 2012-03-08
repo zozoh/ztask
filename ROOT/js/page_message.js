@@ -35,6 +35,8 @@ function msg_events_bind(opt) {
     this.delegate(".msg_readall", "click", msg_events_on_do_readall);
     this.delegate(".msg_clearall", "click", msg_events_on_do_clearall);
     this.delegate(".msg_q li", "click", function() {
+        $(this).parent().children().removeClass("msg_q_li_hlt");
+        $(this).addClass("msg_q_li_hlt");
         var ee = _msg_obj(this);
         $(".msg_kwd",ee.selection).val($(this).attr("kwd"));
         $(".msg_reload",ee.selection).click();
