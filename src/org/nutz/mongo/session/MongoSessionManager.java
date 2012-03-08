@@ -147,7 +147,7 @@ public class MongoSessionManager implements SessionProvider {
 		httpSession.setServletContext(servletContext);
 		httpSession.setNewCreate(true);
 		Cookie cookie = new Cookie("MongoSessionKey", session.getId());
-		cookie.setMaxAge(30 * 60);
+		cookie.setMaxAge(30 * 24 * 60 * 60);
 		resp.addCookie(cookie);
 		return httpSession;
 	}

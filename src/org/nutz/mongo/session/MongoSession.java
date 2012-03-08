@@ -136,7 +136,7 @@ public class MongoSession {
 		dbo.put("info", info != null ? info : Collections.EMPTY_MAP);
 		dbo.put("creationTime", System.currentTimeMillis());
 		dbo.put("lastAccessedTime", System.currentTimeMillis());
-		dbo.put("maxInactiveInterval", 30 * 60 * 1000); // 30min
+		dbo.put("maxInactiveInterval", 30 * 60); // 30min
 		dbo.put("attr", Collections.EMPTY_MAP);
 		context.getSessions().insert(dbo);
 		return new MongoSession(context, dbo.getObjectId("_id"));
