@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import org.nutz.ioc.loader.annotation.IocBean;
+import org.nutz.lang.Strings;
 import org.nutz.ztask.api.GInfo;
 import org.nutz.ztask.api.HookHandler;
 import org.nutz.ztask.api.HookType;
@@ -12,6 +13,7 @@ import org.nutz.ztask.api.Hooking;
 import org.nutz.ztask.api.Label;
 import org.nutz.ztask.api.LabelService;
 import org.nutz.ztask.api.Task;
+import org.nutz.ztask.api.TaskService;
 import org.nutz.ztask.api.TaskStack;
 import org.nutz.ztask.api.TaskStatus;
 import org.nutz.ztask.util.ZTasks;
@@ -33,31 +35,36 @@ public class WhenTaskDone implements HookHandler {
 		if (HookType.DONE == htp && TaskStatus.DONE == ing.t().getStatus()) {
 
 			// 取得必要的变量
-			Task t = ing.factory().tasks().getTask(ing.t().get_id());
-			GInfo ginfo = ing.factory().tasks().getGlobalInfo();
+			String myName = ZTasks.getMyName();
+			TaskService tasks = ing.factory().tasks();
+			Task t = tasks.getTask(ing.t().get_id());
+			GInfo ginfo = tasks.getGlobalInfo();
 			LabelService labels = ing.factory().labels();
+
+			// 确保有 owner
+			if (Strings.isBlank(t.getOwner())) {
+				tasks.setOwner(t, myName);
+			}
 
 			// 当次操作的参考信息
 			String snm = ing.getReferString();
 
 			// 准备要处理的结果集
 			HashSet<String> lbset = new HashSet<String>();
-			Map<String, Label> drmap = labels.toFlatMap(ginfo.getDoneRemovedLabels());
 
 			// 加入自身
 			if (null != t.getLabels()) {
 				for (String lb : t.getLabels()) {
-					if (!drmap.containsKey(lb))
-						lbset.add(lb);
+					lbset.add(lb);
 				}
 			}
 
 			// 搜索所有堆栈
-			TaskStack s = ing.factory().tasks().getStack(snm);
+			TaskStack s = tasks.getStack(snm);
 			LinkedList<String> slist = new LinkedList<String>();
 			while (null != s) {
 				slist.add(s.getName());
-				s = ing.factory().tasks().getStack(s.getParentName());
+				s = tasks.getStack(s.getParentName());
 			}
 
 			// 准备 ...
@@ -73,8 +80,8 @@ public class WhenTaskDone implements HookHandler {
 					}
 				}
 			// 增加标签
-			String myName = ZTasks.getMyName();
 			lbset.add(myName);
+			lbset.add(t.getOwner());
 			for (String lb : slist) {
 				lbset.add(lb);
 			}
@@ -84,9 +91,15 @@ public class WhenTaskDone implements HookHandler {
 				lbset.remove(t.getOwner());
 			}
 
+			// 删除需要自动移除的标签
+			Map<String, Label> drmap = labels.toFlatMap(ginfo.getDoneRemovedLabels());
+			for (String dr : drmap.keySet())
+				lbset.remove(dr);
+
 			// 更新标签
 			t.setLabels(lbset.isEmpty() ? null : lbset.toArray(new String[lbset.size()]));
-			ing.factory().htasks().setLabels(ing.t(), t.getLabels());
+			ing.t().setLabels(t.getLabels());
+			ing.factory().htasks().setLabels(t, t.getLabels());
 		}
 	}
 

@@ -141,7 +141,7 @@ function init_pgan() {
     } else if(stack) {
         $(".sflt_cus").text(stack);
         $(".sflt_cus").addClass("sflt_li_on").removeClass("sflt_cus_undefined");
-        $(".sflt_cus").attr("href", "#s:'" + stack + "'").click();
+        $(".sflt_cus").attr("href", "#s'" + stack).click();
     } else {
         $(".sflt_mine").click();
     }

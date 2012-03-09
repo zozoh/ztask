@@ -1,6 +1,5 @@
 package org.nutz.ztask.web.module;
 
-import org.nutz.mvc.SessionProvider;
 import org.nutz.mvc.annotation.*;
 import org.nutz.mvc.ioc.provider.ComboIocProvider;
 import org.nutz.web.ajax.AjaxViewMaker;
@@ -21,5 +20,5 @@ import org.nutz.ztask.web.ZTaskSetup;
 				"*org.nutz.ioc.loader.annotation.AnnotationIocLoader",
 				"org.nutz.ztask"}, type = ComboIocProvider.class)
 @Views({AjaxViewMaker.class})
-@SessionBy(value=SessionProvider.class, args={"ioc:sessionManager"})
+// @SessionBy(value=SessionProvider.class, args={"ioc:sessionManager"})
 public class ZTaskMainModule {}

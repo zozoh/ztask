@@ -68,7 +68,7 @@ function stack_flt_do_edit_cus() {
             newval = $.trim(newval);
             if(newval && newval != oldval) {
                 this.removeClass("sflt_cus_undefined");
-                this.text(newval).attr("href", "#s:'" + newval + "'");
+                this.text(newval).attr("href", "#s" + newval);
             }
             if(this.hasClass("sflt_li_on"))
                 stack_flt_do_filter.apply(this);

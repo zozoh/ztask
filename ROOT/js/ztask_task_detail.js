@@ -2,6 +2,7 @@
  * 这个函数将在 document.body 上 delegate 事件，用来处理 detail 面板的交互动作
  */
 function task_detail_bind() {
+    $(".task_cmt_newer textarea").toggleInput(z.msg("task.cmt.add.tip"));
     $(document.body).delegate(".task_cmt_add", "click", task_detail_cmt_on_add);
     $(document.body).delegate(".task_cmt_del", "click", task_detail_cmt_on_del);
     $(document.body).delegate(".task_cmt_edit", "click", task_detail_cmt_on_edit);
@@ -54,11 +55,7 @@ function task_detail_cmt_collapse() {
  * 事件: 处理关闭
  */
 function task_detail_on_close() {
-    $("#task_detail").animate({
-        opacity: 0
-    }, function() {
-        $(this).css("top", 100000);
-    });
+    $("#task_detail").removeClass("task_detail_show");
 }
 
 /**
@@ -263,14 +260,7 @@ function task_detail_show(t) {
     }
 
     // 播放动画
-    jDetail.css("display", "block").css("top", box.height).animate({
-        "top": 0,
-        "opacity": 1
-    }, 200, function() {
-        _adjust_layout();
-        // 全局调整 layout
-        $(".task_cmt_newer textarea", this).toggleInput(z.msg("task.cmt.add.tip"));
-    });
+    jDetail.addClass("task_detail_show");
     // 显示左侧内容
     task_detail_redraw_info.apply(jDetail, [t]);
 

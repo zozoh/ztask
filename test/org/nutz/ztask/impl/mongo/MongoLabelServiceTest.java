@@ -96,7 +96,8 @@ public class MongoLabelServiceTest extends ZTaskCase {
 		Task t4 = tasks.createTask(t_l("Task4", "D", "G"));
 
 		// 同步一次
-		List<Label> lbs = lbls.syncLables();
+		lbls.syncLables();
+		List<Label> lbs = lbls.all();
 
 		// 检查一下
 		assertEquals(7, lbs.size());
@@ -115,7 +116,8 @@ public class MongoLabelServiceTest extends ZTaskCase {
 		tasks.setLabels(t4, Lang.array("B", "D", "H", "I"));
 
 		// 同步一次
-		lbs = lbls.syncLables();
+		lbls.syncLables();
+		lbs = lbls.all();
 
 		// 检查一下
 		assertEquals(8, lbs.size());
