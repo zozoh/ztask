@@ -31,10 +31,10 @@ public class MongoLabelService extends AbstractMongoService implements LabelServ
 	}
 
 	@Override
-	public List<Label> syncLables() {
+	public void syncLables() {
 		// 保存返回结果
-		final List<Label> list = new LinkedList<Label>();
-		final List<Label> dels = new LinkedList<Label>();
+		final List<Label> nodes = new LinkedList<Label>();
+		final List<Label> rms = new LinkedList<Label>();
 		final List<String> saves = new LinkedList<String>();
 
 		// 保存从 Task 中同步出来的标签
@@ -52,6 +52,12 @@ public class MongoLabelService extends AbstractMongoService implements LabelServ
 		// 查所有的 Label, map 中木有的删除，有的话更新
 		dao.each(new Each<Label>() {
 			public void invoke(int index, Label lb, int length) {
+				// 节点标签，稍候处理
+				if (lb.isNode()) {
+					nodes.add(lb);
+					return;
+				}
+				// 开始处理子标签 ...
 				Integer c = map.get(lb.getName());
 				// 存在在最新同步出来的标签表中的话，尝试更新
 				if (null != c) {
@@ -59,32 +65,48 @@ public class MongoLabelService extends AbstractMongoService implements LabelServ
 					if (lb.getCount() != c) {
 						saves.add(lb.getName() + "?" + c);
 					}
-					// 否则直接保存到结果中
-					else {
-						list.add(lb);
-					}
 					// 从 map 中删除，那么剩下的，就是需要添加的
 					map.remove(lb.getName());
 				}
-				// 不存在，要删除
+				// 自标签，直接删除
 				else {
-					dels.add(lb);
+					rms.add(lb);
 				}
 
 			}
 		}, Label.class, null, null);
 
-		// 删除不在需要的标签
-		for (Label lb : dels) {
+		// 这些是常驻的标签表
+		TaskService tasks = factory.tasks();
+		Map<String, Label> pmap = this.toFlatMap(tasks.getGlobalInfo().getPersistentLabels());
+
+		// 删除不在需要的子标签
+		for (Label lb : rms) {
+			// 常驻的，则保留
+			if (pmap.containsKey(lb.getName())) {
+				dao.updateById(Label.class, lb.get_id(), Moo.SET("count", 0));
+			}
+			// 否则，删除
+			else {
+				this.remove(lb);
+			}
+		}
+
+		// 整理所有的节点标签
+		for (Label lb : nodes) {
+			// 不需要删除 ..
+			if (pmap.containsKey(lb.getName()))
+				continue;
+
 			// 如果是节点标签，统计一下它的子节点
 			// 如果字节为 0 则移除
-			if (lb.isNode()) {
-				lb.setCount((int) dao.sum(Label.class, Moo.NEW("parent", lb.getName()), "count"));
-				if (lb.getCount() > 0) {
-					dao.updateById(Label.class, lb.get_id(), Moo.SET("count", lb.getCount()));
-					continue;
-				}
+			lb.setCount((int) dao.sum(Label.class, Moo.NEW("parent", lb.getName()), "count"));
+			if (lb.getCount() > 0) {
+				dao.updateById(Label.class, lb.get_id(), Moo.SET("count", lb.getCount()));
+				continue;
 			}
+
+			// 这个节点不在有用了，删除它
 			this.remove(lb);
 		}
 
@@ -95,10 +117,29 @@ public class MongoLabelService extends AbstractMongoService implements LabelServ
 			}
 
 		// 执行更新
-		list.addAll(saveList(saves.toArray(new String[saves.size()])));
+		saveList(saves.toArray(new String[saves.size()]));
 
-		// 返回
-		return list;
+	}
+
+	@Override
+	public Map<String, Label> toFlatMap(String[] lbnms) {
+		HashMap<String, Label> map = new HashMap<String, Label>();
+
+		if (null != lbnms)
+			for (String lbnm : lbnms) {
+				Label lb = get(lbnm);
+				if (null == lb)
+					continue;
+				if (lb.isNode()) {
+					for (String chd : lb.getChildren()) {
+						Label chdlb = get(chd);
+						map.put(chd, chdlb);
+					}
+				}
+				map.put(lb.getName(), lb);
+			}
+
+		return map;
 	}
 
 	@Override

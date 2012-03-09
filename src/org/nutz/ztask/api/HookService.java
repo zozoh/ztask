@@ -28,7 +28,7 @@ public interface HookService {
 	 * 
 	 * @param handler
 	 *            处理器名
-	 * @return 处理器
+	 * @return 处理器, null 表示不存在
 	 */
 	HookHandler getHandler(String handler);
 

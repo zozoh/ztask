@@ -59,6 +59,18 @@ public class GInfo {
 	private String[] reportIgnoreLabels;
 
 	/**
+	 * 任务完成后要自动删除的标签或者标签组
+	 */
+	@CoField
+	private String[] doneRemovedLabels;
+
+	/**
+	 * 自动同步标签时，不要自动删除的标签或者标签组
+	 */
+	@CoField
+	private String[] persistentLabels;
+
+	/**
 	 * 如何格式化站内文本
 	 */
 	@CoField
@@ -155,6 +167,22 @@ public class GInfo {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String[] getDoneRemovedLabels() {
+		return doneRemovedLabels;
+	}
+
+	public void setDoneRemovedLabels(String[] doneRemoved) {
+		this.doneRemovedLabels = doneRemoved;
+	}
+
+	public String[] getPersistentLabels() {
+		return persistentLabels;
+	}
+
+	public void setPersistentLabels(String[] labelPersistent) {
+		this.persistentLabels = labelPersistent;
 	}
 
 	public Map<String, List<String>> getUserGroups() {

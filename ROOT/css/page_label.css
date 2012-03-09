@@ -75,6 +75,7 @@ div.label_hover > .lb_name > u {
     content: "";
     display: block;
     position: absolute;
+    margin-top:-2px;
     width: 0;
     height: 0;
     border-width: 6px;

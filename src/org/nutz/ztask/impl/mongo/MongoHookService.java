@@ -2,7 +2,7 @@ package org.nutz.ztask.impl.mongo;
 
 import java.util.List;
 
-import org.nutz.lang.Lang;
+import org.nutz.ioc.IocException;
 import org.nutz.lang.Times;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
@@ -58,8 +58,11 @@ public class MongoHookService extends AbstractMongoService implements HookServic
 
 			// 获得处理器，并保证其存在
 			HookHandler hh = getHandler(h.getHandler());
-			if (null == hh)
-				throw Lang.makeThrow("Hook handle noexists : %s", h.toString());
+			if (null == hh) {
+				if (log.isWarnEnabled())
+					log.warnf("  !!%2d -> %s :: %s", ing.hookIndex(), h, "-No Handle-");
+				continue;
+			}
 
 			if (log.isDebugEnabled())
 				log.debugf("    %2d -> %s :: %s", ing.hookIndex(), h, hh.getClass().getName());
@@ -79,7 +82,12 @@ public class MongoHookService extends AbstractMongoService implements HookServic
 
 	@Override
 	public HookHandler getHandler(String handler) {
-		return ioc.get(HookHandler.class, handler);
+		try {
+			return ioc.get(HookHandler.class, handler);
+		}
+		catch (IocException e) {
+			return null;
+		}
 	}
 
 	@Override

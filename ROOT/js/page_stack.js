@@ -103,31 +103,41 @@ function main() {
         $(".srch_do").click();
     });
     // 初始化 : 任务搜索
-    var pgano = z.pgano();
-    if(pgano.t) {
+    var pgan = z.pgan();
+    var ss = pgan.split("::");
+    var task, stack;
+    if(ss && ss.length > 0) {
+        for(var i = 0; i < ss.length; i++) {
+            var s = ss[i];
+            if(z.startsWith(s, "t")) {
+                task = $.trim(s.substring(1));
+            } else if(z.startsWith(s, "s")) {
+                stack = $.trim(s.substring(1));
+            }
+        }
+    }
+
+    if(task) {
         $(".srch_toptask").removeClass("srch_toptask_on");
-        $(".srch_keyword input").val(pgano.t)
+        $(".srch_keyword input").val(task)
     } else {
         $(".srch_toptask").addClass("srch_toptask_on");
         $(".srch_keyword input").val("%(NEW)")
-    }
-    if(pgano.s) {
-
     }
     // 模拟点击
     $(".srch_do").click();
 
     // 初始化 : 任务搜索
-    if("$favo" == pgano.s) {
+    if("$favo" == stack) {
         $(".sflt_favo").click();
-    } else if("$mine" == pgano.s) {
+    } else if("$mine" == stack) {
         $(".sflt_mine").click();
-    } else if("$all" == pgano.s) {
+    } else if("$all" == stack) {
         $(".sflt_all").click();
-    } else if($.trim(pgano.s)) {
-        $(".sflt_cus").text($.trim(pgano.s));
+    } else if(stack) {
+        $(".sflt_cus").text(stack);
         $(".sflt_cus").addClass("sflt_li_on").removeClass("sflt_cus_undefined");
-        $(".sflt_cus").attr("href", "#s:'" + $.trim(pgano.s) + "'").click();
+        $(".sflt_cus").attr("href", "#s:'" + stack + "'").click();
     } else {
         $(".sflt_mine").click();
     }

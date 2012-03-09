@@ -135,7 +135,7 @@ function task_wrap_comment(str) {
  * @return HTML 字符串
  */
 function task_format_id(tid) {
-    var html = '<a href="/page/stack#t:\'' + tid + '\'">';
+    var html = '<a href="/page/stack#t' + tid + '">';
     html += tid.replace(/(\w{8})(\w{6})(\w{4})(\w{6})/, "<u>$1</u><em>$2</em><b>$3</b><i>$4</i>");
     html += '</a>';
     return html;

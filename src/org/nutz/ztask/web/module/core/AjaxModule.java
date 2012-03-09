@@ -107,8 +107,8 @@ public class AjaxModule {
 	}
 
 	@At("/do/sync/labels")
-	public List<Label> doSyncLabels() {
-		return factory.labels().syncLables();
+	public void doSyncLabels() {
+		factory.labels().syncLables();
 	}
 
 	@At("/label/group")

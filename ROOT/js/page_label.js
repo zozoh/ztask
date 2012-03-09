@@ -204,7 +204,7 @@ function redrawLables(selection, lbs) {
                 // 不是节点标签，那么询问一个名字
                 var grpas = "";
                 if(!jMe.hasClass("label_node")) {
-                    grpas = $.trim(window.prompt("Please give me a name"));
+                    grpas = $.trim(window.prompt(z.msg("lb.newgrpnm")));
                     // 确保组不能为空
                     if(!grpas) {
                         grpas = mynm + "_" + tanm;

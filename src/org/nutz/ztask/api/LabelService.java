@@ -1,6 +1,7 @@
 package org.nutz.ztask.api;
 
 import java.util.List;
+import java.util.Map;
 
 public interface LabelService extends AbstractService {
 
@@ -11,10 +12,8 @@ public interface LabelService extends AbstractService {
 	 * <li>统计每个标签的任务数量，保存到 Label 集合中
 	 * <li>如果标签不存在任务了，将从 Label 集合删除
 	 * </ul>
-	 * 
-	 * @return 系统中所有的标签（最新）
 	 */
-	List<Label> syncLables();
+	void syncLables();
 
 	/**
 	 * 根据标签名称得到一个标签
@@ -120,6 +119,16 @@ public interface LabelService extends AbstractService {
 	 * @return 移动的标签对象列表
 	 */
 	List<Label> joinTo(String parentName, String... lbnms);
+
+	/**
+	 * 给定一组标签或者标签组名，并根据这组名称，生成一个 Map <br>
+	 * 它会解开标签组，如果标签不存在，那么它也会在 Map 中增加一项，不过 value 为 null
+	 * 
+	 * @param lbnms
+	 *            标签或组的名称
+	 * @return 扁平化后的 Map
+	 */
+	Map<String, Label> toFlatMap(String[] lbnms);
 
 	/**
 	 * @return 标签的数量

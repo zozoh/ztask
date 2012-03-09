@@ -18,7 +18,6 @@ import org.nutz.quartz.Quartz;
 import org.nutz.ztask.api.GInfo;
 import org.nutz.ztask.api.GlobalLock;
 import org.nutz.ztask.api.Hook;
-import org.nutz.ztask.api.HookHandler;
 import org.nutz.ztask.api.HookService;
 import org.nutz.ztask.api.HookType;
 import org.nutz.ztask.api.Task;
@@ -408,7 +407,7 @@ public class HookedTaskService implements TaskService {
 				h.setHandler(Strings.trim(ss[1]));
 
 				// 检查一下 handler 是否有效
-				if (null == ioc.get(HookHandler.class, h.getHandler()))
+				if (null == hooks.getHandler(h.getHandler()))
 					throw Err.H.NO_HANDLER(h);
 
 				// 有这个钩子 ...
