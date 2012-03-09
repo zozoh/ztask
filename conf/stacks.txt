@@ -1,7 +1,14 @@
 # 这里存放系统中所有的堆栈
 #
-Nutz问答 @nutzam
-提交者们  @zozoh
+问题解答 @nutzam
+ - Core @zozoh
+ - Dao  @pangwu
+ - Ioc  @wendal
+ - Mvc  @zozoh
+ - Json @juqkai
+ - EL   @juqkai
+ - 其他  @wendal
+主要提交者 @nutzam
  - ${name} @juqkai
  - ${name} @pangwu
  - ${name} @wendal

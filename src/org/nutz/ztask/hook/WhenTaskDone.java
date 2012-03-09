@@ -14,6 +14,7 @@ import org.nutz.ztask.api.LabelService;
 import org.nutz.ztask.api.Task;
 import org.nutz.ztask.api.TaskStack;
 import org.nutz.ztask.api.TaskStatus;
+import org.nutz.ztask.util.ZTasks;
 
 /**
  * 当堆栈弹出时，如果是完成，那么将任务所在堆栈名，加在任务标签上
@@ -71,14 +72,16 @@ public class WhenTaskDone implements HookHandler {
 						break;
 					}
 				}
-			// 忽略，因此仅仅加入顶级堆栈
-			if (isIgnore && slist.size() > 0) {
-				lbset.add(slist.peekLast());
+			// 增加标签
+			String myName = ZTasks.getMyName();
+			lbset.add(myName);
+			for (String lb : slist) {
+				lbset.add(lb);
 			}
-			// 否则，全部加入
-			else {
-				for (String lb : slist)
-					lbset.add(lb);
+			// 如果要忽略人员，那么操作者，所属者的标签都要移除掉
+			if (isIgnore) {
+				lbset.remove(myName);
+				lbset.remove(t.getOwner());
 			}
 
 			// 更新标签

@@ -103,7 +103,11 @@ function main() {
         $(".srch_do").click();
     });
     // 初始化 : 任务搜索
-    var pgan = z.pgan();
+    init_pgan();
+}
+
+function init_pgan() {
+    var pgan = z.pgan() || "";
     var ss = pgan.split("::");
     var task, stack;
     if(ss && ss.length > 0) {
