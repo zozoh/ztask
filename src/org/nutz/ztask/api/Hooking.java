@@ -162,17 +162,17 @@ public class Hooking extends ZTasking {
 	public String toString() {
 		if (null == list || list.length == 0)
 			return "<Empty Hooking>";
-		String s = "";
+		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < list.length; i++) {
 			if (i > 0)
-				s += ",";
+				sb.append(",");
 			if (i == hookIndex)
-				s += "*";
-			s += list[i];
+				sb.append("*");
+			sb.append(list[i]);
 		}
 		return String.format(	"Hooking(%d) [%s] @%s/%s",
 								hookIndex,
-								s,
+								sb.toString(),
 								null == startTime() ? "--" : Castors.me().castToString(startTime()),
 								null == endTime() ? "--" : Castors.me().castToString(endTime()));
 	}
