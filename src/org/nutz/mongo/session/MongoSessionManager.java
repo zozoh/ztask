@@ -68,12 +68,12 @@ public class MongoSessionManager implements SessionProvider {
 				while (!stop) {
 					DBCursor cur = null;
 					try {
-						cur = context.getSessions().find(query, keys);
+						cur = context.getSessions().find(query, keys).snapshot();
 						while (cur.hasNext()) {
 							DBObject dbo = cur.next();
 							long lastAccessedTime = ((Number)dbo.get("lastAccessedTime")).longValue();
 							long maxInactiveInterval = ((Number)dbo.get("maxInactiveInterval")).longValue();
-							if (lastAccessedTime / 1000 - maxInactiveInterval < 0) {
+							if ((lastAccessedTime - System.currentTimeMillis()) / 1000 < maxInactiveInterval) {
 								if (log.isDebugEnabled())
 									log.debug("Remove session id="+dbo.get("_id"));
 								context.getSessions().remove(new BasicDBObject("_id", dbo.get("_id")));
