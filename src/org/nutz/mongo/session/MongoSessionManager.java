@@ -12,11 +12,9 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.bson.types.Code;
 import org.bson.types.ObjectId;
 import org.nutz.json.Json;
 import org.nutz.json.JsonFormat;
-import org.nutz.lang.Files;
 import org.nutz.lang.Strings;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
@@ -26,7 +24,7 @@ import org.nutz.mvc.Mvcs;
 import org.nutz.mvc.SessionProvider;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
 /**
@@ -61,19 +59,36 @@ public class MongoSessionManager implements SessionProvider {
 		context.setSessions(dao.getDB().getCollection(colName));
 		context.setProvider(new SessionValueAdpter());
 		lock = new Object();
-		DBCollection systemJs = dao.getDB().getCollection("system.js");
-		systemJs.remove(new BasicDBObject("_id", "mongoSessionClean"));
-		systemJs.insert(new BasicDBObject("_id", "mongoSessionClean").append(
-				"value",
-				new Code(Files.read(Files.findFile("org/nutz/mongo/session/mongoSessionClean.js")))));
 		cleaner = new Thread("MongoSessionCleaner") {
 			public void run() {
+				DBObject query = new BasicDBObject();
+				BasicDBObject keys = new BasicDBObject();
+				keys.put("lastAccessedTime", 1);
+				keys.put("maxInactiveInterval", 1);
 				while (!stop) {
+					DBCursor cur = null;
 					try {
-						context.getMongoDao().getDB().eval("mongoSessionClean()");
+						cur = context.getSessions().find(query, keys);
+						while (cur.hasNext()) {
+							DBObject dbo = cur.next();
+							long lastAccessedTime = ((Number)dbo.get("lastAccessedTime")).longValue();
+							long maxInactiveInterval = ((Number)dbo.get("maxInactiveInterval")).longValue();
+							if (lastAccessedTime / 1000 - maxInactiveInterval < 0) {
+								if (log.isDebugEnabled())
+									log.debug("Remove session id="+dbo.get("_id"));
+								context.getSessions().remove(new BasicDBObject("_id", dbo.get("_id")));
+							}
+						}
 					} catch (Throwable e) {
 						if (log.isWarnEnabled())
 							log.warn("Clean case some error", e);
+					} finally {
+						if (cur != null) {
+							try {
+								cur.close();
+								cur = null;
+							} catch (Throwable e) {}
+						}
 					}
 
 					synchronized (lock) {
@@ -186,8 +201,9 @@ public class MongoSessionManager implements SessionProvider {
 		dbo.put("maxInactiveInterval", 30 * 60); // 30min
 		dbo.put("attr", Collections.EMPTY_MAP);
 		context.getSessions().insert(dbo);
+		ObjectId id = dbo.getObjectId("_id");
 		if (log.isDebugEnabled())
-			log.debug("New MongoSession create for " + Json.toJson(extData, JsonFormat.compact()));
-		return dbo.getObjectId("_id");
+			log.debugf("New MongoSession(%s) ==> %s",id, Json.toJson(extData, JsonFormat.compact()));
+		return id;
 	}
 }
