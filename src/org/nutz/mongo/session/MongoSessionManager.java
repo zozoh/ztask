@@ -3,6 +3,7 @@ package org.nutz.mongo.session;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,6 +14,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.bson.types.Code;
 import org.bson.types.ObjectId;
+import org.nutz.json.Json;
+import org.nutz.json.JsonFormat;
 import org.nutz.lang.Files;
 import org.nutz.lang.Strings;
 import org.nutz.log.Log;
@@ -118,35 +121,36 @@ public class MongoSessionManager implements SessionProvider {
 		String key = null;
 		if (req.getCookies() != null)
 			for (Cookie cookie : req.getCookies()) {
-				if ("MongoSessionKey".equalsIgnoreCase(cookie.getName()))
+				if ("msessionid".equalsIgnoreCase(cookie.getName()))
 					key = cookie.getValue();
 			}
 		if (!Strings.isBlank(key)) {
 			MongoSession session = getSession(key);
-			if (session != null
-					&& req.getRemoteAddr().equals(
-							session.getValue("remoteAddr"))
-					&& req.getHeader("User-Agent").equals(
-							session.getValue("userAgent"))) {
-				session.touch();
-				return new MongoHttpSession(context, new ObjectId(
-						session.getId()));
+			if (session != null ) {
+				Map<String,Object> extData = session.getExtData();
+				if (req.getRemoteAddr().equals(extData.get("remoteAddr"))
+						&& req.getHeader("User-Agent").equals(extData.get("userAgent"))) {
+					session.touch();
+					return new MongoHttpSession(context, new ObjectId(session.getId()));
+				}
 			}
 		}
 		if (!createNew)
 			return null;
-		Map<String, String> info = new HashMap<String, String>();
-		info.put("remoteAddr", req.getRemoteAddr());
-		info.put("userAgent", req.getHeader("User-Agent"));
-		MongoSession session = MongoSession.create(context, info);
-		MongoHttpSession httpSession = new MongoHttpSession(context,
-				new ObjectId(session.getId()));
+		Map<String, Object> extData = new HashMap<String, Object>();
+		extData.put("remoteAddr", req.getRemoteAddr());
+		extData.put("userAgent", req.getHeader("User-Agent"));
+		MongoHttpSession httpSession = new MongoHttpSession(context,create(extData));
 		httpSession.setServletContext(servletContext);
 		httpSession.setNewCreate(true);
-		Cookie cookie = new Cookie("MongoSessionKey", session.getId());
+		Cookie cookie = new Cookie("msessionid", httpSession.getId());
 		cookie.setMaxAge(30 * 24 * 60 * 60);
 		resp.addCookie(cookie);
 		return httpSession;
+	}
+	
+	public void setupCookie(HttpServletResponse resp, String id) {
+		
 	}
 
 	public HttpServletRequest filter(final HttpServletRequest req,
@@ -172,4 +176,18 @@ public class MongoSessionManager implements SessionProvider {
 				ih);
 	}
 
+
+	public final ObjectId create(Map<String, Object> extData) {
+		BasicDBObject dbo = new BasicDBObject();
+		dbo.put("_id", new ObjectId());
+		dbo.put("extData", extData != null ? extData : Collections.EMPTY_MAP);
+		dbo.put("creationTime", System.currentTimeMillis());
+		dbo.put("lastAccessedTime", System.currentTimeMillis());
+		dbo.put("maxInactiveInterval", 30 * 60); // 30min
+		dbo.put("attr", Collections.EMPTY_MAP);
+		context.getSessions().insert(dbo);
+		if (log.isDebugEnabled())
+			log.debug("New MongoSession create for " + Json.toJson(extData, JsonFormat.compact()));
+		return dbo.getObjectId("_id");
+	}
 }
