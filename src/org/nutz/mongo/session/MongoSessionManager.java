@@ -1,8 +1,5 @@
 package org.nutz.mongo.session;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,7 +7,9 @@ import java.util.Map;
 import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.bson.types.ObjectId;
 import org.nutz.json.Json;
@@ -170,25 +169,16 @@ public class MongoSessionManager implements SessionProvider {
 
 	public HttpServletRequest filter(final HttpServletRequest req,
 			final HttpServletResponse resp, final ServletContext servletContext) {
-		InvocationHandler ih = new InvocationHandler() {
-			public Object invoke(Object obj, Method method, Object[] args)
-					throws Throwable {
-				if ("getSession".equals(method.getName())) {
-					if (args == null || args.length == 0)
-						return getHttpSession((HttpServletRequest) req,
-								(HttpServletResponse) resp, servletContext,
-								true);
-					else
-						return getHttpSession((HttpServletRequest) req,
-								(HttpServletResponse) resp, servletContext,
-								(Boolean) args[0]);
-				}
-				return method.invoke(req, args);
+		return new HttpServletRequestWrapper(req) {
+			
+			public HttpSession getSession(boolean create) {
+				return getHttpSession(req, resp, servletContext, create);
+			}
+			
+			public HttpSession getSession() {
+				return getHttpSession(req, resp, servletContext, false);
 			}
 		};
-		return (HttpServletRequest) Proxy.newProxyInstance(getClass()
-				.getClassLoader(), new Class<?>[] { HttpServletRequest.class },
-				ih);
 	}
 
 
