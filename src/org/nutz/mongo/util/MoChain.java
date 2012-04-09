@@ -71,7 +71,7 @@ public abstract class MoChain {
 				Object o = c.value;
 				// null val,直接添加
 				if (null == o) {
-					rootMap.put(c.key, o);
+					rootMap.put(c.key, null);
 					return;
 				}
 				/*

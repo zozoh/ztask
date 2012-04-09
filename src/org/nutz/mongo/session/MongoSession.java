@@ -99,27 +99,24 @@ public class MongoSession {
 		return dbo.get(key);
 	}
 
+	@Deprecated
 	public Object getValue(String key) {
-		return ((Map<String, Object>) fetch("info")).get(key);
+		throw Lang.noImplement();
 	}
 
+	@Deprecated
 	public void putValue(String key, Object obj) {
-		try {
-			sessions.update(queryKey, new BasicDBObject("$set",
-					new BasicDBObject("info." + key, context.getProvider().toValue(obj))));
-		} catch (Throwable e) {
-			throw Lang.wrapThrow(e);
-		}
+		throw Lang.noImplement();
 	}
 
+	@Deprecated
 	public String[] getValueNames() {
-		return ((Map<String, Object>) fetch("info")).keySet().toArray(
-				new String[0]);
+		throw Lang.noImplement();
 	}
 
+	@Deprecated
 	public void removeValue(String key) {
-		sessions.update(queryKey, new BasicDBObject("$unset",
-				new BasicDBObject("info." + key, 1)));
+		throw Lang.noImplement();
 	}
 
 	public boolean isNew() {
@@ -130,15 +127,11 @@ public class MongoSession {
 		this.newCreate = newCreate;
 	}
 
-	public static final MongoSession create(ManagerContext context,Map<String, String> info) {
-		BasicDBObject dbo = new BasicDBObject();
-		dbo.put("_id", new ObjectId());
-		dbo.put("info", info != null ? info : Collections.EMPTY_MAP);
-		dbo.put("creationTime", System.currentTimeMillis());
-		dbo.put("lastAccessedTime", System.currentTimeMillis());
-		dbo.put("maxInactiveInterval", 30 * 60); // 30min
-		dbo.put("attr", Collections.EMPTY_MAP);
-		context.getSessions().insert(dbo);
-		return new MongoSession(context, dbo.getObjectId("_id"));
+	public Map<String, Object> getExtData() {
+		return (Map<String, Object>) fetch("extData");
+	}
+	
+	public void setExtData(Map<String, Object> extData) {
+		sessions.update(queryKey, new BasicDBObject("$set", new BasicDBObject("extData", extData)));
 	}
 }

@@ -160,6 +160,7 @@ public class TaskQuery {
 			// 忽略空
 			if (Strings.isBlank(str))
 				return;
+			str = str.trim().intern();//by wendal
 
 			// 判断 ID
 			if (str.length() == 24 && str.toLowerCase().matches("^[0-9a-f]{24}$")) {

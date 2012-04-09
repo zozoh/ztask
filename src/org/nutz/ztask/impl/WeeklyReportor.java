@@ -284,4 +284,11 @@ public class WeeklyReportor implements ZTaskReportor {
 		return new File(home + path);
 	}
 
+	public void setFactory(ZTaskFactory factory) {
+		this.factory = factory;
+	}
+	
+	public void setRender(DocRender<? extends Object> render) {
+		this.render = render;
+	}
 }

@@ -98,6 +98,8 @@ public class DynamicMongoEntity implements MongoEntity {
 	}
 
 	private RuntimeException _failToFill(Object obj) {
+		if (obj == null)
+			return Lang.makeThrow("Can only fillId to Map<String,Object> but it is NULL!");
 		return Lang.makeThrow(	"Can only fillId to Map<String,Object> but it is '%s'",
 								obj.getClass().getName());
 	}
