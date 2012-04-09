@@ -162,10 +162,6 @@ public class MongoSessionManager implements SessionProvider {
 		resp.addCookie(cookie);
 		return httpSession;
 	}
-	
-	public void setupCookie(HttpServletResponse resp, String id) {
-		
-	}
 
 	public HttpServletRequest filter(final HttpServletRequest req,
 			final HttpServletResponse resp, final ServletContext servletContext) {
@@ -176,7 +172,7 @@ public class MongoSessionManager implements SessionProvider {
 			}
 			
 			public HttpSession getSession() {
-				return getHttpSession(req, resp, servletContext, false);
+				return getHttpSession(req, resp, servletContext, true);
 			}
 		};
 	}
