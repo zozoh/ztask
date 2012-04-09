@@ -169,6 +169,23 @@ public class MongoTaskServiceTest extends ZTaskCase {
 	}
 
 	@Test
+	public void test_query_by_labels_by_or() {
+		tasks.createTask(t_l("AAA", "a", "b", "c"));
+		tasks.createTask(t_l("BAB", "x", "y", "z"));
+		tasks.createTask(t_l("CBC", "a", "b", "m"));
+		tasks.createTask(t_l("ADD", "a", "c", "n"));
+
+		List<Task> ts;
+
+		ts = tasks.queryTasks(TaskQuery.NEW("#(b|c)").asc());
+		assertEquals(3, ts.size());
+		assertEquals("AAA", ts.get(0).getText());
+		assertEquals("CBC", ts.get(1).getText());
+		assertEquals("ADD", ts.get(2).getText());
+
+	}
+
+	@Test
 	public void test_query_by_labels_and_names() {
 		tasks.createTask(t_l("AAA", "a", "b", "c"));
 		tasks.createTask(t_l("BAB", "x", "y", "z"));

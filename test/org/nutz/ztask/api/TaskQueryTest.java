@@ -72,6 +72,23 @@ public class TaskQueryTest {
 	}
 
 	@Test
+	public void test_label_by_or() {
+		TaskQuery tq;
+
+		tq = NEW("#(aaa|bbb|ccc)");
+		assertNull(tq.qText());
+		assertNull(tq.qRegex());
+		assertNull(tq.qID());
+		ASTR(tq.qCreaters());
+		ASTR(tq.qOwners());
+		ASTR(tq.qLabels(), "aaa", "bbb", "ccc");
+		assertTrue(tq.qLabelsOr());
+		AD(tq.qTimeScope());
+		AS(tq.qStatus());
+
+	}
+
+	@Test
 	public void test_label_with_color() {
 		TaskQuery tq;
 
@@ -82,6 +99,7 @@ public class TaskQueryTest {
 		ASTR(tq.qCreaters());
 		ASTR(tq.qOwners());
 		ASTR(tq.qLabels(), "abc#FF0", "xyz#CCC");
+		assertFalse(tq.qLabelsOr());
 		AD(tq.qTimeScope());
 		AS(tq.qStatus());
 
@@ -206,7 +224,7 @@ public class TaskQueryTest {
 		assertEquals(0, tq.qLabels().length);
 		AD(tq.qTimeScope());
 		AS(tq.qStatus());
-		
+
 		tq = NEW("#( )");
 		assertNull(tq.qText());
 		assertNull(tq.qRegex());

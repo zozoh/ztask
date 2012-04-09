@@ -22,6 +22,7 @@ import org.nutz.ztask.util.ZTasks;
  * = 按标签查询 ===============
  *    '#(A,B,C)'     // 同时具备 A,B,C 三个标签的任务
  *    '#()'          // 没有任何标签
+ *    '#(A|B|C)'     // 具备 A,B,C 三个标签中的一个
  * 
  * = 按周查询 ================
  *    '&W(-1)'    // 上一周
@@ -90,6 +91,13 @@ public class TaskQuery {
 	}
 
 	/**
+	 * @return labels 是 or 还是 and，默认为 and
+	 */
+	public boolean qLabelsOr() {
+		return _kwd_.labelsOr;
+	}
+
+	/**
 	 * @return null 表示没有 owner 的限定，否则用一个数组表示 owner 的名字列表
 	 */
 	public String[] qOwners() {
@@ -135,6 +143,8 @@ public class TaskQuery {
 		private Pattern regex;
 
 		private String[] labels;
+
+		private boolean labelsOr;
 
 		private String[] owners;
 
@@ -201,7 +211,13 @@ public class TaskQuery {
 			if (text.length() > 0) {
 				re = find("(#[(])([^)]*)([)])");
 				if (null != re) {
-					labels = Strings.splitIgnoreBlank(re[2], "[ \t\n\r,]");
+					if (re[2].indexOf('|') > 0) {
+						labelsOr = true;
+						labels = Strings.splitIgnoreBlank(re[2], "[|]");
+					} else {
+						labelsOr = false;
+						labels = Strings.splitIgnoreBlank(re[2], "[ \t\n\r,]");
+					}
 				}
 			}
 

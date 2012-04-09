@@ -984,7 +984,16 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 			if (0 == tq.qLabels().length) {
 				q.or(Moo.NEW("labels", null), Moo.NEW().all("labels", tq.qLabels()));
 			}
-			// 确定长度的标签
+			// 确定长度的标签，是 "或" 的关系
+			else if (tq.qLabelsOr()) {
+				Moo[] ors = new Moo[tq.qLabels().length];
+				int i = 0;
+				for (String lb : tq.qLabels()) {
+					ors[i++] = Moo.NEW("labels", lb);
+				}
+				q.or(ors);
+			}
+			// 确定长度的标签，是 "与" 的关系
 			else {
 				q.all("labels", tq.qLabels());
 			}
