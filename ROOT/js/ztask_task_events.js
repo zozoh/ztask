@@ -39,6 +39,7 @@ function task_events_bind(selection, opt) {
     selection.delegate(".task_ing", "click", task_events_on_done);
     selection.delegate(".task_labels *", "click", task_events_on_label);
     selection.delegate(".task_favo", "click", task_events_on_watchOrNot);
+    selection.delegate(".task_planat", "click", task_events_on_planAt);
 
     // 点击 .task_content
     selection.delegate(".task_content", "click", function(e) {
@@ -56,6 +57,35 @@ function task_events_bind(selection, opt) {
     selection.delegate(".task_lbe input", "change", _task_lbe_on_change_);
     selection.delegate(".task_lbe input", "keyup", _task_lbe_on_keyup_);
     selection.delegate(".task_lbe input", "keydown", _task_lbe_on_esc_);
+}
+
+/**
+ * 事件处理: 编辑当前任务的计划时间
+ */
+function task_events_on_planAt(e) {
+    var ee = _task_obj(this);
+    $(this).pop({
+        title: z.msg("ui.task.planat.title"),
+        width: 240,
+        height: 276,
+        show: function() {
+            $(this).calendar({
+                range: [0],
+                date: '2011-09-13'
+            });
+        },
+        afterClose: function() {
+            $(this).calendar("depose");
+        },
+        btns: {
+            "::ui.cancel": function() {
+                $(this).pop("close");
+            },
+            "::ui.task.planat.clean": function() {
+                alert("haha");
+            }
+        }
+    });
 }
 
 /**
@@ -94,7 +124,7 @@ function task_events_on_label(e) {
     // 建立一个 html，插入到标签容器中
     var jq = $(task_html_lbe()).prependTo($(".task_labels_gasket",ee.jTask)).attr("old-value", lbs.join(","));
     jq.css({
-        width:        ee.jTask.innerWidth() - 30,
+        width:            ee.jTask.innerWidth() - 30,
         top: jLbs.outerHeight(),
     });
     // 设立 body 取消事件

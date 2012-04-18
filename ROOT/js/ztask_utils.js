@@ -231,7 +231,22 @@ function task_html(t, opt) {
      */
     var favoIt = z.contains(t.watchers, myname());
     var tip = favoIt ? z.msg("task.unwatch.tip") : z.msg("task.watch.tip");
-    html += '<span class="task_favo' + ( favoIt ? " task_favo_on" : "") + '" title="' + tip + '"></span>'
+    html += '<div class="task_favo' + ( favoIt ? " task_favo_on" : "") + '" title="' + tip + '"></div>'
+
+    /*
+     * 显示 Deadline 按钮
+     */
+    var planat = t.planAt;
+    // 没有截止日期
+    if(!planat) {
+        html += '<div class="task_planat task_planat_null"></div>';
+    }
+    // 有截止日期
+    else {
+        var day = 7;
+        // 计算天数
+        html += '<div class="task_planat task_planat_on" title="' + planat + '">' + day + '</div>';
+    }
 
     /*
      * 简要模式

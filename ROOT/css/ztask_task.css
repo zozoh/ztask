@@ -31,6 +31,27 @@
     background-position: 0 -80px;
 }
 
+.task_planat{
+    display:block;
+    position: absolute;
+    top:4px;
+    min-width:18px;
+    height:18px;
+    line-height:18px;
+    text-align:center;
+    padding:0 4px;
+    cursor:pointer;
+}
+
+.task_planat_null{
+    border-radius: 2px;
+    background:url(pics/icons.png) no-repeat -47px -79px;
+}
+
+.task_planat_null:hover{
+    background:#DDD url(pics/icons.png) no-repeat -63px -79px;
+}
+
 .task:after, .task_labels:after, .task_menu:after {
     content: ".";
     display: block;
@@ -334,6 +355,10 @@
     right: 12px;
 }
 
+.hierachy_left .task_planat {
+    right: 32px;
+}
+
 .hierachy_left .task_nums {
     right: 12px;
 }
@@ -386,6 +411,10 @@
 /*--------------------------------------------------------- direction:right --*/
 .hierachy_right .task_favo {
     left: 12px;
+}
+
+.hierachy_right .task_planat {
+    left: 32px;
 }
 
 .hierachy_right .task_nums {

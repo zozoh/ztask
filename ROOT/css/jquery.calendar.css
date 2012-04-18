@@ -1,0 +1,70 @@
+.calendar {
+    padding: 10px;
+}
+
+.cal_switch b {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background: #DDD url(pics/icons.png) no-repeat;
+    cursor: pointer;
+    border-radius: 2px;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.cal_switch b:hover {
+    background-color: #EEE;
+    box-shadow: 0 0 10px #FFF;
+}
+
+.cal_switch .cal_switch_prev {
+    background-position: -16px -64px;
+}
+
+.cal_switch .cal_switch_next {
+    background-position: -32px -64px;
+}
+
+.cal_dd {
+    text-align: center;
+    border: 1px solid #999;
+    cursor: pointer;
+    padding: 4px;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.cal_dd:hover {
+    background-color: #999;
+}
+
+.cal_mm_head {
+    border: 1px solid #DDD;
+    padding: 4px;
+    color: #F80;
+    background: #DDD;
+}
+
+.cal_checked, .cal_checked:hover {
+    background: #08F;
+    color: #FFF;
+}
+
+.cal_ww th{
+    line-height:24px;
+    color:#666;
+}
+
+.cal_today {
+    font-weight: bold;
+    color: #F80;
+}
+
+.calendar table {
+    border-collapse: collapse;
+}
