@@ -248,6 +248,8 @@ function task_html(t, opt) {
         var day = z.compareDate(planat, z.today());
         // 显示
         var dayClass = day >= 0 ? "task_planat_on_" + day : "task_planat_on_negative";
+        if("task_done" == statusClass)
+            dayClass = "task_planat_on_pass";
         html += '<div class="task_planat task_planat_on ' + dayClass + '" title="' + planat + '">' + day + '</div>';
     }
 

@@ -62,6 +62,11 @@
     background-color: #DDD;
 }
 
+.task_planat_on_pass, .task_planat_on_pass:hover {
+    color: #AAA;
+    background-color: rgba(255,255,255,0.3);
+}
+
 .task_planat_on_negative, .task_planat_on_0, .task_planat_on_1 {
     color: #F00;
 }
