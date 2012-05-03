@@ -3,8 +3,8 @@ var OPT_NAME = "calendar-opt";
 //......................................................................................
 // 帮助函数集合
 var util = {
-    opt: function(selection) {
-        return selection.data(OPT_NAME);
+    opt: function(ele) {
+        return util.selection(ele).data(OPT_NAME);
     },
     selection: function(ele) {
         var jq = $(ele);
@@ -50,7 +50,7 @@ var util = {
 // HTML 生成相关方法
 var dom = {
     month: function(opt, yy, mm) {
-        var chckd = opt.date ? z.d(opt.date) : null;
+        var chckd = z.d(opt.date);
         var today = z.today();
         var dd = z.monthDays(yy, mm);
         var html = '<table class="cal_mm" yy="' + yy + '" mm="' + mm + '" ';
@@ -97,8 +97,9 @@ var dom = {
         return html;
     },
     init: function(opt) {
-        var d = opt.date ? z.d(opt.date) : z.today();
-        var html = '<div class="calendar"><div class="cal_body" yy="' + d.year + '" mm="' + d.month + '">';
+        var d = z.d(opt.date);
+        var html = '<div class="calendar">';
+        html += '<div class="cal_body" yy="' + d.year + '" mm="' + d.month + '" date="' + opt.date + '">';
         html += dom.cal_table(opt, d.year, d.month);
         html += '</div></div>';
 
@@ -115,6 +116,25 @@ var events = {
     bind: function(opt) {
         this.delegate(".cal_switch_prev", "click", events.onPrev);
         this.delegate(".cal_switch_next", "click", events.onNext);
+        this.delegate(".cal_dd", "click", events.onClick);
+    },
+    onClick: function() {
+        // 准备必要变量
+        var opt = util.opt(this);
+        var cbody = util.selection(this).find(".cal_body");
+        // 得到当前日期
+        var ds = z.alignr(cbody.attr("yy"), 4, "0");
+        ds += "-" + z.alignr(cbody.attr("mm"), 2, "0");
+        ds += '-' + z.alignr($(this).text(), 2, "0");
+        // 调用回调
+        if( typeof opt.click == "function") {
+            if(false == opt.click.apply(this, [ds]))
+                return;
+        }
+        // 改变当前选择的日期
+        cbody.attr("date", ds);
+        cbody.find(".cal_checked").removeClass("cal_checked");
+        $(this).addClass("cal_checked");
     },
     onPrev: function() {
         util.doSwitch.apply(this, [-1]);
@@ -127,11 +147,17 @@ var events = {
 var commands = {
     depose: function() {
         dom.depose.apply(this);
+    },
+    getstr: function() {
+        return this.find(".cal_body").attr("date");
+    },
+    get: function() {
+        return z.d(this.find(".cal_body").attr("date"));
     }
 };
 //.........................................................................
 // 在选区内绘制某一个或者几个月的日历
-// opt.click - callback
+// opt.click - callback(ds){this 为 .cal_dd ...}，ds 格式为 "yyyy-MM-dd"，如果 return false，则不更改 .cal_checked
 // opt.date  - 选中的当前日期，格式为 yyyy-MM-dd
 // opt.range - 显示几个月，默认为 [0]，[-1, 0, 1] 表示前一个月，本月，后一个月
 $.fn.extend({
@@ -140,6 +166,7 @@ $.fn.extend({
         // 初始化模式
         if( typeof opt == "object") {
             opt.range = opt.range || [0];
+            opt.date = opt.date || z.dstr(z.today());
             this.data(OPT_NAME, opt);
             // 初始化 DOM
             var div = dom.init.apply(this, [opt]);
@@ -150,7 +177,8 @@ $.fn.extend({
         else if( typeof opt == "string") {
             if("function" != typeof commands[opt])
                 throw "$.pop: don't support command '" + opt + "'";
-            commands[opt].apply(this);
+            var re = commands[opt].apply(this);
+            return re || this;
         }
         // 返回支持链式赋值
         return this;

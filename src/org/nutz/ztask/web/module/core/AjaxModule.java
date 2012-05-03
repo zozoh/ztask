@@ -2,6 +2,7 @@ package org.nutz.ztask.web.module.core;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -207,7 +208,8 @@ public class AjaxModule {
 
 	@At("/task/set/labels")
 	public Task doSetTaskLabels(@Param("tid") String taskId, @Param("lbs") String[] lbs) {
-		return factory.htasks().setLabels(factory.htasks().checkTask(taskId), lbs);
+		TaskService tasks = factory.htasks();
+		return tasks.setLabels(tasks.checkTask(taskId), lbs);
 	}
 
 	@At("/task/set/owner")
@@ -217,9 +219,16 @@ public class AjaxModule {
 
 	@At("/task/set/parent")
 	public Task doSetTaskParent(@Param("tids") String[] taskIds, @Param("pid") String parentId) {
-		factory.htasks().setParentTask(	factory.htasks().checkTask(parentId),
-										factory.htasks().checkTasks(taskIds));
-		return factory.htasks().getTask(parentId);
+		TaskService tasks = factory.htasks();
+		tasks.setParentTask(tasks.checkTask(parentId), tasks.checkTasks(taskIds));
+		return tasks.getTask(parentId);
+	}
+
+	@At("/task/set/planat")
+	public Task doSetTaskPlanAt(@Param("tid") String taskId, @Param("planat") Date planat) {
+		TaskService tasks = factory.htasks();
+		tasks.setPlanAt(tasks.checkTask(taskId), planat);
+		return tasks.getTask(taskId);
 	}
 
 	/**
@@ -231,12 +240,13 @@ public class AjaxModule {
 	 */
 	@At("/task/gout")
 	public Task doGoutTask(@Param("tid") String taskId) {
-		Task t = factory.htasks().checkTask(taskId);
+		TaskService tasks = factory.htasks();
+		Task t = tasks.checkTask(taskId);
 		if (t.isTop())
 			return t;
-		Task p = factory.htasks().checkTask(t.getParentId());
+		Task p = tasks.checkTask(t.getParentId());
 		Task pp = factory.tasks().getTask(p.getParentId());
-		factory.htasks().setParentTask(pp, t);
+		tasks.setParentTask(pp, t);
 		return t;
 	}
 

@@ -1,5 +1,6 @@
 package org.nutz.ztask.api;
 
+import java.util.Date;
 import java.util.List;
 
 import org.nutz.lang.Each;
@@ -289,6 +290,17 @@ public interface TaskService extends AbstractService {
 	 * @return 修改后的任务对象，null 表示该任务不存在
 	 */
 	Task setOwner(Task t, String ownerName);
+
+	/**
+	 * 修改一个任务的计划执行日期
+	 * 
+	 * @param t
+	 *            任务
+	 * @param planat
+	 *            计划执行日期
+	 * @return 修改后的任务对象
+	 */
+	Task setPlanAt(Task t, Date planat);
 
 	/**
 	 * 修改一个任务对象的标题，同时也会改变最后的修改时间

@@ -122,6 +122,11 @@ public class AddNotify implements HookHandler {
 			_N(me, t.getStack(), htp, ing, null);
 			break;
 
+		// @${u.name} 将任务 ${t._id} 计划时间从 "${str}" 改为 "${t.planAt}"
+		case PLAN_AT:
+			_N(me, t.getStack(), htp, ing, Strings.sBlank(ing.getReferString(), "..."));
+			break;
+
 		// 默认，写入出错 Log
 		default:
 			if (log.isWarnEnabled())
@@ -278,7 +283,11 @@ public class AddNotify implements HookHandler {
 		dft_msgs.put("notify.REJECT", "@${u.name} rejected ${t._id} \"${t.brief}\"");
 
 		// DROP
-		dft_msgs.put("notify.DROP", "@${u.name} deleted ${t._id} \"${t.brief}了\"");
+		dft_msgs.put("notify.DROP", "@${u.name} deleted ${t._id} \"${t.brief}\"");
+
+		// PLAN_AT
+		dft_msgs.put(	"notify.PLAN_AT",
+						"@${u.name} had changed task ${t._id} plan from \"${str}\" to \"${t.planAt}\"");
 	}
 
 }

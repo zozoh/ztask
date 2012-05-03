@@ -696,6 +696,30 @@ window.z = {
         return re;
     },
     //---------------------------------------------------------------------------------------
+    // 获得某个日期，当年年初有多少天
+    yearDayCount: function(d) {
+        d = ( typeof d == "string") ? z.d(d) : d;
+        var re = 0;
+        // 计算今年的天数
+        for(var i = 0; i < d.month; i++) {
+            re += MONTH[i];
+            // 闰年，二月加一天
+            if(i == 1 && z.leapYear(d.year))
+                re++;
+        }
+        re += d.date;
+        return re;
+    },
+    //---------------------------------------------------------------------------------------
+    // 获得某个日期，距离公元 1900 年有多少天
+    dayCount: function(d) {
+        d = ( typeof d == "string") ? z.d(d) : d;
+        var yy = d.year - 1900;
+        var re = yy * 365 + (parseInt(yy / 4)) - (parseInt(yy / 100)) + (parseInt(yy / 400));
+        re += z.yearDayCount(d);
+        return re;
+    },
+    //---------------------------------------------------------------------------------------
     // 获得某年某月，最大的天数
     //   year  : 可以为四位或两位，如果两位表示19xx
     //   month : 1-12 表示12个月
@@ -711,21 +735,10 @@ window.z = {
         return (d < 30 && z.leapYear(year)) ? d + 1 : d;
     },
     //---------------------------------------------------------------------------------------
-    // @return 0 : 相等， -1 为 d1 小，1为 d2 小
+    // 比较两个日期
+    // @return 0 : 相等， -n 为 d1 小，+n为 d2 小
     compareDate: function(d1, d2) {
-        if(d1.year < d2.year)
-            return -1;
-        if(d1.year == d2.year) {
-            if(d1.month < d2.month)
-                return -1;
-            if(d1.month == d2.month) {
-                if(d1.date < d2.date)
-                    return -1;
-                else if(d1.date == d2.date)
-                    return 0;
-            }
-        }
-        return 1;
+        return  z.dayCount(d1) - z.dayCount(d2);
     },
     //---------------------------------------------------------------------------------------
     // 根据 offset 生成一个新日期, offset 是一个天数，可正可负
@@ -871,7 +884,7 @@ window.z = {
             $("#div_out").append(newDivIn);
             var divOutS = $("#div_out");
             var divInS = $("#div_in");
-            scrollWidth =                                                                               divOutS.width() -                                                                               divInS.width();
+            scrollWidth =                                                                                                 divOutS.width() -                                                                                                 divInS.width();
             $("#div_out").remove();
             $("#div_in").remove();
             SCROLL_BAR_WIDTH = scrollWidth;

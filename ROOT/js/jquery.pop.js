@@ -76,8 +76,8 @@ var dom = {
             "opacity": 1.0,
             "width": w,
             "height": h,
-            "left": (off.left - (w / 2)),
-            "top": (off.top - (h / 2))
+            "left": Math.max((off.left - (w / 2)), 2),
+            "top": Math.max((off.top - (h / 2)), 2)
         }, 200, function() {
             if( typeof opt.show == "function") {
                 opt.show.apply(div.find(".pop_body")[0], [opt, util.popAnchor(div)[0]]);
@@ -121,7 +121,7 @@ var events = {
 };
 //.........................................................................
 var commands = {
-    close: function() {
+    close: function(callback) {
         var opt = util.opt(this);
         var div = util.selection(this);
         var anchor = util.popAnchor(this);
@@ -137,7 +137,7 @@ var commands = {
         if(div.size() > 0) {
             var org = div.data("org-size");
             // 为了更平滑的动画，将内部内容全部虚化
-            div.find("*").css("opacity",0);
+            div.find("*").css("opacity", 0);
             div.undelegate().animate({
                 "opacity": 0.1,
                 "width": org.w,
@@ -151,6 +151,10 @@ var commands = {
                 }
                 // 移除
                 $(this).remove();
+                // 调用回调
+                if( typeof callback == "function") {
+                    callback.apply(anchor);
+                }
             });
         }
     },
@@ -172,7 +176,7 @@ var commands = {
 //  callback 为函数，格式为
 //     function(opt, ele){...}  # this 为 pop DIV.pop_body(DOM)，ele 为宿主元素(DOM)
 $.fn.extend({
-    pop: function(opt) {
+    pop: function(opt, arg) {
         opt = opt || {};
         // 初始化模式
         if( typeof opt == "object") {
@@ -184,7 +188,7 @@ $.fn.extend({
         } else if( typeof opt == "string") { /* 命令模式 */
             if("function" != typeof commands[opt])
                 throw "$.pop: don't support command '" + opt + "'";
-            commands[opt].apply(this);
+            commands[opt].apply(this, [arg]);
         }
         // 返回支持链式赋值
         return this;

@@ -66,6 +66,12 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 	}
 
 	@Override
+	public Task setPlanAt(Task t, Date planat) {
+		dao.updateById(Task.class, t.get_id(), Moo.SET("planAt", planat));
+		return getTask(t.get_id());
+	}
+
+	@Override
 	public Task addWatchers(Task t, String... watchers) {
 		if (null == watchers || 0 == watchers.length)
 			return t;

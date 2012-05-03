@@ -71,7 +71,10 @@ function task_events_on_planAt(e) {
         show: function() {
             $(this).calendar({
                 range: [0],
-                date: '2011-09-13'
+                date: ee.t.planAt ? ee.t.planAt.replace(/([0-9]{4}-[0-9]{2}-[0-9]{2})([ ].+)/, "$1") : null,
+                click: function(ds) {
+                    task_set_planat(ee.jTask, ee.t, ds, this);
+                }
             });
         },
         afterClose: function() {
@@ -81,10 +84,24 @@ function task_events_on_planAt(e) {
             "::ui.cancel": function() {
                 $(this).pop("close");
             },
-            "::ui.task.planat.clean": function() {
-                alert("haha");
+            "::ui.task.planat.clean": function(e, opt, div) {
+                task_set_planat(ee.jTask, ee.t, null, this);
             }
         }
+    });
+}
+
+function task_set_planat(jTask, t, planat, pop) {
+    var form = {
+        tid: t._id
+    };
+    if(planat)
+        form.planat = planat;
+    ajax.post("/ajax/task/set/planat", form, function(re) {
+        jTask.data("task", re.data);
+        $(pop).pop("close", function() {
+            task_replace.apply(jTask, [re.data]);
+        });
     });
 }
 
@@ -124,7 +141,7 @@ function task_events_on_label(e) {
     // 建立一个 html，插入到标签容器中
     var jq = $(task_html_lbe()).prependTo($(".task_labels_gasket",ee.jTask)).attr("old-value", lbs.join(","));
     jq.css({
-        width:            ee.jTask.innerWidth() - 30,
+        width:                                                 ee.jTask.innerWidth() - 30,
         top: jLbs.outerHeight(),
     });
     // 设立 body 取消事件

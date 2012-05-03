@@ -1,5 +1,6 @@
 package org.nutz.ztask.impl;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -69,6 +70,14 @@ public class HookedTaskService implements TaskService {
 	public Task setComment(Task t, int index, String newText) {
 		t = tasks.setComment(t, index, newText);
 		hooks.doHook(HookType.COMMENT, t, index);
+		return t;
+	}
+
+	@Override
+	public Task setPlanAt(Task t, Date planat) {
+		Date oldPlanAt = t.getPlanAt();
+		t = tasks.setPlanAt(t, planat);
+		hooks.doHook(HookType.PLAN_AT, t, oldPlanAt);
 		return t;
 	}
 

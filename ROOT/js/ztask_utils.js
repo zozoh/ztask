@@ -243,9 +243,12 @@ function task_html(t, opt) {
     }
     // 有截止日期
     else {
-        var day = 7;
+        planat = planat.replace(/([0-9]{4}-[0-9]{2}-[0-9]{2})([ ].+)/, "$1");
         // 计算天数
-        html += '<div class="task_planat task_planat_on" title="' + planat + '">' + day + '</div>';
+        var day = z.compareDate(planat, z.today());
+        // 显示
+        var dayClass = day >= 0 ? "task_planat_on_" + day : "task_planat_on_negative";
+        html += '<div class="task_planat task_planat_on ' + dayClass + '" title="' + planat + '">' + day + '</div>';
     }
 
     /*

@@ -15,6 +15,13 @@ public enum HookType {
 	LABEL,
 
 	/**
+	 * 当一个任务的计划日期被修改后调用
+	 * <p>
+	 * refer 表旧的任务计划时间
+	 */
+	PLAN_AT,
+
+	/**
 	 * 当被增加或者修改了注释后
 	 * <p>
 	 * refer 为 int，表修改的 command 的下标，-1 表示新增
