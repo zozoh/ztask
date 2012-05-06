@@ -10,6 +10,8 @@ String url = request.getAttribute("page-url").toString();
             ${msg['ui.label']}
         </a><a href="${base}/page/task" <%=url.endsWith("/task")?"class=\"hlt\"":""%>>
             ${msg['ui.task']}
+        </a><a href="${base}/page/plan" <%=url.endsWith("/plan")?"class=\"hlt\"":""%>>
+            ${msg['ui.plan']}
         </a><a href="${base}/page/report" <%=url.endsWith("/report")?"class=\"hlt\"":""%>>
             ${msg['ui.report']}
         </a><a href="${base}/page/message" <%=url.endsWith("/message")?"class=\"hlt\"":""%>>

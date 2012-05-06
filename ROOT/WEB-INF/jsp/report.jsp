@@ -33,7 +33,7 @@
         NutMap[][] cells = (NutMap[][])request.getAttribute("cells");
         for(int i=1;i<cells.length;i++){
             NutMap[] weeks = cells[i];
-            String title = msgs.get("MM."+i);
+            String title = msgs.get("d.MM."+i);
         %>
         <div class="cell_m" index="<%=i%>">
             <h5><%=title%></h5>
@@ -47,7 +47,7 @@
                 <a target="_blank" href="${base}/page/do/report/${year}-<%=map.get("d")%><%=force%>"
                     class="cell_w <%=hasReportCss%> <%=currentWeekCss%>" 
                     index="<%=w%>">
-                        <em>#<%=map.get("wyy")%>${msg['ww']}</em>
+                        <em>#<%=map.get("wyy")%>${msg['d.ww']}</em>
                         <b><%=map.get("d")%></b></a>
         <%
             } // ~ end loop weeks

@@ -1,11 +1,13 @@
 package org.nutz.ztask.hook;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
+import org.nutz.lang.Times;
 import org.nutz.lang.segment.Segment;
 import org.nutz.lang.segment.Segments;
 import org.nutz.lang.util.Context;
@@ -124,7 +126,8 @@ public class AddNotify implements HookHandler {
 
 		// @${u.name} 将任务 ${t._id} 计划时间从 "${str}" 改为 "${t.planAt}"
 		case PLAN_AT:
-			_N(me, t.getStack(), htp, ing, Strings.sBlank(ing.getReferString(), "..."));
+			Date d = ing.getReferAs(Date.class);
+			_N(me, t.getStack(), htp, ing, d == null ? ".." : Times.sD(d));
 			break;
 
 		// 默认，写入出错 Log
@@ -225,6 +228,7 @@ public class AddNotify implements HookHandler {
 		context.set("htp", htp.toString());
 		context.set("t.brief", Strings.brief(ing.t().getText(), 16));
 		context.putAll("u.", userMap).putAll("t.", taskMap);
+		context.set("t.planAt", null == ing.t().getPlanAt() ? ".." : Times.sD(ing.t().getPlanAt()));
 
 		/*
 		 * 格式化文本

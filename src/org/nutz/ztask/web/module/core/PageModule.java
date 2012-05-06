@@ -247,6 +247,13 @@ public class PageModule {
 	@At("/page/task")
 	@Ok("jsp:jsp.task")
 	public void showTaskPage() {}
+	
+	/**
+	 * 计划界面
+	 */
+	@At("/page/plan")
+	@Ok("jsp:jsp.plan")
+	public void showPlanPage() {}
 
 	/**
 	 * 堆栈界面
