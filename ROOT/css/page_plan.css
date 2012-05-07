@@ -1,6 +1,6 @@
 #tasks, #plan {
     float: left;
-    padding-top: 124px;
+    padding-top: 127px;
     position: relative;
 }
 
@@ -8,32 +8,108 @@
     width: 70%;
 }
 
-#plan{
-    padding-right:2px;
+#flt_plan {
+    position: relative;
 }
 
-.plan_main{
-    background: #EEE;
-    width:100%;
-    height:100%;
+.plan_main {
+    background: #FFF;
+    border-right: 1px dashed #DDD;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+.plan_scroller{
+    
+}
+
+.plan_range {
+    padding-left: 12px;
+}
+
+.plan_range a {
+    text-decoration: none;
+    display: block;
+    float: left;
+    letter-spacing: 2px;
+    padding: 2px 10px;
+    font-size: 14px;
+    color: #AAA;
+    background-color: #DDD;
+    margin: 6px 1px 6px 0;
+    height: 32px;
+    line-height: 28px;
+    border-radius: 2px;
+    border: 1px solid #DDD;
+}
+
+.plan_range a.plan_range_hlt {
+    border: 1px dashed #CCC;
+    background-color: #08F;
+    color: #FFF;
+}
+
+.plan_switch {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+}
+
+.plan_switch b {
+    cursor: pointer;
+    width: 80px;
+    height: 22px;
+    line-height: 22px;
+    display: block;
+    text-align: center;
+}
+
+.plan_switch_today {
+    color: #888;
+    background-color: #BBB;
+}
+
+.plan_switch_today:hover {
+    color: #F80;
+    background-color: #CCC;
+}
+
+.plan_switch_prev {
+    background: url(pics/icons.png) no-repeat -64px 0;
+}
+
+.plan_switch_prev:hover {
+    background-position: -144px 0;
+}
+
+.plan_switch_next {
+    background: url(pics/icons.png) no-repeat -64px -26px;
+}
+
+.plan_switch_next:hover {
+    background-position: -144px -26px;
 }
 
 #tasks, #flt_task {
     width: 30%;
 }
 
-#tasks{
-    background-color:#F0F0F0;
+#tasks {
+    background-color: #F0F0F0;
 }
 
-#filters{
+#filters {
     position: fixed;
-    background:rgba(0,0,0,0.3);
-    top:50px;
-    left:0;
+    background: rgba(0,0,0,0.3);
+    top: 50px;
+    left: 0;
     z-index: 80;
 }
 
-.flt_block{
-    float:left;
+.flt_block {
+    float: left;
+    padding: 10px;
 }
+

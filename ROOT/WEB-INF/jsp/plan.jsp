@@ -4,15 +4,12 @@
 <%@include file="/WEB-INF/jsp/include/_page_metas.jsp" %>
 <%@include file="/WEB-INF/jsp/include/_common_rs.jsp" %>
 
-<script language="JavaScript" src="${rs}/js/ztask_stack_events.js"></script>
+<script language="JavaScript" src="${rs}/js/ztask_plan_events.js"></script>
 <script language="JavaScript" src="${rs}/js/ztask_task_events.js"></script>
 <script language="JavaScript" src="${rs}/js/ztask_task_newer.js"></script>
 <script language="JavaScript" src="${rs}/js/ztask_task_search.js"></script>
-<script language="JavaScript" src="${rs}/js/ztask_stack_flt.js"></script>
 
-<link rel="stylesheet" type="text/css" href="${rs}/css/ztask_stack.css"/>
 <link rel="stylesheet" type="text/css" href="${rs}/css/ztask_newer.css"/>
-<link rel="stylesheet" type="text/css" href="${rs}/css/ztask_stack_flt.css"/>
 <link rel="stylesheet" type="text/css" href="${rs}/css/ztask_task_search.css"/>
 <link rel="stylesheet" type="text/css" href="${rs}/css/page_plan.css"/>
 
@@ -25,17 +22,17 @@
     <%@include file="/WEB-INF/jsp/include/_sky.jsp" %>
     <% /*===============================================过滤器=*/ %>
     <div id="filters">
-        <div id="flt_plan" class="flt_block sflt">
-            <%@include file="/WEB-INF/jsp/include/_stack_filter.jsp" %>
+        <div id="flt_plan" class="flt_block">
+            <%@include file="/WEB-INF/jsp/include/_plan_filter.jsp" %>
         </div> <%// End of #flt_plan %>
         <div id="flt_task" class="flt_block srch">
             <%@include file="/WEB-INF/jsp/include/_task_search.jsp" %>
         </div> <%// End of #flt_task %>
     </div>
     <% /*==========================================左侧堆栈列表=*/ %>
-    <div id="plan"><div class="plan_main">
-        
-    </div></div>
+    <div id="plan">
+        <div class="plan_main"><div class="plan_scroller"></div></div>
+    </div>
     <% /*==========================================右侧堆栈列表=*/ %>
     <div id="tasks" class="hierachy"><div class="hierachy_arena">
         <div id="tasks_crumb" class="hierachy_crumb"></div>

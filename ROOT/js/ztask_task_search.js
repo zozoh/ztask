@@ -45,6 +45,9 @@ function task_search_bind(selector, opt) {
         }, {
             text: z.msg('task.startAt'),
             value: "startAt"
+        }, {
+            text: z.msg('task.planAt'),
+            value: "planAt"
         }]
     });
     $(".srch_sort_order", jsrch).droplist({
