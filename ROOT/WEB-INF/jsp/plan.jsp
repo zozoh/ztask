@@ -30,9 +30,7 @@
         </div> <%// End of #flt_task %>
     </div>
     <% /*==========================================左侧堆栈列表=*/ %>
-    <div id="plan">
-        <div class="plan_main"><div class="plan_scroller"></div></div>
-    </div>
+    <div id="plan"><div class="plan_main disselect"><div class="plan_scroller"></div></div></div>
     <% /*==========================================右侧堆栈列表=*/ %>
     <div id="tasks" class="hierachy"><div class="hierachy_arena">
         <div id="tasks_crumb" class="hierachy_crumb"></div>

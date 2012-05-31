@@ -21,24 +21,98 @@
     position: relative;
 }
 
-.plan_scroller{
-    
+.plan_scroller {
+    position: absolute;
+}
+
+.plan_row{
+    border-left:3px solid #EEE;
+}
+
+.plan_row:after{
+    content: "";
+    height:0;
+    width:0;
+    display: block;
+    clear: both;
+}
+
+.plan_row_today{
+    border-color:#F80;
+}
+
+.plan_cell {
+    border-right: 1px solid #DDD;
+}
+
+.plan_cell_month_even .plan_cell_title{
+    background-color:#EEF0FF;
+}
+
+.plan_cell_title {
+    font-weight: bold;
+    height: 22px;
+    line-height: 20px;
+    padding:0 12px;
+    border-color:#F80;
+    background-color: #EEE;
+    border-top: 1px solid #DDD;
+    border-bottom: 1px solid #DDD;
+}
+
+.plan_cell_title em {
+    float: left;
+    font-style: normal;
+    color: #888;
+}
+
+.plan_cell_title i {
+    float: right;
+    font-style: normal;
+    font-size:10px;
+    color:#AAA;
+}
+
+.plan_cell_today .plan_cell_title{
+    background-color:#F80;
+}
+
+.plan_cell_today .plan_cell_title em{
+    color:#FEA;
+}
+
+.plan_cell_today .plan_cell_title i{
+    color:#FCA;
+}
+
+.plan_month {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    width: 120px;
+    height: 24px;
+    line-height: 24px;
+    text-align: center;
+    font-weight: bold;
+    padding: 0 8px 0 0;
+    background-color: rgba(0,0,0,0.2);
+    border-radius: 0 4px 0 0;
+    text-shadow: 1px 0 0 #AAA;
 }
 
 .plan_range {
-    padding-left: 12px;
+    padding-left: 2px;
 }
 
 .plan_range a {
     text-decoration: none;
     display: block;
     float: left;
-    letter-spacing: 2px;
-    padding: 2px 10px;
+    padding: 2px 6px;
     font-size: 14px;
     color: #AAA;
     background-color: #DDD;
-    margin: 6px 1px 6px 0;
+    margin: 0px 1px 6px 0;
     height: 32px;
     line-height: 28px;
     border-radius: 2px;
@@ -51,19 +125,38 @@
     color: #FFF;
 }
 
+.plan_reload_btn{
+    position: absolute;
+    top:10px;
+    right:85px;
+    width:32px;
+    height:32px;
+    background: #BBB url(pics/icons.png) no-repeat -80px -64px;
+    border-radius: 8px 0 0 8px;
+    cursor: pointer;
+    opacity: 0.8;
+}
+
+.plan_reload_btn:hover{
+    opacity: 1.0;
+    background-color:#AAA;
+}
+
+
 .plan_switch {
     position: absolute;
     right: 5px;
     top: 5px;
 }
 
-.plan_switch b {
+.plan_switch a {
     cursor: pointer;
     width: 80px;
     height: 22px;
     line-height: 22px;
     display: block;
     text-align: center;
+    text-decoration: none;
 }
 
 .plan_switch_today {
@@ -90,6 +183,17 @@
 
 .plan_switch_next:hover {
     background-position: -144px -26px;
+}
+
+.plan_task{
+    white-space: nowrap;
+    padding:4px 6px;
+    border-bottom:1px dotted #CCC;
+    cursor:default;
+}
+
+.plan_task .task_content{
+    font-size:12px;
 }
 
 #tasks, #flt_task {

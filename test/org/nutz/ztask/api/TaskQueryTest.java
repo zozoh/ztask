@@ -3,12 +3,50 @@ package org.nutz.ztask.api;
 import java.util.Date;
 
 import org.junit.Test;
+import org.nutz.lang.Lang;
 import org.nutz.lang.Times;
 
 import static org.junit.Assert.*;
 import static org.nutz.ztask.api.TaskQuery.*;
 
 public class TaskQueryTest {
+
+	@Test
+	public void test_by_date_scope() {
+		TaskQuery tq;
+
+		tq = NEW("&D(2012-08-21)");
+		assertNull(tq.qText());
+		assertNull(tq.qRegex());
+		assertNull(tq.qID());
+		ASTR(tq.qCreaters());
+		ASTR(tq.qOwners());
+		ASTR(tq.qLabels());
+		AD(tq.qTimeScope(), Lang.array(Times.D("2012-08-21"), Times.D("2012-08-21 23:59:59")));
+		AS(tq.qStatus());
+
+		tq = NEW("&D(2012-01-09, 2012-05-06)");
+		assertNull(tq.qText());
+		assertNull(tq.qRegex());
+		assertNull(tq.qID());
+		ASTR(tq.qCreaters());
+		ASTR(tq.qOwners());
+		ASTR(tq.qLabels());
+		AD(tq.qTimeScope(), Lang.array(Times.D("2012-01-09"), Times.D("2012-05-06 23:59:59")));
+		AS(tq.qStatus());
+
+		tq = NEW("&Dt(2012-01-09 14:56:12, 2012-05-06 08:32:19)");
+		assertNull(tq.qText());
+		assertNull(tq.qRegex());
+		assertNull(tq.qID());
+		ASTR(tq.qCreaters());
+		ASTR(tq.qOwners());
+		ASTR(tq.qLabels());
+		AD(	tq.qTimeScope(),
+			Lang.array(Times.D("2012-01-09 14:56:12"), Times.D("2012-05-06 08:32:19")));
+		AS(tq.qStatus());
+
+	}
 
 	@Test
 	public void test_by_watchers() {

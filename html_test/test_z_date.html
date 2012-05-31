@@ -1,0 +1,35 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+        <title>JSTest :: z.js : date</title>
+        <link rel="stylesheet" type="text/css" href="test_z.css"/>
+        <script language="JavaScript" src="../ROOT/js/jquery.js"></script>
+        <script language="JavaScript" src="../ROOT/js/z.js"></script>
+        <script language="JavaScript">
+            $(document).ready(function() {
+                var jq = $("pre");
+                var d = z.today();
+                var days = z.dayCount(d);
+                var s = "";
+                for(var i = 0; i < 1; i++) {
+                    var theDay = days + i;
+                    var theDate = z.d(theDay);
+                    var tomorrow = z.offDate(theDate, 1);
+                    s += z.alignr(i, 3, "-") + " > ";
+                    s += z.alignl(theDay, 16, " ");
+                    s += " : ";
+                    s += z.dstr(theDate);
+                    s += " : +1 : ";
+                    s += z.dstr(tomorrow);
+                    s += "\n";
+                }
+                jq.html(s);
+            });
+
+        </script>
+    </head>
+    <body>
+        <pre></pre>
+    </body>
+</html>

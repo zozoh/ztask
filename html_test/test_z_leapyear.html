@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+        <title>JSTest :: z.js : date</title>
+        <style rel="stylesheet" type="text/css">
+            .leap {
+                color: red;
+            }
+        </style>
+        <link rel="stylesheet" type="text/css" href="test_z.css"/>
+        <script language="JavaScript" src="../ROOT/js/jquery.js"></script>
+        <script language="JavaScript" src="../ROOT/js/z.js"></script>
+        <script language="JavaScript">
+            $(document).ready(function() {
+                var jq = $("pre");
+                var d = z.today();
+                var days = z.dayCount(d);
+                var html = "";
+                var cc = 365;
+                for(var i = 1; i < 2020; i++) {
+                    var ld = {
+                        year: i,
+                        month: 12,
+                        date: 31
+                    };
+                    var yds = z.yearDayCount(ld);
+                    cc += yds;
+                    if(z.leapYear(i))
+                        html += '<div class="leap">';
+                    else
+                        html += '<div>';
+                    html += z.alignr(i, 4, " ");
+                    html += " : " + yds;
+                    html += " : " + z.dayCount(ld);
+                    html += " : " + cc;
+                    html += "</div>";
+                }
+                jq.html(html);
+            });
+
+        </script>
+    </head>
+    <body>
+        <pre></pre>
+    </body>
+</html>

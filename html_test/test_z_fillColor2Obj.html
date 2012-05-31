@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+        <title>JSTest :: z.js : date</title>
+        <link rel="stylesheet" type="text/css" href="test_z.css"/>
+        <script language="JavaScript" src="../ROOT/js/jquery.js"></script>
+        <script language="JavaScript" src="../ROOT/js/z.js"></script>
+        <script language="JavaScript">
+            $(document).ready(function() {
+                var jq = $("pre");
+                var colors = {
+                    "A": null,
+                    "B": null,
+                    "C": null,
+                    "D": null,
+                    "E": null,
+                    "F": null,
+                    "G": null,
+                    "H": null,
+                    "I": null,
+                    "G": null,
+                    "K": null,
+                    "L": null
+                };
+                z.fillColor2Obj(colors);
+                var s = "";
+                for(var key in colors) {
+                    var c = colors[key];
+                    s += '<b style="color:' + c + '">';
+                    s += key + " (" + c + ")";
+                    s += '</b>\n';
+                }
+                jq.html(s);
+            });
+
+        </script>
+    </head>
+    <body>
+        <pre></pre>
+    </body>
+</html>

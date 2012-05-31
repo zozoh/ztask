@@ -29,6 +29,61 @@ window.z = {
             if(localStorage) {
                 return localStorage.getItem(key);
             }
+        },
+        each: function(prefix, callback) {
+            if(!localStorage)
+                return;
+            if( typeof prefix == "function") {
+                callback = prefix;
+                prefix = null;
+            }
+            if( typeof callback != "function")
+                return;
+            for(var i = 0; i < localStorage.length; i++) {
+                var key = localStorage.key(i);
+                if(!prefix) {
+                    var val = localStorage.getItem(key);
+                    callback(i, key, val);
+                } else if(z.startsWith(key, prefix)) {
+                    var val = localStorage.getItem(key);
+                    callback(i, key.substring(prefix.length), val);
+                }
+            }
+        },
+        rm: function(key) {
+            if(localStorage) {
+                localStorage.removeItem(key);
+            }
+        },
+        clear: function(prefix) {
+            if(!localStorage)
+                return;
+            if(!prefix)
+                localStorage.clear();
+            var keys = [];
+            z.local.each(prefix, function(index, key) {
+                keys.push(key);
+            });
+            for(var i = 0; i < keys.length; i++) {
+                localStorage.removeItem(keys[i]);
+            }
+        },
+        getObj: function(prefix, initObj) {
+            if(!localStorage)
+                return;
+            var obj = z.clone(initObj || {});
+            z.local.each(prefix, function(index, key, val) {
+                obj[key] = val;
+            });
+            return obj;
+        },
+        setObj: function(prefix, obj) {
+            if(!localStorage)
+                return;
+            z.local.clear(prefix);
+            for(var key in obj) {
+                localStorage.setItem(prefix + key, obj[key]);
+            }
         }
     },
     //---------------------------------------------------------------------------------------
@@ -332,22 +387,25 @@ window.z = {
             };
         if( typeof color == "object")
             return color;
-        // 格式为 #RRGGBB
+        // 格式为 #RRGGBB[AA]
         if(z.startsWith(color, "#")) {
-            return {
+            var re = {
                 R: parseInt(color.substring(1, 3), 16),
                 G: parseInt(color.substring(3, 5), 16),
-                B: parseInt(color.substring(5, 7), 16),
-                A: parseInt(color.substring(7), 16) / 255.0,
+                B: parseInt(color.substring(5, 7), 16)
+            };
+            if(color.length > 7) {
+                re.A = parseInt(color.substring(7), 16) / 255.0
             }
+            return re;
         }
         // 格式为 0xAARRGGBB
-        return {
+        return re = {
             A: parseInt(color.substring(2, 4), 16) / 255.0,
             R: parseInt(color.substring(4, 6), 16),
             G: parseInt(color.substring(6, 8), 16),
             B: parseInt(color.substring(8), 16)
-        }
+        };
     },
     //---------------------------------------------------------------------------------------
     toAHexString: function(color) {
@@ -366,13 +424,75 @@ window.z = {
         re += z.alignr(rgba.R.toString(16), 2, "0");
         re += z.alignr(rgba.G.toString(16), 2, "0");
         re += z.alignr(rgba.B.toString(16), 2, "0");
-        re += z.alignr(parseInt(rgba.A*255).toString(16), 2, "0");
+        if( typeof rgba.A == "number")
+            re += z.alignr(parseInt(rgba.A*255).toString(16), 2, "0");
         return re.toUpperCase();
     },
     //---------------------------------------------------------------------------------------
     toRGBAString: function(color) {
         var rgba = z.toRGBA(color);
-        return "rgba(" + rgba.R + "," + rgba.G + "," + rgba.B + "," + rgba.A + ")";
+        return "rgba(" + rgba.R + "," + rgba.G + "," + rgba.B + ( typeof rgba.A == "number" ? "," + rgba.A : "") + ")";
+    },
+    //---------------------------------------------------------------------------------------
+    // 根据一个给定的对象，按照一定顺序，填充一组颜色
+    // obj - 对象，被填充对象
+    // force - 是否强制填充
+    fillColor2Obj: function(obj, force) {
+        obj = obj || {};
+        // 计算数量
+        var count = 0;
+        for(var key in obj) {
+            count++;
+        }
+        // 偏差比例
+        var scale = 0.8;
+        // 得到一个步长
+        var num = Math.pow(count, 1 / 3);
+        var step = parseInt(255 / num);
+        // 开始计算 color
+        var colors = [];
+        var i = 0;
+        for(var r = 0; r <= 255; r += step) {
+            for(var g = 0; g <= 255; g += step) {
+                for(var b = 0; b <= 255; b += step) {
+                    colors.push({
+                        R: parseInt(r * scale) % 255,
+                        G: parseInt(g * scale) % 255,
+                        B: parseInt(b * scale) % 255
+                    });
+                    i++;
+                }
+            }
+        };
+        // 乱序颜色
+        z.randomArray(colors);
+        // 依次加入对象中
+        i = 0;
+        for(var key in obj) {
+            if(!obj[key] || force)
+                obj[key] = z.toHexaString(colors[i++]);
+        }
+        // 返回
+        return obj;
+    },
+    //---------------------------------------------------------------------------------------
+    // 将给定数组打乱顺序
+    randomArray: function(ary) {
+        if(ary && ary.length > 1) {
+            var len = ary.length;
+            var tailIndex = len - 1;
+            for(var i = 0; i < len; i++) {
+                // 计算下标
+                var index = parseInt(Math.random() * tailIndex);
+                // 交换
+                var ele = ary[index];
+                ary[index] = ary[tailIndex];
+                ary[tailIndex] = ele;
+                // 移动尾
+                tailIndex--;
+            }
+        }
+        return ary;
     },
     //---------------------------------------------------------------------------------------
     // 从一个 jq 对象中选择一个 dom 元素，并用 jQuery 包裹返回
@@ -696,26 +816,32 @@ window.z = {
         return re;
     },
     //---------------------------------------------------------------------------------------
-    // 获得某个日期，当年年初有多少天
+    // 获得某个日期，是今年的第几天，每年的 1 月 1 日，本函数计算结果为 1
     yearDayCount: function(d) {
-        d = ( typeof d == "string") ? z.d(d) : d;
+        if( typeof d == "string")
+            d = z.d(d).year;
+
+        var isLeapYear = z.leapYear(d.year);
         var re = 0;
         // 计算今年的天数
-        for(var i = 0; i < d.month; i++) {
+        for(var i = 0; i < (d.month - 1); i++) {
             re += MONTH[i];
             // 闰年，二月加一天
-            if(i == 1 && z.leapYear(d.year))
+            if(i == 1 && isLeapYear)
                 re++;
         }
         re += d.date;
         return re;
     },
     //---------------------------------------------------------------------------------------
-    // 获得某个日期，距离公元 1900 年有多少天
+    // 获得某个日期，公元元年元月元日的第几天
     dayCount: function(d) {
         d = ( typeof d == "string") ? z.d(d) : d;
-        var yy = d.year - 1900;
-        var re = yy * 365 + (parseInt(yy / 4)) - (parseInt(yy / 100)) + (parseInt(yy / 400));
+        var re = d.year * 365;
+        var yy = d.year - 1;
+        re += parseInt(yy / 4);
+        re -= parseInt(yy / 100);
+        re += parseInt(yy / 400);
         re += z.yearDayCount(d);
         return re;
     },
@@ -738,61 +864,26 @@ window.z = {
     // 比较两个日期
     // @return 0 : 相等， -n 为 d1 小，+n为 d2 小
     compareDate: function(d1, d2) {
-        return  z.dayCount(d1) - z.dayCount(d2);
+        return                                                                                                                                                                                                                                         z.dayCount(d1) -                                                                                                                                                                                                                                        z.dayCount(d2);
     },
     //---------------------------------------------------------------------------------------
     // 根据 offset 生成一个新日期, offset 是一个天数，可正可负
     offDate: function(d, offset) {
         if(offset == 0)
             return d;
-        if(offset == -1) {
-            var re = {
-                year: d.year,
-                month: d.month,
-                date: d.date - 1
-            };
-            if(re.date == 0) {
-                re.month -= 1;
-                if(re.month == 0) {
-                    re.year -= 1;
-                    re.month = 12;
-                }
-                re.date = z.monthDate(re.year, re.month);
-            }
-            return re;
-        } else if(offset == 1) {
-            var re = {
-                year: d.year,
-                month: d.month,
-                date: d.date + 1
-            };
-            if(re.date > z.monthDate(re.year, re.month)) {
-                re.month += 1;
-                if(re.month > 12) {
-                    re.year += 1;
-                    re.month = 1;
-                }
-                re.date = z.monthDate(re.year, re.month);
-            }
-            return re;
-        } else if(offset > 1) {
-            var re = d;
-            for(var i = 0; i < offset; i++) {
-                re = z.offDate(re, 1);
-            }
-            return re;
-        } else {
-            var re = d;
-            for(var i = 0; i < Math.abs(offset); i++) {
-                re = z.offDate(re, -1);
-            }
-            return re;
-        }
+        var days = z.dayCount(d);
+        days += offset;
+        return z.d(days);
     },
     //---------------------------------------------------------------------------------------
     // 判断一年是否为闰年
     leapYear: function(year) {
-        return (year % 4 == 0) && (year % 400 == 0 || year % 100 == 0);
+        return (year % 4 == 0) && (year % 400 == 0 || year % 100 != 0);
+    },
+    //---------------------------------------------------------------------------------------
+    // 判断一年（不包括自己）之前有多少个闰年
+    countLeapYear: function(year) {
+        return                                                                                                                                                      parseInt(year / 4) -                                                                                                                                                      parseInt(year % 100) + parseInt(year % 400);
     },
     //---------------------------------------------------------------------------------------
     // 将一个 date 对象，输出成 yyyy-MM-dd 的格式
@@ -811,8 +902,45 @@ window.z = {
         };
     },
     //---------------------------------------------------------------------------------------
+    // 获得今天的日期对象的字符串形式
+    todaystr: function() {
+        return z.dstr(z.today());
+    },
+    //---------------------------------------------------------------------------------------
     // 根据一个 yyyy-MM-dd 字符串，解析成一个 d 对象
+    // 如果输入的参数是一个数字，那么表示距离 公元元年元月元日 这一天的天数
+    // 其中 day 表示星期几，数值为 0-6
     d: function(str) {
+        // 根据绝对天数
+        if( typeof str == "number") {
+            var yy = parseInt(str / 365);
+            // 先来个大概
+            var leapYears = z.countLeapYear(yy);
+            // 去掉闰年后的准确的年份
+            yy = parseInt(( str - leapYears) / 365);
+            var yyDay = z.dayCount({
+                year: yy - 1,
+                month: 12,
+                date: 31
+            });
+            yyDay = str - yyDay;
+            // 根据今年天数得到月份
+            var i = 0;
+            for(; i < MONTH.length; i++) {
+                var days = MONTH[i];
+                if(z.leapYear(yy) && i == 1)
+                    days++;
+                if(yyDay <= days)
+                    break;
+                yyDay -= days;
+            }
+            return z.d(yy + "-" + (i + 1) + "-" + yyDay);
+        }
+        // 如果有空格，截断先
+        var pos = str.indexOf(" ");
+        if(pos > 0)
+            str = str.substring(0, pos);
+        // 根据字符串
         var ss = str.split("-");
         if(ss.length < 3) {
             ss.push(1).push(1);
@@ -884,7 +1012,7 @@ window.z = {
             $("#div_out").append(newDivIn);
             var divOutS = $("#div_out");
             var divInS = $("#div_in");
-            scrollWidth =                                                                                                 divOutS.width() -                                                                                                 divInS.width();
+            scrollWidth =                                                                                                                                                                                                                                                                                                                                        divOutS.width() -                                                                                                                                                                                                                                                                                                                                        divInS.width();
             $("#div_out").remove();
             $("#div_in").remove();
             SCROLL_BAR_WIDTH = scrollWidth;

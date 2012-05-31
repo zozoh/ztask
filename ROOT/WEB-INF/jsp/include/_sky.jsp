@@ -14,8 +14,6 @@ String url = request.getAttribute("page-url").toString();
             ${msg['ui.plan']}
         </a><a href="${base}/page/report" <%=url.endsWith("/report")?"class=\"hlt\"":""%>>
             ${msg['ui.report']}
-        </a><a href="${base}/page/message" <%=url.endsWith("/message")?"class=\"hlt\"":""%>>
-            ${msg['ui.message']} <i id="msg_count">0</i>
         </a>
     </div>
     <div id="menu" class="lnk_menu">
@@ -34,7 +32,9 @@ String url = request.getAttribute("page-url").toString();
     </div>
     <div id="corner" class="lnk_menu">
         <b style="color:#F80;">${me.name}</b>
-        <a href="${base}/page/sys" <%=url.endsWith("/sys")?"class=\"hlt\"":""%>>
+        <a href="${base}/page/message" <%=url.endsWith("/message")?"class=\"hlt\"":""%>>
+            ${msg['ui.message']} <i id="msg_count">0</i>
+        </a><a href="${base}/page/sys" <%=url.endsWith("/sys")?"class=\"hlt\"":""%>>
             ${msg['ui.sys']}
         </a>
         <a href="${base}/do/logout">${msg['ui.logout']}</a>

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
 import org.nutz.lang.Times;
 import org.nutz.ztask.util.ZTasks;
@@ -25,10 +26,17 @@ import org.nutz.ztask.util.ZTasks;
  *    '#(A|B|C)'     // 具备 A,B,C 三个标签中的一个
  * 
  * = 按周查询 ================
- *    '&W(-1)'    // 上一周
+ *    '&W(-1)'    // 前一周
  *    '&W(0)'     // 本周
- *    '&W(1)'     // 下一周
- *    '&W(-1,-3)' // 上三周
+ *    '&W(1)'     // 后一周
+ *    '&W(-1,-3)' // 前三周
+ *    
+ * = 指定精确的日期范围 ================
+ *    '&D(2011-05-01,2011-05-09)'   // 包括这两天
+ *    '&D(2011-05-01)'              // 某一天 
+ * 
+ * = 指定精确的日期时间范围 ================
+ *    '&DT(2011-05-01 13:00:12,2011-05-09 14:23:21)' // 包括这两个时间
  * 
  * = 按 Task 的用户字段查询 ====
  *    '@(A, B)'      // owner 为 A 或 B
@@ -160,7 +168,7 @@ public class TaskQuery {
 			// 忽略空
 			if (Strings.isBlank(str))
 				return;
-			str = str.trim().intern();//by wendal
+			str = str.trim().intern();// by wendal
 
 			// 判断 ID
 			if (str.length() == 24 && str.toLowerCase().matches("^[0-9a-f]{24}$")) {
@@ -247,6 +255,34 @@ public class TaskQuery {
 						timescope = Times.week(Integer.parseInt(ss[0]));
 					else
 						timescope = Times.weeks(Integer.parseInt(ss[0]), Integer.parseInt(ss[1]));
+				}
+			}
+
+			// 统计: date -> timescope
+			if (text.length() > 0) {
+				re = find("(&[D|d][(])([ \t0-9,-]+)([)])");
+				if (null != re) {
+					String[] ss = Strings.splitIgnoreBlank(re[2], ",");
+					// 指定一天
+					if (1 == ss.length) {
+						timescope = Lang.array(Times.D(ss[0]), Times.D(ss[0] + " 23:59:59"));
+					}
+					// 指定多天
+					else {
+						timescope = Lang.array(Times.D(ss[0]), Times.D(ss[1] + " 23:59:59"));
+					}
+				}
+			}
+
+			// 统计: datetime -> timescope
+			if (text.length() > 0) {
+				re = find("(&[D|d][T|t][(])([ \t0-9:,-]+)([)])");
+				if (null != re) {
+					String[] ss = Strings.splitIgnoreBlank(re[2], ",");
+					// 指定一个时间段
+					if (2 == ss.length) {
+						timescope = Lang.array(Times.D(ss[0]), Times.D(ss[1]));
+					}
 				}
 			}
 

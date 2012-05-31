@@ -1,6 +1,5 @@
 function main() {
     // 读取左侧所有的堆栈列表
-
     // 初始化右侧所有的新 Task，按照时间逆序排列
     hierachy_init.apply($("#tasks"), [{
         direction: 'right',
@@ -13,6 +12,8 @@ function main() {
             }
         }
     }, "::task.results"]);
+    // 事件 : 计划 ...
+    plan_events_bind.apply($("#flt_plan .plan_flt"), [$("#plan .plan_main")]);
     // 事件 : 任务 ...
     task_events_bind($("#tasks"), {
         reload: function() {
@@ -62,8 +63,13 @@ function initLayout() {
 }
 
 function adjustLayout() {
-    $("#filters").css("width", this.width);
-    $("#plan").css("height", this.height);
+    var skyH = $("#sky").outerHeight();
+    var fH = $("#filters").css("width", this.width).outerHeight();
+    $("#flt_plan").css("height", $("#filters").innerHeight());
+    $("#plan").css({
+        "height": this.height,
+        "padding-top": skyH + fH
+    });
     $("#tasks .newtask").css("width", this.width * 0.3 - this.scrollbar);
     $(".hierachy").css("height",this.height).each(hierachy_layout);
 }
