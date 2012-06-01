@@ -21,6 +21,7 @@
         <ul style="position:absolute;top:80px;left:0px;font-size:14px;line-height:28px;">
              <li><a target="_blank" href="${base}/monitor/schedule">Schedules</a></li>
              <li><a target="_blank" href="${base}/monitor/threads">Threads</a></li>
+             <li><a target="_blank" href="${base}/page/do/backup">Backup</a></li>
         </ul>
     </div>
     <% /*==========================================本地化字符串支持=*/ %>   

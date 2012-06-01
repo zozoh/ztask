@@ -13,6 +13,8 @@
  *                                          # snames - 堆栈的名称
  *                                          # selection - .sflt 的 jq 对象
  *                                          # opt - 配置对象
+ *      cusval : function(newval){...}   # 如果用户自定义一个堆栈过滤器，那么这个值该如何被格式化
+ *                                       # 默认用 #s+newval
  * }
  * </pre>
  *
@@ -70,12 +72,18 @@ function stack_flt_on_click_li(e) {
  * @param this 为 .sflt_cus 的 DOM 对象
  */
 function stack_flt_do_edit_cus(e) {
+    var selection = stack_flt_selection(this);
+    var opt = stack_flt_opt(selection);
     z.editIt(this, {
         after: function(newval, oldval) {
             newval = $.trim(newval);
             if(newval && newval != oldval) {
                 this.removeClass("sflt_cus_undefined");
-                this.text(newval).attr("href", "#s" + newval);
+                var href = "#s" + newval;
+                if( typeof opt.cusval == "function") {
+                    href = opt.cusval(newval);
+                }
+                this.text(newval).attr("href", href);
             }
             if(this.hasClass("sflt_li_on"))
                 stack_flt_do_filter.apply(this, [e]);

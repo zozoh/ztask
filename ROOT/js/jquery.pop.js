@@ -67,10 +67,6 @@ var dom = {
         "left": org.l,
         "top": org.t
         }).data("org-size", org);
-        // 设置尺寸
-        var hTitle = div.find(".pop_title").outerHeight();
-        var hBtns = div.find(".pop_btns").css("width",w).outerHeight();
-        div.find(".pop_body").css("height", h - hTitle - hBtns);
         // 显示
         div.insertAfter(this).animate({
             "opacity": 1.0,
@@ -79,6 +75,13 @@ var dom = {
             "left": Math.max((off.left - (w / 2)), 2),
             "top": Math.max((off.top - (h / 2)), 2)
         }, 200, function() {
+            // 设置尺寸
+            var hTitle = div.find(".pop_title").outerHeight();
+            var hBtns = div.find(".pop_btns").css("width",w).outerHeight();
+            div.find(".pop_body").css({
+                "width": w,
+                "height": h - hTitle - hBtns
+            });
             if( typeof opt.show == "function") {
                 opt.show.apply(div.find(".pop_body")[0], [opt, util.popAnchor(div)[0]]);
             }

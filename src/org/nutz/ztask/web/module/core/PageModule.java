@@ -1,14 +1,25 @@
 package org.nutz.ztask.web.module.core;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Calendar;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.nutz.ioc.annotation.InjectName;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
+import org.nutz.json.Json;
+import org.nutz.json.JsonFormat;
+import org.nutz.lang.Each;
+import org.nutz.lang.Encoding;
+import org.nutz.lang.Files;
 import org.nutz.lang.Lang;
+import org.nutz.lang.Streams;
 import org.nutz.lang.Strings;
 import org.nutz.lang.Times;
 import org.nutz.lang.util.NutMap;
@@ -22,6 +33,8 @@ import org.nutz.mvc.annotation.Ok;
 import org.nutz.mvc.annotation.Param;
 import org.nutz.mvc.filter.CheckSession;
 import org.nutz.web.Webs;
+import org.nutz.ztask.api.Task;
+import org.nutz.ztask.api.TaskQuery;
 import org.nutz.ztask.api.TaskReport;
 import org.nutz.ztask.api.User;
 import org.nutz.ztask.api.ZTaskFactory;
@@ -151,6 +164,47 @@ public class PageModule {
 		return sb.toString();
 	}
 
+	@At("/page/do/backup")
+	@Ok("jsp:jsp.backup_done")
+	public String doBackupAllTasks(ServletContext sc) throws IOException {
+		String nm = Times.sDT(Times.now()).replaceAll("[:-]", "").replace(' ', '_');
+		String path = sc.getRealPath("/backup/" + nm + ".zip");
+		File f = Files.createFileIfNoExists(path);
+
+		// 准备 zip 流
+		final ZipArchiveOutputStream zops;
+		try {
+			zops = new ZipArchiveOutputStream(f);
+		}
+		catch (IOException e1) {
+			throw Lang.wrapThrow(e1);
+		}
+		zops.setMethod(ZipArchiveOutputStream.DEFLATED); // 为压缩方式
+
+		try {
+			// 写入所有的 Task
+			factory.tasks().each(new Each<Task>() {
+				public void invoke(int index, Task t, int len) {
+					try {
+						zops.putArchiveEntry(new ZipArchiveEntry("tasks/" + t.get_id() + ".task"));
+						String str = Json.toJson(t, JsonFormat.nice().setQuoteName(true));
+						zops.write(str.getBytes(Encoding.CHARSET_UTF8));
+						zops.closeArchiveEntry();
+					}
+					catch (IOException e) {
+						throw Lang.wrapThrow(e);
+					}
+				}
+			}, TaskQuery.NEW());
+		}
+		// 关闭整个压缩流
+		finally {
+			Streams.safeClose(zops);
+		}
+
+		return nm + ".zip";
+	}
+
 	/**
 	 * 报告界面
 	 */
@@ -247,7 +301,7 @@ public class PageModule {
 	@At("/page/task")
 	@Ok("jsp:jsp.task")
 	public void showTaskPage() {}
-	
+
 	/**
 	 * 计划界面
 	 */

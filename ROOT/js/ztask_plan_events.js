@@ -12,20 +12,71 @@ function plan_events_bind(selection) {
     this.delegate(".plan_switch_next", "click", plan_on_switch_next);
     this.delegate(".plan_reload_btn", "click", plan_on_reload);
     selection.delegate(".plan_task", "click", plan_on_task_click);
+    selection.delegate(".plan_cell_title", "click", plan_on_click_cell_title);
+    selection.delegate(".plan_cell_title em", "click", plan_on_click_one_day);
 
     // 初始化自己的 .sflt 部分
     stack_flt_bind(this.find(".sflt"), {
+        cusval: function(newval) {
+            return "#s:" + newval;
+        },
         click: function(e, form) {
+            var sLi = this;
             var po = _plan_obj(this);
             po.jscroller.find(".plan_row_in").removeClass("plan_row_loaded");
             _plan_reload_row_in(po, true);
+            // 修改 .plan_range 部分所有的 A
+            po.jflt.find(".plan_range a").each(function() {
+                _plan_marge_href(this, sLi, "rng,row,mod,date");
+            });
         }
     });
+    // 修改锚的形式
+    this.find(".sflt .sflt_li").each(function() {
+        var href = $(this).attr("href");
+        if(href)
+            $(this).attr("href", "#s:" + href.substring(2));
+    });
+}
 
-    // 开始重绘
-    var a = $(".plan_range_hlt", this);
-    var str = a.attr("href").substring(1);
-    plan_redraw.apply(this, [str]);
+/**
+ * 标准事件: 点击一天的标题
+ */
+function plan_on_click_cell_title() {
+    var cell = $(this).parents(".plan_cell");
+    $(this).pop({
+        title: cell.attr("cell_date") + " (" + $(this).find("i").text() + ")",
+        width: 600,
+        height: 500,
+        show: function() {
+            var html = '<div class="plan_cell_pop_outer"><div class="plan_cell_pop">';
+            html += cell.find(".plan_cell_tasks").html();
+            html += '</div></div>';
+            $(this).html(html);
+        }
+    });
+}
+
+/**
+ * 标准事件: 点击一天，将视图变成一天的视图
+ */
+function plan_on_click_one_day(e) {
+    // 停止冒泡
+    e.stopPropagation();
+    // 开始切换视图
+    var po = _plan_obj(this);
+    var ds = $(this).parents(".plan_cell").attr("cell_date");
+    // 查找一下"每日"的按钮
+    plan_match_todo(po.jflt.find(".plan_rng_li"), {
+        mod: "day",
+        row: 1,
+        rng: 1
+    }, "mod,rng,row", function() {
+        // 为其设置一个 date
+        var o = plan_opt($(this).attr("href").substring(1));
+        o.date = ds;
+        $(this).attr("href", "#" + plan_optstr(o)).click();
+    });
 }
 
 /**
@@ -122,10 +173,33 @@ function _plan_goto_row(jrow) {
  * 标准事件: 切换 range
  */
 function plan_on_change_range() {
+    var rngLi = this;
     $(this).parent().children(".plan_range_hlt").removeClass("plan_range_hlt");
     var str = $(this).attr("href").substring(1);
     var jflt = $(this).addClass("plan_range_hlt").parents(".plan_flt");
     plan_redraw.apply(jflt, [str]);
+    // 修改 .sflt 部分所有的 A
+    jflt.find(".sflt_li").each(function() {
+        _plan_marge_href(this, rngLi, "s");
+    });
+}
+
+/**
+ * 用 ele1 的 href 覆盖 ele0 的 href，即 ele0 的 href 会被改写
+ */
+function _plan_marge_href(ele0, ele1, expcepts) {
+    var ignores = expcepts ? expcepts.split(",") : [];
+    var s0 = $(ele0).attr("href").substring(1);
+    var s1 = $(ele1).attr("href").substring(1);
+    var opt0 = plan_opt(s0);
+    var opt1 = plan_opt(s1);
+    for(var key in opt1) {
+        if(ignores.indexOf(key) >= 0)
+            continue;
+        opt0[key] = opt1[key];
+    }
+    var s = plan_optstr(opt0);
+    $(ele0).attr("href", "#" + s);
 }
 
 /**
@@ -153,7 +227,7 @@ function _plan_reload_row_in(po, force) {
         return;
 
     // 显示加载
-    jRows.find(".plan_cell_tasks").empty().html("loading...");
+    jRows.find(".plan_cell_tasks").empty().html('<div class="plan_loading">' + z.msg("ui.loading") + '</div>');
 
     // 准备查询关键字
     var kwd = "";
@@ -236,7 +310,60 @@ function _plan_fill_task_to_cell(jRows, ts, opt) {
         // 写入 DOM
         me.html(html);
     });
+    // 设置标志
     jRows.addClass("plan_row_loaded");
+    // 设置拖拽
+    jRows.find(".plan_task").draggable({
+        appendTo: "body",
+        zIndex: 999999,
+        helper: "clone",
+        scroll: false,
+        start: function(event, ui) {
+            var myCell = $(this).parents(".plan_cell")[0];
+            $(".plan_cell").not(myCell).droppable({
+                hoverClass: 'plan_cell_drophover',
+                drop: function(event, ui) {
+                    // 首先将 DOM 移动到目标格子
+                    ui.draggable.appendTo($(this).find(".plan_cell_tasks"));
+                    // 获取目标格子的日期
+                    var planAt = $(this).attr("cell_date");
+                    // 发送请求到服务器
+                    ajax.post("/ajax/task/set/planat", {
+                        tid: ui.draggable.attr("task-id"),
+                        planat: $(this).attr("cell_date")
+                    }, function(re) {
+                        z.blinkIt(ui.draggable);
+                    });
+                }
+            });
+        },
+        stop: function() {
+            $(".plan_cell_tasks").droppable("destroy");
+        }
+    });
+}
+
+/**
+ * 从一组 dom 元素中找到第一个匹配的，并调用回调
+ */
+function plan_match_todo(jq, opt, keys, callback) {
+    keys = keys ? keys.split(",") : [];
+    for(var i = 0; i < jq.size(); i++) {
+        var ele = jq[i];
+        var obj = plan_opt($(ele).attr("href").substring(1));
+        var matched = true;
+        for(var x = 0; x < keys.length; x++) {
+            var key = keys[x];
+            if(obj[key] != opt[key]) {
+                matched = false;
+                break;
+            }
+        }
+        if(matched && typeof callback == "function") {
+            callback.apply(ele, [opt]);
+            break;
+        }
+    }
 }
 
 // HTML 的行模板
@@ -255,14 +382,27 @@ function plan_redraw(str) {
 
     po.jplan.attr("plan_opt", plan_optstr(opt));
 
+    // 如果有特殊的 stack
+    if(opt.s && opt.s[0] != "$") {
+        po.jflt.find(".sflt_cus").removeClass("sflt_cus_undefined").text(opt.s).attr("href", "#s:" + opt.s);
+    }
+
+    // 对日期范围查找高亮项目
+    plan_match_todo(po.jflt.find(".plan_rng_li"), opt, "mod,rng,row", function() {
+        $(this).addClass("plan_range_hlt");
+    });
+    // 对堆栈过滤器查找高亮项目
+    plan_match_todo(po.jflt.find(".sflt_li"), opt, "s", function() {
+        $(this).addClass("sflt_li_on");
+    });
     // 计算一下每个项目的宽高
     var w = po.jplan.innerWidth();
     var h = po.jplan.innerHeight();
 
     // 评估一下 off
-    var firstDate = z.d(opt.date);
+    var firstDate = z.d(opt.date || z.todaystr());
     if("week" == opt.mod) { // 周的话，寻找周日
-        var d = z.d(opt.date);
+        var d = z.d(opt.date || z.todaystr());
         if(d.day > 0)
             d = z.offDate(d, d.day * -1);
         firstDate = d;
@@ -285,7 +425,7 @@ function plan_redraw(str) {
     _plan_resize_cells(opt, po);
 
     // 默认显示属于我的
-    this.find(".sflt_mine").click();
+    po.jflt.find(".sflt_li_on").click();
 
 }
 
@@ -322,7 +462,6 @@ function _plan_update_in_month(ele) {
 function _plan_draw_row(jrow, opt, firstDate) {
     var css = {
         "float": "left",
-        "overflow": "hidden",
         "position": "relative"
     };
     // 如果本行包括今天，那么就标记一下
@@ -358,6 +497,11 @@ function _plan_draw_cell(jcell, d) {
     jcell.addClass(d.month % 2 == 0 ? "plan_cell_month_odd" : "plan_cell_month_even");
 }
 
+function plan_on_resize() {
+    var po = _plan_obj(this);
+    _plan_resize_cells(po.opt, po);
+}
+
 function _plan_resize_cells(opt, po) {
     var w = -6 + po.jplan.innerWidth();
     var h = po.jplan.innerHeight();
@@ -375,18 +519,23 @@ function _plan_resize_cells(opt, po) {
 
 /**
  * 根据一个配置字符串，变成一个配置对象
- * <p> 配置字符串的格式为 "rng:7|row:1|off:week|"
+ * <p> 配置字符串的格式为 "rng:7|row:1|mod:week|"
  */
 function plan_opt(str) {
-    var sss = str.split("|");
-    var re = {};
-    for(var i = 0; i < sss.length; i++) {
-        var ss = sss[i].split(":");
-        re[ss[0]] = ss[1];
+    var re = {
+        rng: 7,
+        row: 2,
+        mod: "week",
+        s: "$mine"
+    };
+    // 解析字符串
+    if(str) {
+        var sss = str.split("|");
+        for(var i = 0; i < sss.length; i++) {
+            var ss = sss[i].split(":");
+            re[ss[0]] = ss[1];
+        }
     }
-    // 确认一下参考日期
-    if(!re.date)
-        re.date = z.todaystr();
     return re;
 }
 

@@ -41,6 +41,9 @@ function redrawTasks(tasks) {
 function init_pgan() {
     var pgan = z.pgan() || "";
 
+    // 显示左侧
+    plan_redraw.apply(this, [pgan]);
+
     // 显示右侧列表
     $(".srch_keyword input").val("%(NEW)");
     $(".srch_toptask").click();
@@ -72,4 +75,5 @@ function adjustLayout() {
     });
     $("#tasks .newtask").css("width", this.width * 0.3 - this.scrollbar);
     $(".hierachy").css("height",this.height).each(hierachy_layout);
+    plan_on_resize($("#flt_plan"));
 }

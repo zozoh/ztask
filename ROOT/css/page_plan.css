@@ -43,6 +43,7 @@
 
 .plan_cell {
     border-right: 1px solid #DDD;
+    overflow: hidden;
 }
 
 .plan_cell_month_even .plan_cell_title {
@@ -64,6 +65,12 @@
     float: left;
     font-style: normal;
     color: #888;
+    cursor: pointer;
+}
+
+.plan_cell_title em:hover {
+    color: #00A;
+    text-decoration: underline;
 }
 
 .plan_cell_title i {
@@ -83,6 +90,42 @@
 
 .plan_cell_today .plan_cell_title i {
     color: #FCA;
+}
+
+.plan_cell_drophover {
+    background-color: #FFFFCC;
+}
+
+.plan_cell_drophover .plan_cell_title {
+    background-color: #F0F000;
+}
+
+.plan_cell_drophover .plan_cell_title em, .plan_cell_drophover .plan_cell_title i {
+    font-weight: bold;
+    color: #000;
+    font-size: 16px;
+    -webkit-transition: all 0.1s ease-out 0.1s;
+    -moz-transition: all 0.1s ease-out 0.2s;
+    -o-transition: all 0.1s ease-out 0.1s;
+    transition: all 0.1s ease-out 0.1s;
+}
+
+.plan_cell_pop_outer{
+    padding:18px;
+    width:100%;
+    height:100%;
+}
+
+.plan_cell_pop{
+    padding:18px;
+    width:100%;
+    height:100%;
+    overflow:auto;
+    border:1px dashed #AAA;
+    background-color:#F0F0F0;
+    min-height:80%;
+    border-radius: 10px;
+    box-shadow: 2px 2px 12px #666;
 }
 
 .plan_month {
@@ -195,12 +238,24 @@
     font-size: 12px;
 }
 
+.plan_task_DONE {
+    text-decoration: line-through;
+    opacity: 0.8;
+}
+
 .plan_stack {
     float: left;
 }
 
 .plan_stack .sflt {
     padding: 3px 10px;
+}
+
+.plan_loading {
+    font-size: 10px;
+    padding: 10px;
+    font-weight: bold;
+    color: #CCC;
 }
 
 #tasks, #flt_task {
