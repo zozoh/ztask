@@ -11,6 +11,9 @@
         <a href="#" class="plan_switch_today">${msg['plan.switch.today']}</a>
         <a href="#" class="plan_switch_next"></a>
     </div>
+    <div class="plan_stack">
+        <%@include file="_stack_filter.jsp" %>
+    </div>
     <div class="plan_reload_btn"></div>
     <div class="plan_month"></div>
 </div>

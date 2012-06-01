@@ -25,36 +25,36 @@
     position: absolute;
 }
 
-.plan_row{
-    border-left:3px solid #EEE;
+.plan_row {
+    border-left: 3px solid #EEE;
 }
 
-.plan_row:after{
+.plan_row:after {
     content: "";
-    height:0;
-    width:0;
+    height: 0;
+    width: 0;
     display: block;
     clear: both;
 }
 
-.plan_row_today{
-    border-color:#F80;
+.plan_row_today {
+    border-color: #F80;
 }
 
 .plan_cell {
     border-right: 1px solid #DDD;
 }
 
-.plan_cell_month_even .plan_cell_title{
-    background-color:#EEF0FF;
+.plan_cell_month_even .plan_cell_title {
+    background-color: #EEF0FF;
 }
 
 .plan_cell_title {
     font-weight: bold;
     height: 22px;
     line-height: 20px;
-    padding:0 12px;
-    border-color:#F80;
+    padding: 0 12px;
+    border-color: #F80;
     background-color: #EEE;
     border-top: 1px solid #DDD;
     border-bottom: 1px solid #DDD;
@@ -69,20 +69,20 @@
 .plan_cell_title i {
     float: right;
     font-style: normal;
-    font-size:10px;
-    color:#AAA;
+    font-size: 10px;
+    color: #AAA;
 }
 
-.plan_cell_today .plan_cell_title{
-    background-color:#F80;
+.plan_cell_today .plan_cell_title {
+    background-color: #F80;
 }
 
-.plan_cell_today .plan_cell_title em{
-    color:#FEA;
+.plan_cell_today .plan_cell_title em {
+    color: #FEA;
 }
 
-.plan_cell_today .plan_cell_title i{
-    color:#FCA;
+.plan_cell_today .plan_cell_title i {
+    color: #FCA;
 }
 
 .plan_month {
@@ -125,23 +125,22 @@
     color: #FFF;
 }
 
-.plan_reload_btn{
+.plan_reload_btn {
     position: absolute;
-    top:10px;
-    right:85px;
-    width:32px;
-    height:32px;
+    top: 10px;
+    right: 85px;
+    width: 32px;
+    height: 32px;
     background: #BBB url(pics/icons.png) no-repeat -80px -64px;
     border-radius: 8px 0 0 8px;
     cursor: pointer;
     opacity: 0.8;
 }
 
-.plan_reload_btn:hover{
+.plan_reload_btn:hover {
     opacity: 1.0;
-    background-color:#AAA;
+    background-color: #AAA;
 }
-
 
 .plan_switch {
     position: absolute;
@@ -185,15 +184,23 @@
     background-position: -144px -26px;
 }
 
-.plan_task{
+.plan_task {
     white-space: nowrap;
-    padding:4px 6px;
-    border-bottom:1px dotted #CCC;
-    cursor:default;
+    padding: 4px 6px;
+    border-bottom: 1px dotted #CCC;
+    cursor: default;
 }
 
-.plan_task .task_content{
-    font-size:12px;
+.plan_task .task_content {
+    font-size: 12px;
+}
+
+.plan_stack {
+    float: left;
+}
+
+.plan_stack .sflt {
+    padding: 3px 10px;
 }
 
 #tasks, #flt_task {

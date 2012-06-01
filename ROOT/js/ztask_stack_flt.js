@@ -6,6 +6,13 @@
  *                                          #  this - .sflt 的 jq 对象
  *                                          #  stacks - 任务结果数组
  *                                          #  form - 提交的表单数据
+ *     click : function(e, snames, selection, opt){...}
+ *                                          # 处理标签的点击，这个配置想，将会让 "after" 配置失效
+ *                                          #  this - 被点击的 LI
+ *                                          # e - 事件对象
+ *                                          # snames - 堆栈的名称
+ *                                          # selection - .sflt 的 jq 对象
+ *                                          # opt - 配置对象
  * }
  * </pre>
  *
@@ -40,7 +47,7 @@ function stack_flt_on_dblclick_cus() {
 /**
  * 事件: 点击过滤器标签
  */
-function stack_flt_on_click_li() {
+function stack_flt_on_click_li(e) {
     // 对于自定义堆栈
     var snames = "";
     if($(this).hasClass("sflt_cus")) {
@@ -54,7 +61,7 @@ function stack_flt_on_click_li() {
     $(this).parent().children(".sflt_li_on").removeClass("sflt_li_on");
     $(this).addClass("sflt_li_on");
 
-    stack_flt_do_filter.apply(this);
+    stack_flt_do_filter.apply(this, [e]);
 }
 
 /**
@@ -62,7 +69,7 @@ function stack_flt_on_click_li() {
  *
  * @param this 为 .sflt_cus 的 DOM 对象
  */
-function stack_flt_do_edit_cus() {
+function stack_flt_do_edit_cus(e) {
     z.editIt(this, {
         after: function(newval, oldval) {
             newval = $.trim(newval);
@@ -71,7 +78,7 @@ function stack_flt_do_edit_cus() {
                 this.text(newval).attr("href", "#s" + newval);
             }
             if(this.hasClass("sflt_li_on"))
-                stack_flt_do_filter.apply(this);
+                stack_flt_do_filter.apply(this, [e]);
         }
     });
 }
@@ -81,25 +88,39 @@ function stack_flt_do_edit_cus() {
  *
  * @param this 为选区相关元素
  */
-function stack_flt_do_filter() {
+function stack_flt_do_filter(e) {
     var selection = stack_flt_selection(this);
     var opt = stack_flt_opt(selection);
 
-    if(opt && typeof opt.after == "function") {
+    // 获取被点击的名称
+    var form = stack_flt_get_form(selection);
+
+    // 点击被拦截
+    if(opt && typeof opt.click == "function") {
+        opt.click.apply(this, [e, form, selection, opt]);
+    }
+    // 仅仅声明了回调
+    else if(opt && typeof opt.after == "function") {
         var url = "/ajax/stack/query";
-        var snames = "";
-        if($(".sflt_cus", selection).filter(".sflt_li_on").not(".sflt_cus_undefined").size() > 0) {
-            snames = $(".sflt_cus", selection).text();
-        }
-        var form = {
-            favo: $(".sflt_favo",selection).hasClass("sflt_li_on"),
-            mine: $(".sflt_mine",selection).hasClass("sflt_li_on"),
-            snms: snames
-        };
         ajax.get(url, form, function(re) {
             opt.after.apply(selection, [re.data, form]);
         });
     }
+}
+
+/**
+ * 从选区内根据 .sflt 的 DOM 结构得到一个 obj 作为 form
+ */
+function stack_flt_get_form(selection) {
+    var snames = "";
+    if($(".sflt_cus", selection).filter(".sflt_li_on").not(".sflt_cus_undefined").size() > 0) {
+        snames = $(".sflt_cus", selection).text();
+    }
+    return {
+        favo: $(".sflt_favo",selection).hasClass("sflt_li_on"),
+        mine: $(".sflt_mine",selection).hasClass("sflt_li_on"),
+        snms: snames
+    };
 }
 
 /**

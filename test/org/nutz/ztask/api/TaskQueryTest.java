@@ -12,6 +12,23 @@ import static org.nutz.ztask.api.TaskQuery.*;
 public class TaskQueryTest {
 
 	@Test
+	public void test_by_stack() {
+		TaskQuery tq;
+
+		tq = NEW("S(A,B,$favo)");
+		assertNull(tq.qText());
+		assertNull(tq.qRegex());
+		assertNull(tq.qID());
+		ASTR(tq.qCreaters());
+		ASTR(tq.qOwners());
+		ASTR(tq.qLabels());
+		AD(tq.qTimeScope());
+		AS(tq.qStatus());
+		ASTR(tq.qStacks(), "A", "B", "$favo");
+
+	}
+
+	@Test
 	public void test_by_date_scope() {
 		TaskQuery tq;
 
@@ -24,6 +41,7 @@ public class TaskQueryTest {
 		ASTR(tq.qLabels());
 		AD(tq.qTimeScope(), Lang.array(Times.D("2012-08-21"), Times.D("2012-08-21 23:59:59")));
 		AS(tq.qStatus());
+		ASTR(tq.qStacks());
 
 		tq = NEW("&D(2012-01-09, 2012-05-06)");
 		assertNull(tq.qText());

@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.nutz.castor.Castors;
 import org.nutz.lang.Each;
@@ -951,6 +952,30 @@ public class MongoTaskService extends AbstractMongoService implements TaskServic
 			q.d_gte(tq.getSortBy(), ds[0]);
 			q.d_lte(tq.getSortBy(), ds[1]);
 
+		}
+
+		// 处理 stack
+		if (null != tq.qStacks() && tq.qStacks().length > 0) {
+			Set<String> ss = new HashSet<String>();
+			for (String s : tq.qStacks()) {
+				// 我关注的堆栈
+				if ("$favo".equalsIgnoreCase(s)) {
+					List<TaskStack> list = this.getMyFavoStacks(ZTasks.getMyName());
+					for (TaskStack ts : list)
+						ss.add(ts.getName());
+				}
+				// 属于我的堆栈
+				else if ("$mine".equalsIgnoreCase(s)) {
+					List<TaskStack> list = this.getStacks(false, ZTasks.getMyName());
+					for (TaskStack ts : list)
+						ss.add(ts.getName());
+				}
+				// 仅仅添加
+				else {
+					ss.add(s);
+				}
+			}
+			q.inArray("stack", ss.toArray(new String[ss.size()]));
 		}
 
 		// 处理 owners

@@ -24,6 +24,11 @@ import org.nutz.ztask.util.ZTasks;
  *    '#(A,B,C)'     // 同时具备 A,B,C 三个标签的任务
  *    '#()'          // 没有任何标签
  *    '#(A|B|C)'     // 具备 A,B,C 三个标签中的一个
+ *    
+ * = 按所在堆栈查询 ===============
+ *    'S(A,B,C)'     // 在堆栈 A 或 B 或 C 中
+ *    'S()'          // 任何堆栈
+ *    其中堆栈名支持 $mine 和 $favo 两个变量
  * 
  * = 按周查询 ================
  *    '&W(-1)'    // 前一周
@@ -106,6 +111,13 @@ public class TaskQuery {
 	}
 
 	/**
+	 * @return null 或者空数组表示没有 stack 的限定，否则用一个数组表示一个堆栈名称的列表
+	 */
+	public String[] qStacks() {
+		return _kwd_.stacks;
+	}
+
+	/**
 	 * @return null 表示没有 owner 的限定，否则用一个数组表示 owner 的名字列表
 	 */
 	public String[] qOwners() {
@@ -153,6 +165,8 @@ public class TaskQuery {
 		private String[] labels;
 
 		private boolean labelsOr;
+
+		private String[] stacks;
 
 		private String[] owners;
 
@@ -227,6 +241,14 @@ public class TaskQuery {
 						labelsOr = false;
 						labels = Strings.splitIgnoreBlank(re[2], "[ \t\n\r,]");
 					}
+				}
+			}
+
+			// 统计: stack
+			if (text.length() > 0) {
+				re = find("([S|s][(])([^)]*)([)])");
+				if (null != re) {
+					stacks = Strings.splitIgnoreBlank(re[2], "[ \t\n\r,]");
 				}
 			}
 

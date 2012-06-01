@@ -5,9 +5,6 @@
  * @param selection : .plan_main , jq 对象，表绘制滚动日期的选区，内必有 .plan_scroller 作为滚动器
  */
 function plan_events_bind(selection) {
-    var a = $(".plan_range_hlt", this);
-    var str = a.attr("href").substring(1);
-    plan_redraw.apply(this, [str]);
     // 绑定事件
     this.delegate(".plan_range a", "click", plan_on_change_range);
     this.delegate(".plan_switch_prev", "click", plan_on_switch_prev);
@@ -15,6 +12,20 @@ function plan_events_bind(selection) {
     this.delegate(".plan_switch_next", "click", plan_on_switch_next);
     this.delegate(".plan_reload_btn", "click", plan_on_reload);
     selection.delegate(".plan_task", "click", plan_on_task_click);
+
+    // 初始化自己的 .sflt 部分
+    stack_flt_bind(this.find(".sflt"), {
+        click: function(e, form) {
+            var po = _plan_obj(this);
+            po.jscroller.find(".plan_row_in").removeClass("plan_row_loaded");
+            _plan_reload_row_in(po, true);
+        }
+    });
+
+    // 开始重绘
+    var a = $(".plan_range_hlt", this);
+    var str = a.attr("href").substring(1);
+    plan_redraw.apply(this, [str]);
 }
 
 /**
@@ -22,7 +33,7 @@ function plan_events_bind(selection) {
  */
 function plan_on_task_click(e) {
     var input = $("#flt_task .srch_keyword input");
-    if(input.size()>0){
+    if(input.size() > 0) {
         input.val($(this).attr("task-id"));
         $("#flt_task .srch_do").click();
     }
@@ -123,13 +134,20 @@ function plan_on_change_range() {
 function plan_on_reload() {
     var po = _plan_obj(this);
     po.jscroller.find(".plan_row_in").removeClass("plan_row_loaded");
-    _plan_reload_row_in(po);
+    _plan_reload_row_in(po, true);
 }
 
 /**
  * 本函数，根据当前被标记了 .plan_row_in 的单元格
+ * @param po - 相关对象
+ * @param force - 强制刷新全部
  */
-function _plan_reload_row_in(po) {
+function _plan_reload_row_in(po, force) {
+    // 如果强制更新的话，那么重新加载全部个子
+    if(force)
+        po.jplan.find(".plan_row_loaded").removeClass("plan_row_loaded");
+
+    // 确定行
     var jRows = po.jplan.find(".plan_row").not(".plan_row_loaded");
     if(jRows.size() == 0)
         return;
@@ -145,6 +163,14 @@ function _plan_reload_row_in(po) {
     kwd += "&D(" + d0 + "," + d1 + ")";
 
     // 准备其他条件
+    var sform = stack_flt_get_form(po.jflt.find(".sflt"));
+    if(sform.favo) {
+        kwd += " S($favo)";
+    } else if(sform.mine) {
+        kwd += " S($mine)";
+    } else if(sform.snms) {
+        kwd += " S(" + sform.snms + ")";
+    }
 
     // 获取
     var form = {
@@ -252,14 +278,15 @@ function plan_redraw(str) {
         _plan_draw_row(rowDiv, opt, rowFirstDate);
     }
 
-    // 加载数据
-    _plan_reload_row_in(po);
-
     // 显示当前月
     _plan_update_in_month(po.jplan);
 
     // 重新改变尺寸大小
     _plan_resize_cells(opt, po);
+
+    // 默认显示属于我的
+    this.find(".sflt_mine").click();
+
 }
 
 /**

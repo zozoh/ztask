@@ -8,8 +8,10 @@
 <script language="JavaScript" src="${rs}/js/ztask_task_events.js"></script>
 <script language="JavaScript" src="${rs}/js/ztask_task_newer.js"></script>
 <script language="JavaScript" src="${rs}/js/ztask_task_search.js"></script>
+<script language="JavaScript" src="${rs}/js/ztask_stack_flt.js"></script>
 
 <link rel="stylesheet" type="text/css" href="${rs}/css/ztask_newer.css"/>
+<link rel="stylesheet" type="text/css" href="${rs}/css/ztask_stack_flt.css"/>
 <link rel="stylesheet" type="text/css" href="${rs}/css/ztask_task_search.css"/>
 <link rel="stylesheet" type="text/css" href="${rs}/css/page_plan.css"/>
 
