@@ -152,7 +152,7 @@ public class Moo extends MoChain {
 	 *            数值
 	 * @return 新节点
 	 */
-	public Moo gte(String field, long n) {
+	public Moo gte(String field, Number n) {
 		return append(field, Mongos.dbo("$gte", n));
 	}
 
@@ -165,7 +165,7 @@ public class Moo extends MoChain {
 	 *            数值
 	 * @return 新节点
 	 */
-	public Moo gt(String field, long n) {
+	public Moo gt(String field, Number n) {
 		return append(field, Mongos.dbo("$gt", n));
 	}
 
@@ -200,7 +200,7 @@ public class Moo extends MoChain {
 	 *            数值
 	 * @return 新节点
 	 */
-	public Moo lte(String field, long n) {
+	public Moo lte(String field, Number n) {
 		return append(field, Mongos.dbo("$lte", n));
 	}
 
@@ -213,7 +213,7 @@ public class Moo extends MoChain {
 	 *            数值
 	 * @return 新节点
 	 */
-	public Moo lt(String field, long n) {
+	public Moo lt(String field, Number n) {
 		return append(field, Mongos.dbo("$lt", n));
 	}
 
@@ -622,7 +622,7 @@ public class Moo extends MoChain {
 	 *            值
 	 * @return 链表对象
 	 */
-	public static Moo GTE(String field, long n) {
+	public static Moo GTE(String field, Number n) {
 		return NEW().gte(field, n);
 	}
 
@@ -635,7 +635,7 @@ public class Moo extends MoChain {
 	 *            值
 	 * @return 链表对象
 	 */
-	public static Moo GT(String field, long n) {
+	public static Moo GT(String field, Number n) {
 		return NEW().gt(field, n);
 	}
 
@@ -648,7 +648,7 @@ public class Moo extends MoChain {
 	 *            值
 	 * @return 链表对象
 	 */
-	public static Moo LTE(String field, long n) {
+	public static Moo LTE(String field, Number n) {
 		return NEW().lte(field, n);
 	}
 
@@ -661,7 +661,7 @@ public class Moo extends MoChain {
 	 *            值
 	 * @return 链表对象
 	 */
-	public static Moo LT(String field, long n) {
+	public static Moo LT(String field, Number n) {
 		return NEW().lt(field, n);
 	}
 
