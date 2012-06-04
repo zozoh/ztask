@@ -110,14 +110,29 @@ public class MongoDao {
 	 * @return 保存后的对象，如果为 null，表示集合不存在，保存失败
 	 */
 	public <T extends Object> T save(T obj) {
-		MongoEntity moe = Mongos.entity(obj);
-		String collName = moe.getCollectionName(obj);
+		return save(obj, Mongos.entity(obj).getCollectionName(obj));
+	}
+
+	/**
+	 * 指定colnm，保存对象。
+	 * 
+	 * @param <T>
+	 * @param obj
+	 *            对象
+	 * @param collName
+	 *            集合名称
+	 * @return
+	 */
+	public <T extends Object> T save(T obj, String collName) {
 		if (db.collectionExists(collName)) {
+			MongoEntity moe = Mongos.entity(obj);
 			moe.fillIdIfNoexits(obj);
 			DBObject dbo = moe.toDBObject(obj);
 			DBCollection coll = db.getCollection(collName);
 			coll.save(dbo);
 			return obj;
+		} else {
+			// TODO 为么不建立个集合然后插入来？？？
 		}
 		return null;
 	}
